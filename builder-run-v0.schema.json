@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdu-research.local/schema/builder-run-v0.schema.json",
+  "title": "GDU Builder v0 reproducible run configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "source",
+    "contracts",
+    "adapter",
+    "model_identity",
+    "output_dir",
+    "limits",
+    "checkpoint_source_requests"
+  ],
+  "properties": {
+    "run_id": { "$ref": "#/$defs/id" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "pdf", "pdf_sha256", "extracted_text", "extracted_text_sha256"],
+      "properties": {
+        "document_id": { "$ref": "#/$defs/id" },
+        "pdf": { "$ref": "#/$defs/safePath" },
+        "pdf_sha256": { "$ref": "#/$defs/sha256" },
+        "extracted_text": { "$ref": "#/$defs/safePath" },
+        "extracted_text_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gdu_schema", "gdu_schema_sha256", "build_log_schema", "build_log_schema_sha256", "protocol", "protocol_name", "protocol_version", "protocol_sha256"],
+      "properties": {
+        "gdu_schema": { "$ref": "#/$defs/safePath" },
+        "gdu_schema_sha256": { "$ref": "#/$defs/sha256" },
+        "build_log_schema": { "$ref": "#/$defs/safePath" },
+        "build_log_schema_sha256": { "$ref": "#/$defs/sha256" },
+        "protocol": { "$ref": "#/$defs/safePath" },
+        "protocol_name": { "$ref": "#/$defs/nonEmptyString" },
+        "protocol_version": { "$ref": "#/$defs/nonEmptyString" },
+        "protocol_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "fixture_gdu", "fixture_gdu_sha256", "strict_source_fragments"],
+      "properties": {
+        "kind": { "const": "gdu_fixture" },
+        "fixture_gdu": { "$ref": "#/$defs/safePath" },
+        "fixture_gdu_sha256": { "$ref": "#/$defs/sha256" },
+        "strict_source_fragments": { "const": true }
+      }
+    },
+    "model_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "reasoning_effort", "config_or_prompt_sha256"],
+      "properties": {
+        "model_id": { "$ref": "#/$defs/nonEmptyString" },
+        "reasoning_effort": { "$ref": "#/$defs/nonEmptyString" },
+        "config_or_prompt_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "output_dir": { "$ref": "#/$defs/safePath" },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_semantic_corrections", "max_technical_retries", "single_builder", "external_knowledge_allowed"],
+      "properties": {
+        "max_semantic_corrections": { "const": 2 },
+        "max_technical_retries": { "const": 1 },
+        "single_builder": { "const": true },
+        "external_knowledge_allowed": { "const": false }
+      }
+    },
+    "checkpoint_source_requests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cp1", "cp2", "cp3", "cp4", "cp5", "cp6"],
+      "properties": {
+        "cp1": { "$ref": "#/$defs/sourceRequest" },
+        "cp2": { "$ref": "#/$defs/sourceRequest" },
+        "cp3": { "$ref": "#/$defs/sourceRequest" },
+        "cp4": { "$ref": "#/$defs/sourceRequest" },
+        "cp5": { "$ref": "#/$defs/sourceRequest" },
+        "cp6": { "$ref": "#/$defs/sourceRequest" }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "safePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"
+    },
+    "pageRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 1 },
+        "end": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sourceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["purpose", "page_ranges", "modalities", "locator_hints"],
+      "properties": {
+        "purpose": { "$ref": "#/$defs/nonEmptyString" },
+        "page_ranges": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/pageRange" }
+        },
+        "modalities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "const": "text" }
+        },
+        "locator_hints": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    }
+  }
+}

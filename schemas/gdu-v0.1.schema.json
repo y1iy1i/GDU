@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:gdu:schema:v0.1",
+  "title": "Generative Document Understanding Unit v0.1",
+  "description": "Canonical, provenance-aware representation shared by human and agent views.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest",
+    "source_units",
+    "claims",
+    "evidence_links",
+    "document_model",
+    "views"
+  ],
+  "properties": {
+    "manifest": { "$ref": "#/$defs/manifest" },
+    "source_units": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source_unit" },
+      "minItems": 1
+    },
+    "claims": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/claim" },
+      "minItems": 1
+    },
+    "evidence_links": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence_link" },
+      "minItems": 1
+    },
+    "document_model": { "$ref": "#/$defs/document_model" },
+    "views": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/view" }
+    }
+  },
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+    },
+    "id_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" },
+      "uniqueItems": true
+    },
+    "non_empty_id_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gdu_id",
+        "schema_version",
+        "gdu_version",
+        "created_at",
+        "source_document",
+        "build"
+      ],
+      "properties": {
+        "gdu_id": { "$ref": "#/$defs/id" },
+        "schema_version": { "const": "0.1" },
+        "gdu_version": { "$ref": "#/$defs/non_empty_string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "source_document": { "$ref": "#/$defs/source_document" },
+        "build": { "$ref": "#/$defs/build" }
+      }
+    },
+    "source_document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_id",
+        "content_sha256",
+        "title",
+        "document_type",
+        "language",
+        "page_count"
+      ],
+      "properties": {
+        "document_id": { "$ref": "#/$defs/id" },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        },
+        "title": { "$ref": "#/$defs/non_empty_string" },
+        "document_type": { "$ref": "#/$defs/non_empty_string" },
+        "language": { "$ref": "#/$defs/non_empty_string" },
+        "page_count": { "type": "integer", "minimum": 1 },
+        "source_path": { "type": "string" }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "generator", "input_versions"],
+      "properties": {
+        "method": { "$ref": "#/$defs/non_empty_string" },
+        "generator": { "$ref": "#/$defs/non_empty_string" },
+        "model": { "type": ["string", "null"] },
+        "prompt_version": { "type": ["string", "null"] },
+        "input_versions": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "source_unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_unit_id",
+        "unit_type",
+        "page_start",
+        "page_end"
+      ],
+      "properties": {
+        "source_unit_id": { "$ref": "#/$defs/id" },
+        "unit_type": {
+          "enum": ["chunk", "table", "figure", "heading", "page_region"]
+        },
+        "page_start": { "type": "integer", "minimum": 1 },
+        "page_end": { "type": "integer", "minimum": 1 },
+        "chunk_id": { "type": ["string", "null"] },
+        "section_path": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "text": { "type": ["string", "null"] },
+        "char_start": { "type": ["integer", "null"], "minimum": 0 },
+        "char_end": { "type": ["integer", "null"], "minimum": 0 },
+        "table_cells": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "bbox": {
+          "type": ["array", "null"],
+          "prefixItems": [
+            { "type": "number" },
+            { "type": "number" },
+            { "type": "number" },
+            { "type": "number" }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "claim_type",
+        "text",
+        "epistemic_status",
+        "confidence",
+        "rationale",
+        "alternative_claim_ids",
+        "review_status"
+      ],
+      "properties": {
+        "claim_id": { "$ref": "#/$defs/id" },
+        "claim_type": {
+          "enum": [
+            "fact",
+            "main_idea",
+            "purpose",
+            "section_function",
+            "relation",
+            "constraint",
+            "genre_deviation"
+          ]
+        },
+        "text": { "$ref": "#/$defs/non_empty_string" },
+        "epistemic_status": {
+          "enum": ["explicit", "entailed", "inferred", "hypothesis"]
+        },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "rationale": { "type": "string" },
+        "alternative_claim_ids": { "$ref": "#/$defs/id_list" },
+        "review_status": {
+          "enum": ["unreviewed", "accepted", "rejected", "needs_revision"]
+        }
+      }
+    },
+    "evidence_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_link_id",
+        "claim_id",
+        "source_unit_ids",
+        "role",
+        "support_mode",
+        "individually_sufficient",
+        "explanation",
+        "review_status"
+      ],
+      "properties": {
+        "evidence_link_id": { "$ref": "#/$defs/id" },
+        "claim_id": { "$ref": "#/$defs/id" },
+        "source_unit_ids": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "role": {
+          "enum": ["supports", "contradicts", "qualifies", "contextualizes"]
+        },
+        "support_mode": {
+          "enum": ["direct", "multi_source_inference", "structural_signal", "genre_prior"]
+        },
+        "individually_sufficient": { "type": "boolean" },
+        "explanation": { "$ref": "#/$defs/non_empty_string" },
+        "review_status": {
+          "enum": ["unreviewed", "accepted", "rejected", "needs_revision"]
+        }
+      }
+    },
+    "document_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "purpose_claim_ids",
+        "main_idea_claim_ids",
+        "audience",
+        "constraint_claim_ids",
+        "genre_prior",
+        "document_specific_choices",
+        "sections",
+        "relations"
+      ],
+      "properties": {
+        "purpose_claim_ids": { "$ref": "#/$defs/non_empty_id_list" },
+        "main_idea_claim_ids": { "$ref": "#/$defs/non_empty_id_list" },
+        "audience": { "$ref": "#/$defs/audience" },
+        "constraint_claim_ids": { "$ref": "#/$defs/id_list" },
+        "genre_prior": { "$ref": "#/$defs/genre_prior" },
+        "document_specific_choices": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/document_specific_choice" }
+        },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/section" },
+          "minItems": 1
+        },
+        "relations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relation" }
+        }
+      }
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["descriptions", "assumed_knowledge", "confidence", "rationale"],
+      "properties": {
+        "descriptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "assumed_knowledge": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "rationale": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "genre_prior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["genre", "conventions", "source_description"],
+      "properties": {
+        "genre": { "$ref": "#/$defs/non_empty_string" },
+        "conventions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "source_description": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "document_specific_choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["choice_id", "claim_id", "relationship_to_prior"],
+      "properties": {
+        "choice_id": { "$ref": "#/$defs/id" },
+        "claim_id": { "$ref": "#/$defs/id" },
+        "relationship_to_prior": {
+          "enum": ["follows", "deviates", "recombines", "unknown"]
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section_id",
+        "title",
+        "parent_section_id",
+        "order",
+        "boundary_origin",
+        "source_unit_ids",
+        "summary",
+        "function_claim_ids",
+        "boundary_rationale"
+      ],
+      "properties": {
+        "section_id": { "$ref": "#/$defs/id" },
+        "title": { "$ref": "#/$defs/non_empty_string" },
+        "parent_section_id": { "type": ["string", "null"] },
+        "order": { "type": "integer", "minimum": 0 },
+        "boundary_origin": { "enum": ["explicit", "inferred"] },
+        "source_unit_ids": { "$ref": "#/$defs/id_list" },
+        "summary": { "$ref": "#/$defs/non_empty_string" },
+        "function_claim_ids": { "$ref": "#/$defs/id_list" },
+        "boundary_rationale": { "type": "string" }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relation_id",
+        "source_id",
+        "target_id",
+        "relation_type",
+        "claim_id",
+        "confidence",
+        "rationale"
+      ],
+      "properties": {
+        "relation_id": { "$ref": "#/$defs/id" },
+        "source_id": { "$ref": "#/$defs/id" },
+        "target_id": { "$ref": "#/$defs/id" },
+        "relation_type": {
+          "enum": [
+            "elaborates",
+            "supports",
+            "qualifies",
+            "contrasts",
+            "causes",
+            "motivates",
+            "defines",
+            "uses",
+            "precedes",
+            "resolves",
+            "exemplifies",
+            "same_topic"
+          ]
+        },
+        "claim_id": { "$ref": "#/$defs/id" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "rationale": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "view": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["view_id", "view_type", "derived_from_ids", "artifact_path"],
+      "properties": {
+        "view_id": { "$ref": "#/$defs/id" },
+        "view_type": {
+          "enum": ["agent_view", "human_view", "reconstruction_plan", "question_view"]
+        },
+        "derived_from_ids": { "$ref": "#/$defs/id_list" },
+        "artifact_path": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

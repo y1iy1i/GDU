@@ -1,0 +1,76 @@
+{
+  "run_id": "pilot03-fixed-fixture-replay-v0",
+  "source": {
+    "document_id": "litong-2025-annual-report",
+    "pdf": "research_inputs/pilot_03_litong_2025/paper.pdf",
+    "pdf_sha256": "fbb9875c7eca1f921ca0635cabbe53727b7ff57658750fa0eeefd92402730c59",
+    "extracted_text": "research_inputs/pilot_03_litong_2025/paper.txt",
+    "extracted_text_sha256": "d3258943647ba57408471fd43ece8d52415e75ec4f39df16c63861d4af450c9a"
+  },
+  "contracts": {
+    "gdu_schema": "gdu.schema.json",
+    "gdu_schema_sha256": "9a4384dd92e32a8bc8572c7776ac7a3b26ac9198eb54c8ae1b90e62c0c17692f",
+    "build_log_schema": "build_log.schema.json",
+    "build_log_schema_sha256": "204ed7e9bd6302753f3eecc5343bbaf1a473f2d2bf8a3b4694630aea8f4ec593",
+    "protocol": "BUILDER_PROTOCOL_V2.md",
+    "protocol_name": "gdu-builder-protocol",
+    "protocol_version": "v2",
+    "protocol_sha256": "072d827ea6b8cba103af6ffbd3767a4094fc2f4825e51dedc8d921fa513be041"
+  },
+  "adapter": {
+    "kind": "gdu_fixture",
+    "fixture_gdu": "gdu.example.json",
+    "fixture_gdu_sha256": "7f80577ff0cf3df838778ba4ff9ed1d23b5bdc645be7030bb895e64ca0145492",
+    "strict_source_fragments": true
+  },
+  "model_identity": {
+    "model_id": "fixed-gdu-fixture-v0",
+    "reasoning_effort": "not_applicable",
+    "config_or_prompt_sha256": "072d827ea6b8cba103af6ffbd3767a4094fc2f4825e51dedc8d921fa513be041"
+  },
+  "output_dir": "tmp/builder_cli_pilot03_output",
+  "limits": {
+    "max_semantic_corrections": 2,
+    "max_technical_retries": 1,
+    "single_builder": true,
+    "external_knowledge_allowed": false
+  },
+  "checkpoint_source_requests": {
+    "cp1": {
+      "purpose": "Ground document structure and registered fixture evidence.",
+      "page_ranges": [{"start": 1, "end": 1}, {"start": 8, "end": 9}, {"start": 11, "end": 11}],
+      "modalities": ["text"],
+      "locator_hints": ["cover", "financial highlights", "non-recurring items"]
+    },
+    "cp2": {
+      "purpose": "Ground semantic unit and assertion candidates.",
+      "page_ranges": [{"start": 1, "end": 1}, {"start": 8, "end": 9}, {"start": 11, "end": 11}],
+      "modalities": ["text"],
+      "locator_hints": ["profit", "deducted profit", "non-recurring total"]
+    },
+    "cp3": {
+      "purpose": "Check whether supported interpretation alternatives exist.",
+      "page_ranges": [{"start": 1, "end": 1}, {"start": 8, "end": 9}, {"start": 11, "end": 11}],
+      "modalities": ["text"],
+      "locator_hints": []
+    },
+    "cp4": {
+      "purpose": "Ground registered assertion relations.",
+      "page_ranges": [{"start": 1, "end": 1}, {"start": 8, "end": 9}, {"start": 11, "end": 11}],
+      "modalities": ["text"],
+      "locator_hints": ["composition", "support", "limit"]
+    },
+    "cp5": {
+      "purpose": "Check the generative plan against grounded objects.",
+      "page_ranges": [{"start": 1, "end": 1}, {"start": 8, "end": 9}, {"start": 11, "end": 11}],
+      "modalities": ["text"],
+      "locator_hints": []
+    },
+    "cp6": {
+      "purpose": "Run the registered coverage, evidence, stability, carrier, section, and negative-boundary checks.",
+      "page_ranges": [{"start": 1, "end": 1}, {"start": 8, "end": 9}, {"start": 11, "end": 11}],
+      "modalities": ["text"],
+      "locator_hints": []
+    }
+  }
+}

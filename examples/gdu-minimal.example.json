@@ -1,0 +1,150 @@
+{
+  "manifest": {
+    "gdu_id": "gdu.demo.v1",
+    "schema_version": "0.1",
+    "gdu_version": "1",
+    "created_at": "2026-08-14T12:00:00+08:00",
+    "source_document": {
+      "document_id": "doc.demo",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "title": "最小示例文档",
+      "document_type": "demonstration",
+      "language": "zh-CN",
+      "page_count": 1,
+      "source_path": ""
+    },
+    "build": {
+      "method": "manual-example",
+      "generator": "human",
+      "model": null,
+      "prompt_version": null,
+      "input_versions": {
+        "chunks": "demo-v1"
+      }
+    }
+  },
+  "source_units": [
+    {
+      "source_unit_id": "src.demo.1",
+      "unit_type": "chunk",
+      "page_start": 1,
+      "page_end": 1,
+      "chunk_id": "chunk.demo.1",
+      "section_path": ["说明"],
+      "text": "本文用于演示GDU的最小合法结构。",
+      "char_start": 0,
+      "char_end": 18,
+      "table_cells": [],
+      "bbox": null
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "claim.demo.purpose",
+      "claim_type": "purpose",
+      "text": "该文档用于演示GDU结构。",
+      "epistemic_status": "explicit",
+      "confidence": 1.0,
+      "rationale": "原文直接说明用途。",
+      "alternative_claim_ids": [],
+      "review_status": "accepted"
+    },
+    {
+      "claim_id": "claim.demo.function",
+      "claim_type": "section_function",
+      "text": "说明章节承担定义示例用途的功能。",
+      "epistemic_status": "entailed",
+      "confidence": 0.95,
+      "rationale": "章节唯一内容是声明示例用途。",
+      "alternative_claim_ids": [],
+      "review_status": "accepted"
+    },
+    {
+      "claim_id": "claim.demo.main",
+      "claim_type": "main_idea",
+      "text": "GDU示例必须以最小结构展示其用途。",
+      "epistemic_status": "entailed",
+      "confidence": 0.9,
+      "rationale": "原文把最小结构与演示用途直接联系起来。",
+      "alternative_claim_ids": [],
+      "review_status": "accepted"
+    }
+  ],
+  "evidence_links": [
+    {
+      "evidence_link_id": "evidence.demo.1",
+      "claim_id": "claim.demo.purpose",
+      "source_unit_ids": ["src.demo.1"],
+      "role": "supports",
+      "support_mode": "direct",
+      "individually_sufficient": true,
+      "explanation": "原文直接陈述文档用途。",
+      "review_status": "accepted"
+    },
+    {
+      "evidence_link_id": "evidence.demo.2",
+      "claim_id": "claim.demo.function",
+      "source_unit_ids": ["src.demo.1"],
+      "role": "supports",
+      "support_mode": "structural_signal",
+      "individually_sufficient": true,
+      "explanation": "章节标题和唯一内容共同表明其功能。",
+      "review_status": "accepted"
+    },
+    {
+      "evidence_link_id": "evidence.demo.3",
+      "claim_id": "claim.demo.main",
+      "source_unit_ids": ["src.demo.1"],
+      "role": "supports",
+      "support_mode": "direct",
+      "individually_sufficient": true,
+      "explanation": "原文直接说明最小结构与演示用途。",
+      "review_status": "accepted"
+    }
+  ],
+  "document_model": {
+    "purpose_claim_ids": ["claim.demo.purpose"],
+    "main_idea_claim_ids": ["claim.demo.main"],
+    "audience": {
+      "descriptions": ["GDU实现者"],
+      "assumed_knowledge": ["JSON基础"],
+      "confidence": 0.8,
+      "rationale": "示例服务于Schema实现和验证。"
+    },
+    "constraint_claim_ids": [],
+    "genre_prior": {
+      "genre": "schema demonstration",
+      "conventions": ["内容最小化", "字段完整"],
+      "source_description": "项目内人工定义的示例约定。"
+    },
+    "document_specific_choices": [],
+    "sections": [
+      {
+        "section_id": "section.demo.1",
+        "title": "说明",
+        "parent_section_id": null,
+        "order": 0,
+        "boundary_origin": "explicit",
+        "source_unit_ids": ["src.demo.1"],
+        "summary": "说明示例的用途。",
+        "function_claim_ids": ["claim.demo.function"],
+        "boundary_rationale": "原文包含显式标题。"
+      }
+    ],
+    "relations": []
+  },
+  "views": [
+    {
+      "view_id": "view.demo.agent",
+      "view_type": "agent_view",
+      "derived_from_ids": ["claim.demo.purpose", "section.demo.1"],
+      "artifact_path": null
+    },
+    {
+      "view_id": "view.demo.human",
+      "view_type": "human_view",
+      "derived_from_ids": ["claim.demo.purpose", "claim.demo.main", "claim.demo.function", "section.demo.1"],
+      "artifact_path": null
+    }
+  ]
+}

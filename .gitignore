@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.env*
+
+# Generated local artifacts and copied data stay out of source control.
+artifacts/
+data/
+tmp/
+research_inputs/**/paper.pdf
+research_inputs/**/paper.txt

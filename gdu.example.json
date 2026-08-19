@@ -1,0 +1,291 @@
+{
+  "manifest": {
+    "gdu_identity": {
+      "gdu_id": "gdu-example-litong-profit-v0",
+      "schema_version": "gdu-v0",
+      "artifact_version": "0.1.0-example",
+      "status": "provisional",
+      "built_at": "2026-08-19T15:45:52+08:00"
+    },
+    "source_identity": {
+      "document_id": "litong-2025-annual-report",
+      "title": "江苏利通电子股份有限公司2025年年度报告",
+      "language": "zh-CN",
+      "document_type": "上市公司年度报告",
+      "original_filename": "paper.pdf",
+      "source_sha256": "fbb9875c7eca1f921ca0635cabbe53727b7ff57658750fa0eeefd92402730c59",
+      "pdf_page_count": 237,
+      "extracted_text_sha256": "d3258943647ba57408471fd43ece8d52415e75ec4f39df16c63861d4af450c9a",
+      "extraction_system": "Pilot 03 workspace-local PDF extraction; exact dependency version not observable"
+    },
+    "build_identity": {
+      "protocol_name": "gdu-builder-protocol",
+      "protocol_version": "v2",
+      "protocol_sha256": "072d827ea6b8cba103af6ffbd3767a4094fc2f4825e51dedc8d921fa513be041",
+      "model_id": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "config_or_prompt_sha256": "072d827ea6b8cba103af6ffbd3767a4094fc2f4825e51dedc8d921fa513be041",
+      "build_log_ref": "pilot03-human-normalization-example"
+    }
+  },
+  "physical_structure": [
+    {
+      "id": "PS-001",
+      "parent_ref": null,
+      "node_type": "document",
+      "original_label": "江苏利通电子股份有限公司2025年年度报告",
+      "order": 1,
+      "page_range": {
+        "start": 1,
+        "end": 237
+      },
+      "evidence_refs": ["E-001"]
+    },
+    {
+      "id": "PS-002",
+      "parent_ref": "PS-001",
+      "node_type": "section",
+      "original_label": "第二节 公司简介和主要财务指标",
+      "order": 2,
+      "page_range": {
+        "start": 8,
+        "end": 12
+      },
+      "evidence_refs": ["E-004"],
+      "observation_note": "本极小实例只展开其中与2025年利润及非经常性损益有关的连续范围。"
+    }
+  ],
+  "semantic_units": [
+    {
+      "id": "U-001",
+      "physical_structure_refs": ["PS-002"],
+      "evidence_refs": ["E-002", "E-003"],
+      "summary": "并列披露归母净利润、扣非归母净利润和非经常性损益合计，使读者能够区分利润总量与非经常部分。",
+      "primary_function_ref": "A-006",
+      "secondary_function_refs": []
+    }
+  ],
+  "assertions": {
+    "items": [
+      {
+        "id": "A-001",
+        "kind": "content",
+        "statement": "公司2025年归属于上市公司股东的净利润为292,589,095.99元。",
+        "semantic_unit_refs": ["U-001"],
+        "epistemic_origin": "source_attributed",
+        "assessment_complete": true,
+        "evidence_status": "supported",
+        "evidence_refs": ["E-002"],
+        "rationale": "年报主要会计数据表直接列示该金额。",
+        "actor": "江苏利通电子股份有限公司",
+        "attribution_mode": "explicit"
+      },
+      {
+        "id": "A-002",
+        "kind": "content",
+        "statement": "公司2025年归属于上市公司股东的扣除非经常性损益后的净利润为235,942,443.22元。",
+        "semantic_unit_refs": ["U-001"],
+        "epistemic_origin": "source_attributed",
+        "assessment_complete": true,
+        "evidence_status": "supported",
+        "evidence_refs": ["E-002"],
+        "rationale": "年报主要会计数据表直接列示该金额。",
+        "actor": "江苏利通电子股份有限公司",
+        "attribution_mode": "explicit"
+      },
+      {
+        "id": "A-003",
+        "kind": "content",
+        "statement": "公司2025年非经常性损益合计为56,646,652.77元。",
+        "semantic_unit_refs": ["U-001"],
+        "epistemic_origin": "source_attributed",
+        "assessment_complete": true,
+        "evidence_status": "supported",
+        "evidence_refs": ["E-003"],
+        "rationale": "年报非经常性损益表直接列示合计金额。",
+        "actor": "江苏利通电子股份有限公司",
+        "attribution_mode": "explicit"
+      },
+      {
+        "id": "A-004",
+        "kind": "content",
+        "statement": "2025年非经常性损益约占归母净利润的19.36%。",
+        "semantic_unit_refs": ["U-001"],
+        "epistemic_origin": "derived",
+        "assessment_complete": true,
+        "evidence_status": "supported",
+        "evidence_refs": ["E-002", "E-003"],
+        "rationale": "输入金额均已由原文证据接地，计算为确定性除法。",
+        "input_assertion_refs": ["A-003", "A-001"],
+        "formula": "56,646,652.77 / 292,589,095.99 * 100%",
+        "calculation_notes": "未舍入结果约19.360480%，四舍五入到小数点后两位。"
+      },
+      {
+        "id": "A-005",
+        "kind": "constraint",
+        "statement": "不能把2025年归母净利润全部解释为经常性经营成果。",
+        "semantic_unit_refs": ["U-001"],
+        "epistemic_origin": "analytic_interpretation",
+        "assessment_complete": true,
+        "evidence_status": "supported",
+        "evidence_refs": ["E-002", "E-003"],
+        "rationale": "归母净利润中约19.36%被报告划分为非经常性损益，而扣非净利润另有明确口径。",
+        "basis_assertion_refs": ["A-001", "A-002", "A-003", "A-004"]
+      },
+      {
+        "id": "A-006",
+        "kind": "function",
+        "statement": "本单元通过并列利润口径和计算非经常性占比，限制读者把归母净利润直接等同于经常性经营成果。",
+        "semantic_unit_refs": ["U-001"],
+        "epistemic_origin": "analytic_interpretation",
+        "assessment_complete": true,
+        "evidence_status": "supported",
+        "evidence_refs": ["E-002", "E-003"],
+        "rationale": "该连续范围不仅报告利润总量，还专门披露扣非口径与非经常性损益明细。",
+        "basis_assertion_refs": ["A-001", "A-002", "A-003", "A-004", "A-005"],
+        "function_tag": "constrain"
+      }
+    ],
+    "interpretation_groups": []
+  },
+  "relations": [
+    {
+      "id": "R-001",
+      "endpoint_level": "assertion",
+      "from_ref": "A-003",
+      "to_ref": "A-001",
+      "relation_type": "composes",
+      "description": "非经常性损益是归母净利润与扣非归母净利润之间的组成差额。",
+      "epistemic_origin": "source_attributed",
+      "assessment_complete": true,
+      "evidence_status": "supported",
+      "evidence_refs": ["E-002", "E-003"],
+      "rationale": "A-002与A-003之和恰等于A-001，且三个金额由同一年度报告口径披露。",
+      "actor": "江苏利通电子股份有限公司",
+      "attribution_mode": "entailed"
+    },
+    {
+      "id": "R-002",
+      "endpoint_level": "assertion",
+      "from_ref": "A-004",
+      "to_ref": "A-005",
+      "relation_type": "supports",
+      "description": "计算出的非经常性占比支持对归母净利润口径施加解释限制。",
+      "epistemic_origin": "analytic_interpretation",
+      "assessment_complete": true,
+      "evidence_status": "supported",
+      "evidence_refs": ["E-002", "E-003"],
+      "rationale": "19.36%不是可忽略的零值，因此总净利润与经常性经营成果不能无条件画等号。",
+      "basis_assertion_refs": ["A-001", "A-002", "A-003", "A-004"]
+    },
+    {
+      "id": "R-003",
+      "endpoint_level": "assertion",
+      "from_ref": "A-005",
+      "to_ref": "A-001",
+      "relation_type": "limits",
+      "description": "A-005限定A-001可以支持的经营质量解释范围。",
+      "epistemic_origin": "analytic_interpretation",
+      "assessment_complete": true,
+      "evidence_status": "supported",
+      "evidence_refs": ["E-002", "E-003"],
+      "rationale": "A-001的金额真实成立，但仅凭该金额不能判断其中全部来自经常性经营活动。",
+      "basis_assertion_refs": ["A-001", "A-002", "A-003", "A-004", "A-005"]
+    }
+  ],
+  "generative_plan": {
+    "purpose": {
+      "summary": "让读者看见公司2025年归母净利润总量，并辨认其中非经常性部分。",
+      "assertion_refs": ["A-006"],
+      "semantic_unit_refs": ["U-001"],
+      "relation_refs": [],
+      "interpretation_group_refs": []
+    },
+    "core_meaning": {
+      "summary": "归母净利润为2.9259亿元，其中约19.36%属于非经常性损益；利润总量和经常性经营成果需要分开阅读。",
+      "assertion_refs": ["A-001", "A-002", "A-003", "A-004", "A-005"],
+      "semantic_unit_refs": [],
+      "relation_refs": ["R-001", "R-002", "R-003"],
+      "interpretation_group_refs": []
+    },
+    "content_selection": {
+      "summary": "选择归母净利润、扣非归母净利润、非经常性损益合计及其占比，形成最小充分解释集合。",
+      "assertion_refs": ["A-001", "A-002", "A-003", "A-004"],
+      "semantic_unit_refs": [],
+      "relation_refs": [],
+      "interpretation_group_refs": []
+    },
+    "organization": {
+      "summary": "先列两个原文利润口径，再计算占比，最后施加解释边界。",
+      "assertion_refs": [],
+      "semantic_unit_refs": [],
+      "relation_refs": ["R-001", "R-002"],
+      "interpretation_group_refs": []
+    },
+    "constraints": {
+      "summary": "解读A-001的利润总量时，必须保留A-005所表达的口径限制。",
+      "assertion_refs": ["A-005"],
+      "semantic_unit_refs": [],
+      "relation_refs": ["R-003"],
+      "interpretation_group_refs": []
+    }
+  },
+  "evidence": [
+    {
+      "id": "E-001",
+      "modality": "text",
+      "fragments": [
+        {
+          "page": 1,
+          "locator": "封面标题",
+          "excerpt": "江苏利通电子股份有限公司2025年年度报告",
+          "fragment_sha256": "6bedfc3d9907a169b112f70e848381156ce8b1485a8fdedb423e3c5913ebdfe9"
+        }
+      ]
+    },
+    {
+      "id": "E-002",
+      "modality": "table",
+      "fragments": [
+        {
+          "page": 9,
+          "locator": "第二节‘近三年主要会计数据和财务指标’之‘主要会计数据’表，2025年列",
+          "excerpt": "归属于上市公司股东的净利润 292,589,095.99；归属于上市公司股东的扣除非经常性损益后的净利润 235,942,443.22。",
+          "fragment_sha256": "cad66da0d2a64006ce8b9ee4b4cdd5b2990aed66a1b79a92c0cb123b902d6fb6",
+          "table_cell": {
+            "row_label": "归母净利润；扣非归母净利润",
+            "column_label": "2025年"
+          }
+        }
+      ]
+    },
+    {
+      "id": "E-003",
+      "modality": "table",
+      "fragments": [
+        {
+          "page": 11,
+          "locator": "第二节‘非经常性损益项目和金额’表，2025年合计行",
+          "excerpt": "非经常性损益合计 56,646,652.77 元。",
+          "fragment_sha256": "f1eb75014819a643910f24667ee597f4f62a2251ad6586f0cfa5f8cadc49c2a7",
+          "table_cell": {
+            "row_label": "合计",
+            "column_label": "2025年金额"
+          }
+        }
+      ]
+    },
+    {
+      "id": "E-004",
+      "modality": "text",
+      "fragments": [
+        {
+          "page": 8,
+          "locator": "章节起始标题",
+          "excerpt": "第二节 公司简介和主要财务指标",
+          "fragment_sha256": "4568e5a4e7a9ba0507bafa2831f6f80d5e73f87b1994b76ee4c79023a4d334a6"
+        }
+      ]
+    }
+  ]
+}

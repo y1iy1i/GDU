@@ -1,0 +1,558 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdu-research.local/schema/gdu-v0.schema.json",
+  "title": "GDU v0",
+  "description": "Single-authoritative-document GDU translated from the frozen GDU v0 design baseline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest",
+    "physical_structure",
+    "semantic_units",
+    "assertions",
+    "relations",
+    "generative_plan",
+    "evidence"
+  ],
+  "properties": {
+    "manifest": { "$ref": "#/$defs/manifest" },
+    "physical_structure": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/physicalNode" }
+    },
+    "semantic_units": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/semanticUnit" }
+    },
+    "assertions": { "$ref": "#/$defs/assertionBlock" },
+    "relations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relation" }
+    },
+    "generative_plan": { "$ref": "#/$defs/generativePlan" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "manifest": {
+            "properties": {
+              "gdu_identity": {
+                "properties": { "status": { "const": "frozen" } },
+                "required": ["status"]
+              }
+            },
+            "required": ["gdu_identity"]
+          }
+        },
+        "required": ["manifest"]
+      },
+      "then": {
+        "properties": {
+          "assertions": {
+            "properties": {
+              "items": {
+                "items": {
+                  "properties": { "assessment_complete": { "const": true } }
+                }
+              }
+            }
+          },
+          "relations": {
+            "items": {
+              "properties": { "assessment_complete": { "const": true } }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "refArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "nonEmptyRefArray": {
+      "allOf": [
+        { "$ref": "#/$defs/refArray" },
+        { "minItems": 1 }
+      ]
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gdu_identity", "source_identity", "build_identity"],
+      "properties": {
+        "gdu_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gdu_id", "schema_version", "artifact_version", "status", "built_at"],
+          "properties": {
+            "gdu_id": { "$ref": "#/$defs/id" },
+            "schema_version": { "const": "gdu-v0" },
+            "artifact_version": { "$ref": "#/$defs/nonEmptyString" },
+            "status": { "enum": ["frozen", "provisional"] },
+            "built_at": { "type": "string", "format": "date-time" }
+          }
+        },
+        "source_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "document_id",
+            "title",
+            "language",
+            "document_type",
+            "original_filename",
+            "source_sha256",
+            "pdf_page_count",
+            "extracted_text_sha256",
+            "extraction_system"
+          ],
+          "properties": {
+            "document_id": { "$ref": "#/$defs/id" },
+            "title": { "$ref": "#/$defs/nonEmptyString" },
+            "language": { "$ref": "#/$defs/nonEmptyString" },
+            "document_type": { "$ref": "#/$defs/nonEmptyString" },
+            "original_filename": { "$ref": "#/$defs/nonEmptyString" },
+            "source_sha256": { "$ref": "#/$defs/sha256" },
+            "pdf_page_count": { "type": "integer", "minimum": 1 },
+            "extracted_text_sha256": { "$ref": "#/$defs/sha256" },
+            "extraction_system": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        },
+        "build_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocol_name",
+            "protocol_version",
+            "protocol_sha256",
+            "model_id",
+            "reasoning_effort",
+            "config_or_prompt_sha256",
+            "build_log_ref"
+          ],
+          "properties": {
+            "protocol_name": { "$ref": "#/$defs/nonEmptyString" },
+            "protocol_version": { "$ref": "#/$defs/nonEmptyString" },
+            "protocol_sha256": { "$ref": "#/$defs/sha256" },
+            "model_id": { "$ref": "#/$defs/nonEmptyString" },
+            "reasoning_effort": { "$ref": "#/$defs/nonEmptyString" },
+            "config_or_prompt_sha256": { "$ref": "#/$defs/sha256" },
+            "build_log_ref": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        }
+      }
+    },
+    "pageRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 1 },
+        "end": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "physicalNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "parent_ref",
+        "node_type",
+        "original_label",
+        "order",
+        "page_range",
+        "evidence_refs"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "parent_ref": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "node_type": { "$ref": "#/$defs/nonEmptyString" },
+        "original_label": { "$ref": "#/$defs/nonEmptyString" },
+        "order": { "type": "integer", "minimum": 1 },
+        "page_range": { "$ref": "#/$defs/pageRange" },
+        "evidence_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "observation_note": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "semanticUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "physical_structure_refs",
+        "evidence_refs",
+        "summary",
+        "primary_function_ref",
+        "secondary_function_refs"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "physical_structure_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "evidence_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "summary": { "$ref": "#/$defs/nonEmptyString" },
+        "primary_function_ref": { "$ref": "#/$defs/id" },
+        "secondary_function_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/refArray" },
+            { "maxItems": 2 }
+          ]
+        }
+      }
+    },
+    "evidenceStatus": {
+      "enum": ["supported", "partially_supported", "contested", "undetermined"]
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "statement",
+        "epistemic_origin",
+        "assessment_complete",
+        "evidence_refs",
+        "rationale"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["content", "function", "plan", "constraint", "absence"] },
+        "statement": { "$ref": "#/$defs/nonEmptyString" },
+        "semantic_unit_refs": { "$ref": "#/$defs/refArray" },
+        "epistemic_origin": {
+          "enum": ["source_attributed", "derived", "analytic_interpretation"]
+        },
+        "assessment_complete": { "type": "boolean" },
+        "evidence_status": { "$ref": "#/$defs/evidenceStatus" },
+        "evidence_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" },
+        "actor": { "$ref": "#/$defs/nonEmptyString" },
+        "attribution_mode": { "enum": ["explicit", "entailed"] },
+        "input_assertion_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "formula": { "$ref": "#/$defs/nonEmptyString" },
+        "calculation_notes": { "$ref": "#/$defs/nonEmptyString" },
+        "basis_assertion_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "function_tag": {
+          "enum": [
+            "orient",
+            "define",
+            "motivate",
+            "propose",
+            "operationalize",
+            "evidence",
+            "interpret",
+            "constrain"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "assessment_complete": { "const": true } } },
+          "then": { "required": ["evidence_status"] },
+          "else": { "not": { "required": ["evidence_status"] } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "function" } }, "required": ["kind"] },
+          "then": {
+            "required": ["semantic_unit_refs", "function_tag"],
+            "properties": {
+              "semantic_unit_refs": { "minItems": 1, "maxItems": 1 },
+              "epistemic_origin": { "const": "analytic_interpretation" }
+            }
+          },
+          "else": { "not": { "required": ["function_tag"] } }
+        },
+        {
+          "if": {
+            "properties": { "epistemic_origin": { "const": "source_attributed" } },
+            "required": ["epistemic_origin"]
+          },
+          "then": {
+            "required": ["actor", "attribution_mode"],
+            "not": {
+              "anyOf": [
+                { "required": ["input_assertion_refs"] },
+                { "required": ["formula"] },
+                { "required": ["calculation_notes"] },
+                { "required": ["basis_assertion_refs"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "epistemic_origin": { "const": "derived" } },
+            "required": ["epistemic_origin"]
+          },
+          "then": {
+            "required": ["input_assertion_refs", "formula"],
+            "not": {
+              "anyOf": [
+                { "required": ["actor"] },
+                { "required": ["attribution_mode"] },
+                { "required": ["basis_assertion_refs"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "epistemic_origin": { "const": "analytic_interpretation" } },
+            "required": ["epistemic_origin"]
+          },
+          "then": {
+            "required": ["basis_assertion_refs"],
+            "not": {
+              "anyOf": [
+                { "required": ["actor"] },
+                { "required": ["attribution_mode"] },
+                { "required": ["input_assertion_refs"] },
+                { "required": ["formula"] },
+                { "required": ["calculation_notes"] }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "interpretationGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "issue",
+        "mode",
+        "member_refs",
+        "rationale",
+        "unresolved_reason",
+        "impact_scope"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "issue": { "$ref": "#/$defs/nonEmptyString" },
+        "mode": { "enum": ["competing", "parallel"] },
+        "member_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/refArray" },
+            { "minItems": 2 }
+          ]
+        },
+        "preferred_ref": { "$ref": "#/$defs/id" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" },
+        "unresolved_reason": { "$ref": "#/$defs/nonEmptyString" },
+        "impact_scope": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "parallel" } }, "required": ["mode"] },
+          "then": { "not": { "required": ["preferred_ref"] } }
+        }
+      ]
+    },
+    "assertionBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "interpretation_groups"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/assertion" }
+        },
+        "interpretation_groups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/interpretationGroup" }
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "endpoint_level",
+        "from_ref",
+        "to_ref",
+        "relation_type",
+        "description",
+        "epistemic_origin",
+        "assessment_complete",
+        "evidence_refs",
+        "rationale"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "endpoint_level": { "enum": ["semantic_unit", "assertion"] },
+        "from_ref": { "$ref": "#/$defs/id" },
+        "to_ref": { "$ref": "#/$defs/id" },
+        "relation_type": {
+          "enum": [
+            "elaborates",
+            "supports",
+            "limits",
+            "depends_on",
+            "motivates",
+            "composes",
+            "conflicts_with",
+            "alternative_to"
+          ]
+        },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "epistemic_origin": { "enum": ["source_attributed", "analytic_interpretation"] },
+        "assessment_complete": { "type": "boolean" },
+        "evidence_status": { "$ref": "#/$defs/evidenceStatus" },
+        "evidence_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" },
+        "actor": { "$ref": "#/$defs/nonEmptyString" },
+        "attribution_mode": { "enum": ["explicit", "entailed"] },
+        "basis_assertion_refs": { "$ref": "#/$defs/nonEmptyRefArray" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "assessment_complete": { "const": true } } },
+          "then": { "required": ["evidence_status"] },
+          "else": { "not": { "required": ["evidence_status"] } }
+        },
+        {
+          "if": {
+            "properties": { "epistemic_origin": { "const": "source_attributed" } },
+            "required": ["epistemic_origin"]
+          },
+          "then": {
+            "required": ["actor", "attribution_mode"],
+            "not": { "required": ["basis_assertion_refs"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "epistemic_origin": { "const": "analytic_interpretation" } },
+            "required": ["epistemic_origin"]
+          },
+          "then": {
+            "required": ["basis_assertion_refs"],
+            "not": {
+              "anyOf": [
+                { "required": ["actor"] },
+                { "required": ["attribution_mode"] }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "planSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "assertion_refs",
+        "semantic_unit_refs",
+        "relation_refs",
+        "interpretation_group_refs"
+      ],
+      "properties": {
+        "summary": { "$ref": "#/$defs/nonEmptyString" },
+        "assertion_refs": { "$ref": "#/$defs/refArray" },
+        "semantic_unit_refs": { "$ref": "#/$defs/refArray" },
+        "relation_refs": { "$ref": "#/$defs/refArray" },
+        "interpretation_group_refs": { "$ref": "#/$defs/refArray" }
+      },
+      "anyOf": [
+        { "properties": { "assertion_refs": { "minItems": 1 } } },
+        { "properties": { "semantic_unit_refs": { "minItems": 1 } } },
+        { "properties": { "relation_refs": { "minItems": 1 } } },
+        { "properties": { "interpretation_group_refs": { "minItems": 1 } } }
+      ]
+    },
+    "generativePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["purpose", "core_meaning", "content_selection", "organization", "constraints"],
+      "properties": {
+        "purpose": { "$ref": "#/$defs/planSection" },
+        "core_meaning": { "$ref": "#/$defs/planSection" },
+        "content_selection": { "$ref": "#/$defs/planSection" },
+        "organization": { "$ref": "#/$defs/planSection" },
+        "constraints": { "$ref": "#/$defs/planSection" }
+      }
+    },
+    "bbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coordinate_space", "x1", "y1", "x2", "y2"],
+      "properties": {
+        "coordinate_space": { "enum": ["pdf_points", "normalized_0_1", "pixels"] },
+        "x1": { "type": "number", "minimum": 0 },
+        "y1": { "type": "number", "minimum": 0 },
+        "x2": { "type": "number", "minimum": 0 },
+        "y2": { "type": "number", "minimum": 0 }
+      }
+    },
+    "tableCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "row_label": { "$ref": "#/$defs/nonEmptyString" },
+        "column_label": { "$ref": "#/$defs/nonEmptyString" },
+        "cell_ref": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "minProperties": 1
+    },
+    "evidenceFragment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page", "locator", "excerpt", "fragment_sha256"],
+      "properties": {
+        "page": { "type": "integer", "minimum": 1 },
+        "locator": { "$ref": "#/$defs/nonEmptyString" },
+        "excerpt": { "$ref": "#/$defs/nonEmptyString" },
+        "fragment_sha256": { "$ref": "#/$defs/sha256" },
+        "bbox": { "$ref": "#/$defs/bbox" },
+        "table_cell": { "$ref": "#/$defs/tableCell" },
+        "object_label": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "modality", "fragments"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "modality": { "enum": ["text", "table", "image", "formula", "mixed"] },
+        "fragments": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidenceFragment" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdu-research.local/schema/build-log-event-v0.schema.json",
+  "title": "GDU v0 build_log.jsonl event",
+  "description": "Schema for one JSON object line in an append-only GDU v0 build log.",
+  "oneOf": [
+    { "$ref": "#/$defs/revisionEvent" },
+    { "$ref": "#/$defs/checkpointEvent" },
+    { "$ref": "#/$defs/technicalEvent" },
+    { "$ref": "#/$defs/freezeEvent" }
+  ],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+    },
+    "refArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "nonEmptyRefArray": {
+      "allOf": [
+        { "$ref": "#/$defs/refArray" },
+        { "minItems": 1 }
+      ]
+    },
+    "baseEvent": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "logical_time",
+        "timestamp",
+        "event_type",
+        "stage",
+        "object_refs",
+        "rationale"
+      ],
+      "properties": {
+        "event_id": { "$ref": "#/$defs/id" },
+        "logical_time": { "type": "integer", "minimum": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "event_type": {
+          "enum": ["revision", "checkpoint", "technical", "freeze"]
+        },
+        "stage": { "$ref": "#/$defs/nonEmptyString" },
+        "object_refs": { "$ref": "#/$defs/refArray" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "revisionEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "required": [
+            "before_summary",
+            "after_summary",
+            "change_type",
+            "trigger_evidence_refs",
+            "affected_refs",
+            "surviving_alternative_refs"
+          ],
+          "properties": {
+            "event_type": { "const": "revision" },
+            "before_summary": { "$ref": "#/$defs/nonEmptyString" },
+            "after_summary": { "$ref": "#/$defs/nonEmptyString" },
+            "change_type": {
+              "enum": [
+                "promote",
+                "replace",
+                "downgrade",
+                "retain_alternative",
+                "withdraw"
+              ]
+            },
+            "trigger_evidence_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+            "affected_refs": { "$ref": "#/$defs/nonEmptyRefArray" },
+            "surviving_alternative_refs": { "$ref": "#/$defs/refArray" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "checkpointEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "required": ["checkpoint_name", "outcome", "result_summary"],
+          "properties": {
+            "event_type": { "const": "checkpoint" },
+            "checkpoint_name": { "$ref": "#/$defs/nonEmptyString" },
+            "outcome": { "enum": ["completed", "passed", "failed"] },
+            "result_summary": { "$ref": "#/$defs/nonEmptyString" },
+            "trigger_evidence_refs": { "$ref": "#/$defs/refArray" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "technicalEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "required": [
+            "component",
+            "issue_summary",
+            "impact_summary",
+            "resolution_summary",
+            "outcome"
+          ],
+          "properties": {
+            "event_type": { "const": "technical" },
+            "component": { "$ref": "#/$defs/nonEmptyString" },
+            "issue_summary": { "$ref": "#/$defs/nonEmptyString" },
+            "impact_summary": { "$ref": "#/$defs/nonEmptyString" },
+            "resolution_summary": { "$ref": "#/$defs/nonEmptyString" },
+            "outcome": { "enum": ["resolved", "workaround", "unresolved"] }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "freezeEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEvent" },
+        {
+          "type": "object",
+          "required": [
+            "final_artifact_version",
+            "stop_gate",
+            "artifacts_manifest_ref"
+          ],
+          "properties": {
+            "event_type": { "const": "freeze" },
+            "final_artifact_version": { "$ref": "#/$defs/nonEmptyString" },
+            "stop_gate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["coverage", "evidence", "stability"],
+              "properties": {
+                "coverage": { "const": "passed" },
+                "evidence": { "const": "passed" },
+                "stability": { "const": "passed" }
+              }
+            },
+            "artifacts_manifest_ref": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}
