@@ -2774,3 +2774,10 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **用户决定**：Base URL 改为 `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`。
 - **配置变化**：供应商标识改为 `aliyun-bailian-token-plan-beijing`；模型、Key 环境变量、prompt-only JSON 模式和首轮 1 次上限不变。
 - **当前状态**：仅修改配置，尚未发出真实请求。
+
+### V2-209 集中整理 API 配置
+
+- **用户要求**：把所有 API 配置文件放在一起。
+- **目录**：新增 `configs/api/`，集中保存远程配置 Schema、关闭示例、阿里云 Token Plan 示例、使用规则和中文说明。
+- **Key 边界**：真实 Key 不进入该目录，仍只由 Codex `gdu` 环境中的 `DASHSCOPE_API_KEY` 提供。
+- **兼容性**：测试和文档引用全部改为新路径，运行逻辑不变。

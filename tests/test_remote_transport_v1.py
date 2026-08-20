@@ -17,7 +17,8 @@ from gdu.builder_v0.types import TechnicalFailure
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = ROOT / "remote-adapter-v1.schema.json"
+API_CONFIG = ROOT / "configs" / "api"
+SCHEMA = API_CONFIG / "remote-adapter-v1.schema.json"
 
 
 def digest(path: Path) -> str:
@@ -65,19 +66,19 @@ class FakeResponse:
 
 class RemoteConfigTests(unittest.TestCase):
     def test_disabled_example_loads_as_closed(self) -> None:
-        path = ROOT / "remote-adapter-v1.disabled.example.json"
+        path = API_CONFIG / "disabled.example.json"
         config = load_remote_transport_config(path, SCHEMA, digest(path))
         self.assertFalse(config.enabled)
         with self.assertRaisesRegex(TechnicalFailure, "disabled"):
             OpenAICompatibleRemoteTransport(config).invoke(permitted_request())
 
     def test_config_hash_mismatch_is_rejected(self) -> None:
-        path = ROOT / "remote-adapter-v1.disabled.example.json"
+        path = API_CONFIG / "disabled.example.json"
         with self.assertRaisesRegex(TechnicalFailure, "SHA-256 mismatch"):
             load_remote_transport_config(path, SCHEMA, "0" * 64)
 
     def test_aliyun_deepseek_example_is_prompt_only_and_call_capped(self) -> None:
-        path = ROOT / "remote-adapter-v1.aliyun-deepseek.example.json"
+        path = API_CONFIG / "aliyun-token-plan-deepseek-v4-flash.example.json"
         config = load_remote_transport_config(path, SCHEMA, digest(path))
         self.assertTrue(config.enabled)
         self.assertEqual(config.provider_id, "aliyun-bailian-token-plan-beijing")
