@@ -1,0 +1,378 @@
+{
+  "format": "gdu-logic-method-slice-v0.2",
+  "document_id": "pgkd-emnlp-2024",
+  "question": "PGKD每轮训练新学生后，评估的是新模型还是旧模型？",
+  "source_pdf_sha256": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+  "default_context": {
+    "document_scope": "pgkd-emnlp-2024",
+    "section_scope": "methods"
+  },
+  "information_nodes": [
+    {
+      "id": "E-PGKD-P3-METHOD",
+      "kind": "evidence",
+      "text": "Methods正文说明PGKD按轮次生成新训练数据、控制验证损失，并在流程结束时返回验证集上的最佳模型。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=3&section=3-methods",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "carrier": "prose"
+      }
+    },
+    {
+      "id": "E-PGKD-P4-FIGURE",
+      "kind": "evidence",
+      "text": "Figure 1把Student Model评估、训练数据生成和Step 3 Training画成循环；Figure 2说明教师为下一轮生成新样本。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=4&figure=1-2",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "carrier": "figure"
+      }
+    },
+    {
+      "id": "C-PGKD-ITERATIVE",
+      "kind": "claim",
+      "atom": "pgkd_is_iterative",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "PGKD是按轮次运行的知识蒸馏过程。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-PGKD-P3-METHOD",
+          "E-PGKD-P4-FIGURE"
+        ]
+      }
+    },
+    {
+      "id": "C-PGKD-GENERATES-NEXT-DATA",
+      "kind": "claim",
+      "atom": "pgkd_generates_next_iteration_data",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "教师模型依据当前学生表现生成下一轮训练数据。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-PGKD-P3-METHOD",
+          "E-PGKD-P4-FIGURE"
+        ]
+      }
+    },
+    {
+      "id": "C-PGKD-TRAINS-NEXT-MODEL",
+      "kind": "claim",
+      "atom": "pgkd_trains_updated_student",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "新数据加入历史训练集后用于训练下一轮学生模型。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-PGKD-P3-METHOD",
+          "E-PGKD-P4-FIGURE"
+        ]
+      }
+    },
+    {
+      "id": "C-PGKD-RETURNS-BEST",
+      "kind": "claim",
+      "atom": "pgkd_returns_best_validation_model",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "PGKD最终返回验证损失最低的模型。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-PGKD-P3-METHOD"
+        ]
+      }
+    },
+    {
+      "id": "E-GROW-PGKD-P3-METHOD",
+      "kind": "evidence",
+      "text": "方法正文描述迭代生成下一轮数据、控制验证损失，并在流程结束时返回验证集上的最佳模型。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=3&section=3-methods",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "E-GROW-PGKD-P4-FIGURE",
+      "kind": "evidence",
+      "text": "Figure 1把学生评估、下一轮训练数据生成和Step 3 Training画成循环；Figure 2说明新样本用于下一轮。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=4&figure=1-2",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "E-GROW-PGKD-P4-ALGORITHM",
+      "kind": "evidence",
+      "text": "Algorithm 1 line 8: model^{i+1} <- train model on history; line 9: new_loss, val_results <- evaluate(model^i, D^val); line 17: model^best <- model^i.",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=4&algorithm=1&lines=8-17",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-FLOW-SUGGESTS-UPDATED",
+      "kind": "claim",
+      "atom": "pgkd_flow_suggests_updated_model_evaluation",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "方法叙述和循环流程更自然地支持训练下一轮学生后评估更新后的学生模型。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-PGKD-P3-METHOD",
+          "E-GROW-PGKD-P4-FIGURE"
+        ],
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-ALGORITHM-LITERAL-OLD",
+      "kind": "claim",
+      "atom": "pgkd_algorithm_literally_evaluates_old_model",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "Algorithm 1字面上先训练model^{i+1}，随后评估model^i，并把model^i记为最佳模型。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-PGKD-P4-ALGORITHM"
+        ],
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-EVAL-UPDATED-INTERPRETATION",
+      "kind": "claim",
+      "atom": "pgkd_evaluates_updated_model",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "按方法流程解释，每轮应评估更新后的学生模型。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "generated_by": "I-PGKD-INTERPRET-FLOW",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-EVAL-OLD-LITERAL",
+      "kind": "claim",
+      "atom": "pgkd_evaluates_updated_model",
+      "polarity": "negative",
+      "asserted": false,
+      "active": true,
+      "statement": "按Algorithm 1字面索引，每轮评估的是更新前的model^i。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "generated_by": "I-PGKD-READ-ALGORITHM-LITERALLY",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-IDENTITY-UNRESOLVED",
+      "kind": "claim",
+      "atom": "pgkd_evaluated_model_identity",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "来源对每轮被评估模型的身份存在未消解歧义：正文与流程图倾向更新后模型，Algorithm 1字面索引则是旧模型。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "generated_by": "I-PGKD-DETECT-SOURCE-CONFLICT",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-NOT-RESOLVED",
+      "kind": "claim",
+      "atom": "pgkd_identity_source_resolved",
+      "polarity": "negative",
+      "asserted": false,
+      "active": true,
+      "statement": "仅凭论文来源无法确定Algorithm 1是排版错误还是作者有意评估旧模型，不能静默改写索引。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "generated_by": "I-PGKD-PRESERVE-UNRESOLVED",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    },
+    {
+      "id": "C-PGKD-SILENT-CORRECTION",
+      "kind": "claim",
+      "atom": "pgkd_identity_source_resolved",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "流程意图足以证明Algorithm 1只是排版错误，可以直接改成评估model^{i+1}。",
+      "context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "provenance": {
+        "generated_by": "I-PGKD-SILENT-CORRECTION-HEURISTIC",
+        "growth_event": "GROWTH-PGKD-METHOD-001"
+      }
+    }
+  ],
+  "scheme_nodes": [
+    {
+      "id": "I-PGKD-INTERPRET-FLOW",
+      "kind": "inference",
+      "premises": [
+        "C-PGKD-FLOW-SUGGESTS-UPDATED"
+      ],
+      "conclusion": "C-PGKD-EVAL-UPDATED-INTERPRETATION",
+      "rule_kind": "defeasible",
+      "rule_id": "workflow-intent-interpretation-v1"
+    },
+    {
+      "id": "I-PGKD-READ-ALGORITHM-LITERALLY",
+      "kind": "inference",
+      "premises": [
+        "C-PGKD-ALGORITHM-LITERAL-OLD"
+      ],
+      "conclusion": "C-PGKD-EVAL-OLD-LITERAL",
+      "rule_kind": "strict",
+      "rule_id": "literal-index-reading-v1"
+    },
+    {
+      "id": "I-PGKD-DETECT-SOURCE-CONFLICT",
+      "kind": "inference",
+      "premises": [
+        "C-PGKD-FLOW-SUGGESTS-UPDATED",
+        "C-PGKD-ALGORITHM-LITERAL-OLD"
+      ],
+      "conclusion": "C-PGKD-IDENTITY-UNRESOLVED",
+      "rule_kind": "strict",
+      "rule_id": "cross-carrier-conflict-detection-v1"
+    },
+    {
+      "id": "I-PGKD-PRESERVE-UNRESOLVED",
+      "kind": "inference",
+      "premises": [
+        "C-PGKD-IDENTITY-UNRESOLVED"
+      ],
+      "conclusion": "C-PGKD-NOT-RESOLVED",
+      "rule_kind": "strict",
+      "rule_id": "source-underdetermination-v1"
+    },
+    {
+      "id": "I-PGKD-SILENT-CORRECTION-HEURISTIC",
+      "kind": "inference",
+      "premises": [
+        "C-PGKD-FLOW-SUGGESTS-UPDATED"
+      ],
+      "conclusion": "C-PGKD-SILENT-CORRECTION",
+      "rule_kind": "defeasible",
+      "rule_id": "intent-overrides-literal-source-heuristic-v1"
+    },
+    {
+      "id": "CA-PGKD-UPDATED-REBUTS-OLD",
+      "kind": "conflict",
+      "attack_kind": "rebut",
+      "source": "C-PGKD-EVAL-UPDATED-INTERPRETATION",
+      "target_type": "claim",
+      "target": "C-PGKD-EVAL-OLD-LITERAL"
+    },
+    {
+      "id": "CA-PGKD-OLD-REBUTS-UPDATED",
+      "kind": "conflict",
+      "attack_kind": "rebut",
+      "source": "C-PGKD-EVAL-OLD-LITERAL",
+      "target_type": "claim",
+      "target": "C-PGKD-EVAL-UPDATED-INTERPRETATION"
+    },
+    {
+      "id": "CA-PGKD-NOT-RESOLVED-REBUT",
+      "kind": "conflict",
+      "attack_kind": "rebut",
+      "source": "C-PGKD-NOT-RESOLVED",
+      "target_type": "claim",
+      "target": "C-PGKD-SILENT-CORRECTION"
+    },
+    {
+      "id": "CA-PGKD-NOT-RESOLVED-UNDERCUT",
+      "kind": "conflict",
+      "attack_kind": "undercut",
+      "source": "C-PGKD-NOT-RESOLVED",
+      "target_type": "inference",
+      "target": "I-PGKD-SILENT-CORRECTION-HEURISTIC"
+    }
+  ],
+  "revision_history": [
+    {
+      "event_id": "GROWTH-PGKD-METHOD-001",
+      "recorded_at": "2026-08-20T20:00:00+08:00",
+      "operation": "promote_pgkd_source_conflict_candidate",
+      "parent_format": "gdu-logic-method-slice-v0.1",
+      "candidate_hash": "43189cedfe690412f5704a9424ce526ddb81ada1eb74056c00e1eeff6741c843",
+      "added_information_node_ids": [
+        "E-GROW-PGKD-P3-METHOD",
+        "E-GROW-PGKD-P4-FIGURE",
+        "E-GROW-PGKD-P4-ALGORITHM",
+        "C-PGKD-FLOW-SUGGESTS-UPDATED",
+        "C-PGKD-ALGORITHM-LITERAL-OLD",
+        "C-PGKD-EVAL-UPDATED-INTERPRETATION",
+        "C-PGKD-EVAL-OLD-LITERAL",
+        "C-PGKD-IDENTITY-UNRESOLVED",
+        "C-PGKD-NOT-RESOLVED",
+        "C-PGKD-SILENT-CORRECTION"
+      ],
+      "added_scheme_node_ids": [
+        "I-PGKD-INTERPRET-FLOW",
+        "I-PGKD-READ-ALGORITHM-LITERALLY",
+        "I-PGKD-DETECT-SOURCE-CONFLICT",
+        "I-PGKD-PRESERVE-UNRESOLVED",
+        "I-PGKD-SILENT-CORRECTION-HEURISTIC",
+        "CA-PGKD-UPDATED-REBUTS-OLD",
+        "CA-PGKD-OLD-REBUTS-UPDATED",
+        "CA-PGKD-NOT-RESOLVED-REBUT",
+        "CA-PGKD-NOT-RESOLVED-UNDERCUT"
+      ]
+    }
+  ]
+}

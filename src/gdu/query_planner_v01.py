@@ -14,6 +14,8 @@ CONCEPT_ALIASES = {
     "operating_cash_flow": ("经营现金流", "经营活动现金流", "经营活动产生的现金流量净额"),
     "cash_change": ("全年现金", "现金增加", "现金减少", "现金变化", "现金及现金等价物"),
     "investment_activity": ("投资活动", "投资款", "投资支出", "对外投资"),
+    "pgkd": ("PGKD", "知识蒸馏", "学生模型"),
+    "model_evaluation_identity": ("评估新模型", "评估旧模型", "评估的是", "新学生", "旧学生", "模型索引"),
 }
 
 
@@ -42,6 +44,18 @@ def parse_question(question: str) -> dict[str, Any]:
 
 def _query_structure(parsed: Mapping[str, Any]) -> dict[str, Any]:
     concepts = set(parsed["concepts"])
+    if {"pgkd", "model_evaluation_identity"} <= concepts:
+        return {
+            "name": "source_conflict_resolution",
+            "target_atoms": ["pgkd_evaluated_model_identity"],
+            "limitation_atoms": ["pgkd_identity_source_resolved"],
+            "source_terms": [
+                "train model",
+                "evaluate(model",
+                "model best",
+                "best model on the validation set",
+            ],
+        }
     if {"investment_activity", "cash_change"} <= concepts:
         return {
             "name": "missing_causal_driver",
@@ -147,10 +161,17 @@ def expand_claim_neighborhood(
     }
 
 
-def _claim_matches_context(claim: Mapping[str, Any], *, scope: str | None, year: int | None) -> bool:
+def _claim_matches_context(
+    claim: Mapping[str, Any], *, query_context: Mapping[str, Any]
+) -> bool:
     context = claim.get("context", {})
-    if scope is not None and context.get("company_scope") != scope:
-        return False
+    scope = query_context.get("company_scope")
+    year = query_context.get("year")
+    for key, value in query_context.items():
+        if key in {"year", "resolution"} or value is None:
+            continue
+        if context.get(key) != value:
+            return False
     interval = context.get("valid_time", {})
     if year is not None and interval.get("type") == "interval":
         start_year = int(str(interval.get("start", "0000"))[:4])
@@ -161,7 +182,7 @@ def _claim_matches_context(claim: Mapping[str, Any], *, scope: str | None, year:
 
 
 def _accepted_claims_by_atom(
-    graph: Mapping[str, Any], *, scope: str | None, year: int | None
+    graph: Mapping[str, Any], *, query_context: Mapping[str, Any]
 ) -> dict[str, list[str]]:
     arguments, attacks = compile_structured_arguments(graph)
     labels = grounded_labels(arguments, attacks)
@@ -170,7 +191,9 @@ def _accepted_claims_by_atom(
     for argument in arguments.values():
         if labels[argument.id] != "accepted":
             continue
-        if not _claim_matches_context(info[argument.conclusion], scope=scope, year=year):
+        if not _claim_matches_context(
+            info[argument.conclusion], query_context=query_context
+        ):
             continue
         atom = str(info[argument.conclusion].get("atom", ""))
         accepted.setdefault(atom, set()).add(argument.conclusion)
@@ -186,11 +209,12 @@ def plan_query(graph: Mapping[str, Any], question: str) -> dict[str, Any]:
     parsed = parse_question(question)
     structure = _query_structure(parsed)
     default_context = graph.get("default_context", {})
-    effective_scope = parsed["company_scope"] or default_context.get("company_scope")
-    effective_year = parsed["year"] or default_context.get("year")
-    accepted = _accepted_claims_by_atom(
-        graph, scope=effective_scope, year=effective_year
-    )
+    effective_context = dict(default_context)
+    if parsed["company_scope"]:
+        effective_context["company_scope"] = parsed["company_scope"]
+    if parsed["year"]:
+        effective_context["year"] = parsed["year"]
+    accepted = _accepted_claims_by_atom(graph, query_context=effective_context)
     missing_atoms = [atom for atom in structure["target_atoms"] if not accepted.get(atom)]
     target_claim_ids = [
         accepted[atom][0] for atom in structure["target_atoms"] if accepted.get(atom)
@@ -209,8 +233,7 @@ def plan_query(graph: Mapping[str, Any], question: str) -> dict[str, Any]:
         else {"max_hops": 2, "nodes": []}
     )
     context = {
-        "company_scope": effective_scope,
-        "year": effective_year,
+        **effective_context,
         "resolution": {
             "company_scope": "explicit" if parsed["company_scope"] else "document_default",
             "year": "explicit" if parsed["year"] else "document_default",
@@ -247,7 +270,13 @@ def search_source_pages(
     term_list = [term for term in terms if term]
     ranked = []
     for page, text in pages.items():
-        matched = [term for term in term_list if term in text]
+        normalized_text = re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "", text.lower())
+        matched = [
+            term
+            for term in term_list
+            if re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "", term.lower())
+            in normalized_text
+        ]
         if matched:
             ranked.append((-len(matched), int(page), matched))
     return [

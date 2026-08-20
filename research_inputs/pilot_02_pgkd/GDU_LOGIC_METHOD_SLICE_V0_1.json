@@ -1,0 +1,74 @@
+{
+  "format": "gdu-logic-method-slice-v0.1",
+  "document_id": "pgkd-emnlp-2024",
+  "question": "PGKD每轮训练新学生后，评估的是新模型还是旧模型？",
+  "source_pdf_sha256": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+  "default_context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+  "information_nodes": [
+    {
+      "id": "E-PGKD-P3-METHOD",
+      "kind": "evidence",
+      "text": "Methods正文说明PGKD按轮次生成新训练数据、控制验证损失，并在流程结束时返回验证集上的最佳模型。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=3&section=3-methods",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "carrier": "prose"
+      }
+    },
+    {
+      "id": "E-PGKD-P4-FIGURE",
+      "kind": "evidence",
+      "text": "Figure 1把Student Model评估、训练数据生成和Step 3 Training画成循环；Figure 2说明教师为下一轮生成新样本。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=4&figure=1-2",
+        "source_hash": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "carrier": "figure"
+      }
+    },
+    {
+      "id": "C-PGKD-ITERATIVE",
+      "kind": "claim",
+      "atom": "pgkd_is_iterative",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "PGKD是按轮次运行的知识蒸馏过程。",
+      "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+      "provenance": {"quoted_from": ["E-PGKD-P3-METHOD", "E-PGKD-P4-FIGURE"]}
+    },
+    {
+      "id": "C-PGKD-GENERATES-NEXT-DATA",
+      "kind": "claim",
+      "atom": "pgkd_generates_next_iteration_data",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "教师模型依据当前学生表现生成下一轮训练数据。",
+      "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+      "provenance": {"quoted_from": ["E-PGKD-P3-METHOD", "E-PGKD-P4-FIGURE"]}
+    },
+    {
+      "id": "C-PGKD-TRAINS-NEXT-MODEL",
+      "kind": "claim",
+      "atom": "pgkd_trains_updated_student",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "新数据加入历史训练集后用于训练下一轮学生模型。",
+      "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+      "provenance": {"quoted_from": ["E-PGKD-P3-METHOD", "E-PGKD-P4-FIGURE"]}
+    },
+    {
+      "id": "C-PGKD-RETURNS-BEST",
+      "kind": "claim",
+      "atom": "pgkd_returns_best_validation_model",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "PGKD最终返回验证损失最低的模型。",
+      "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+      "provenance": {"quoted_from": ["E-PGKD-P3-METHOD"]}
+    }
+  ],
+  "scheme_nodes": []
+}

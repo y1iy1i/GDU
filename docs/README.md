@@ -4,7 +4,7 @@
 
 ## 当前主线
 
-`current/` 只保留理解当前系统所必需的六份文档：
+`current/` 只保留理解当前系统所必需的七份文档：
 
 1. `GDU_REASONING_GRAPH_OBJECTIVE_V1.md`：研究目标和边界；
 2. `GDU_CANDIDATE_LOGIC_ARCHITECTURE_V0_1.md`：三层逻辑主干与两个横向模块；
@@ -12,6 +12,7 @@
 4. `GDU_ANSWER_EXECUTION_REPORT_V0_1.md`：可审计回答执行；
 5. `GDU_QUERY_PLANNER_THEORY_AND_EXPERIMENT_V0_1.md`：问题到图查询的映射；
 6. `GDU_FIRST_CLOSED_LOOP_GROWTH_REPORT_V0_1.md`：第一次正式数据库生长闭环。
+7. `GDU_SECOND_NONFINANCIAL_GROWTH_REPORT_V0_1.md`：跨正文、图与算法冲突的非财务生长。
 
 文件名中的 `V0_1` 表示对应接口或实验版本，不表示它属于已归档的旧 v0 设计。
 

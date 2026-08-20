@@ -1,0 +1,78 @@
+{
+  "format": "gdu-query-gap-candidate-pgkd-v0.1",
+  "document_id": "pgkd-emnlp-2024",
+  "source_pdf_sha256": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+  "question": "PGKD每轮训练新学生后，评估的是新模型还是旧模型？",
+  "planner_result": {
+    "status": "gap",
+    "missing_atoms": ["pgkd_evaluated_model_identity", "pgkd_identity_source_resolved"],
+    "growth_policy": "quarantine_before_validation"
+  },
+  "candidate_evidence": [
+    {
+      "id": "CE-PGKD-P3-METHOD",
+      "physical_page": 3,
+      "carrier": "prose",
+      "text": "方法正文描述迭代生成下一轮数据、控制验证损失，并在流程结束时返回验证集上的最佳模型。",
+      "source_locator": "paper.pdf#physical-page=3&section=3-methods",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-PGKD-P4-FIGURE",
+      "physical_page": 4,
+      "carrier": "figure",
+      "text": "Figure 1把学生评估、下一轮训练数据生成和Step 3 Training画成循环；Figure 2说明新样本用于下一轮。",
+      "source_locator": "paper.pdf#physical-page=4&figure=1-2",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-PGKD-P4-ALGORITHM",
+      "physical_page": 4,
+      "carrier": "algorithm",
+      "text": "Algorithm 1 line 8: model^{i+1} <- train model on history; line 9: new_loss, val_results <- evaluate(model^i, D^val); line 17: model^best <- model^i.",
+      "source_locator": "paper.pdf#physical-page=4&algorithm=1&lines=8-17",
+      "status": "visually_verified_candidate"
+    }
+  ],
+  "candidate_claims": [
+    {
+      "id": "CC-PGKD-FLOW-UPDATED",
+      "atom": "pgkd_flow_suggests_updated_model_evaluation",
+      "polarity": "positive",
+      "statement": "方法叙述和循环流程更自然地支持训练下一轮学生后评估更新后的学生模型。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-PGKD-P3-METHOD", "CE-PGKD-P4-FIGURE"]
+    },
+    {
+      "id": "CC-PGKD-ALGORITHM-OLD",
+      "atom": "pgkd_algorithm_literally_evaluates_old_model",
+      "polarity": "positive",
+      "statement": "Algorithm 1字面上先训练model^{i+1}，随后却评估model^i，并把model^i记为最佳模型。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-PGKD-P4-ALGORITHM"]
+    },
+    {
+      "id": "CC-PGKD-IDENTITY-UNRESOLVED",
+      "atom": "pgkd_evaluated_model_identity",
+      "polarity": "positive",
+      "statement": "来源对每轮被评估模型的身份存在未消解歧义：正文与流程图倾向更新后模型，Algorithm 1字面索引则是旧模型。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-PGKD-P3-METHOD", "CE-PGKD-P4-FIGURE", "CE-PGKD-P4-ALGORITHM"]
+    },
+    {
+      "id": "CC-PGKD-NOT-RESOLVED",
+      "atom": "pgkd_identity_source_resolved",
+      "polarity": "negative",
+      "statement": "仅凭论文来源无法确定Algorithm 1是排版错误还是作者有意评估旧模型，不能静默改写索引。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-PGKD-P3-METHOD", "CE-PGKD-P4-FIGURE", "CE-PGKD-P4-ALGORITHM"]
+    }
+  ],
+  "promotion_gate": [
+    "context_matches_pgkd_methods",
+    "cross_carrier_conflict_preserved",
+    "literal_algorithm_indices_preserved",
+    "ambiguity_not_silently_resolved",
+    "alternative_interpretations_retained"
+  ]
+}
