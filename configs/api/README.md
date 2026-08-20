@@ -17,6 +17,7 @@
 - `model`：模型 ID；
 - `api_key_env`：保存 Key 的环境变量名称；
 - `max_calls`：本轮最大调用次数。
+- `thinking_mode`：是否启用模型思考；小型结构化实验使用 `disabled` 以减少延迟和 Credits。
 
 ## 填写 Key
 

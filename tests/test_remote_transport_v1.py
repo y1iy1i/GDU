@@ -33,6 +33,7 @@ def enabled_config() -> RemoteTransportConfig:
         model="test-model",
         api_key_env="GDU_TEST_API_KEY",
         json_output_mode="native",
+        thinking_mode="provider_default",
         max_calls=1,
         timeout_seconds=10,
         max_output_tokens=1000,
@@ -89,6 +90,7 @@ class RemoteConfigTests(unittest.TestCase):
         self.assertEqual(config.model, "qwen3.7-plus")
         self.assertEqual(config.api_key_env, "DASHSCOPE_API_KEY")
         self.assertEqual(config.json_output_mode, "native")
+        self.assertEqual(config.thinking_mode, "disabled")
         self.assertEqual(config.max_calls, 1)
 
     def test_non_https_remote_url_is_rejected(self) -> None:
@@ -102,6 +104,7 @@ class RemoteConfigTests(unittest.TestCase):
                 "api_key_env": "GDU_TEST_API_KEY",
                 "api_style": "openai_chat_completions",
                 "json_output_mode": "native",
+                "thinking_mode": "provider_default",
                 "max_calls": 1,
                 "timeout_seconds": 10,
                 "max_output_tokens": 1000,
@@ -208,6 +211,25 @@ class RemoteTransportTests(unittest.TestCase):
             sent = urlopen.call_args.args[0]
             body = json.loads(sent.data.decode("utf-8"))
             self.assertNotIn("response_format", body)
+
+    @patch.dict(os.environ, {"GDU_TEST_API_KEY": "secret-test-key"}, clear=True)
+    def test_disabled_thinking_is_sent_to_provider(self) -> None:
+        envelope = {
+            "choices": [{"message": {"content": json.dumps({"stage": "cp1"})}}]
+        }
+        config = RemoteTransportConfig(
+            **{**enabled_config().__dict__, "thinking_mode": "disabled"}
+        )
+        transport = OpenAICompatibleRemoteTransport(
+            config, explicit_authorization=True
+        )
+        with patch(
+            "urllib.request.urlopen", return_value=FakeResponse(envelope)
+        ) as urlopen:
+            transport.invoke(permitted_request())
+            sent = urlopen.call_args.args[0]
+            body = json.loads(sent.data.decode("utf-8"))
+            self.assertIs(body["enable_thinking"], False)
 
     @patch.dict(os.environ, {"GDU_TEST_API_KEY": "secret-test-key"}, clear=True)
     def test_malformed_remote_envelope_is_a_technical_failure(self) -> None:

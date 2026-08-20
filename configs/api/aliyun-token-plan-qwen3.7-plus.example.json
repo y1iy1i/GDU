@@ -6,6 +6,7 @@
   "api_key_env": "DASHSCOPE_API_KEY",
   "api_style": "openai_chat_completions",
   "json_output_mode": "native",
+  "thinking_mode": "disabled",
   "max_calls": 1,
   "timeout_seconds": 120,
   "max_output_tokens": 8192,

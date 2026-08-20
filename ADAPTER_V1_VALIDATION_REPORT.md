@@ -15,7 +15,7 @@
 
 ## 2. 新增测试
 
-19 项 Adapter v1 测试覆盖：
+20 项 Adapter v1 测试覆盖：
 
 - request 不包含 PDF 路径，且付费远程调用和外部知识均为 false；
 - response 阶段必须与 request 一致；
@@ -27,11 +27,13 @@
 
 ## 3. 全项目结果
 
-- Conda `gdu`（Python 3.12.13）：共运行 114 项，110 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
+- Conda `gdu`（Python 3.12.13）：共运行 115 项，111 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
 - compileall：通过；
 - `GDU_BUILDER_V0_BASELINE.sha256`：28 项全部 OK；
 - 阿里云 Token Plan API 调用：1 次最小连接测试，成功且未重试；
 - Qwen CP1 API 调用：1 次；Adapter response Schema 通过，但 GDU physical_structure 字段 Schema 拒绝，未重试；
+- Qwen CP1 第二次运行：1 次请求在 120 秒读取超时，未自动重试；
+- Qwen CP1 第三次运行：关闭思考模式后成功，4 个对象通过 Adapter Schema、GDU 字段 Schema 和原文逐字接地检查；
 - 本地生成模型调用：0。
 
 ## 4. 结论边界
@@ -41,3 +43,5 @@
 不能得出：一次小 JSON 连接成功不等于 Qwen 已具备生成完整 GDU 对象的能力。
 
 第一次真实 CP1 进一步证明：原生 JSON Mode 只能保证输出可解析，不能替代 GDU 字段级验证。
+
+第三次 CP1 可以得出：Qwen 3.7 Plus 在明确字段形状、关闭长思考并限制来源页后，能够提交机械合格且逐字接地的 CP1 候选。由于只观察第 8 页，章节范围保守记为 8–8，尚未验证完整章节终点。
