@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from gdu.logic_v01 import (
     belnap_status,
+    compare_contexts,
     compile_structured_arguments,
     grounded_labels,
     recompute_after_invalidation,
@@ -130,7 +131,7 @@ def test_rebut_across_different_scope_is_rejected_by_interface():
         }
     )
     issues = validate_aif_interface(graph)
-    assert {issue.code for issue in issues} == {"rebut_scope_mismatch"}
+    assert {issue.code for issue in issues} == {"rebut_context_incomparable"}
 
 
 def test_tms_invalidation_removes_unsupported_downstream_claim():
@@ -252,3 +253,111 @@ def test_inference_dependency_cycle_is_rejected_but_attack_cycle_is_allowed():
     )
     issues = validate_aif_interface(graph)
     assert "cyclic_inference_dependency" in {issue.code for issue in issues}
+
+
+def test_context_interval_relations_are_explicit():
+    annual = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-01-01", "end": "2025-12-31"},
+    }
+    q4 = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-10-01", "end": "2025-12-31"},
+    }
+    q1 = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-01-01", "end": "2025-03-31"},
+    }
+    assert compare_contexts(annual, q4)["relation"] == "contains"
+    assert compare_contexts(q4, annual)["relation"] == "contained_by"
+    assert compare_contexts(q1, q4)["relation"] == "disjoint"
+
+
+def test_annual_claim_cannot_directly_rebut_quarter_claim():
+    graph = base_graph()
+    annual = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-01-01", "end": "2025-12-31"},
+    }
+    q4 = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-10-01", "end": "2025-12-31"},
+    }
+    source = claim("C-ANNUAL", "profit_positive", scope="consolidated")
+    target = claim("C-Q4", "profit_positive", polarity="negative", scope="consolidated")
+    source["context"] = annual
+    target["context"] = q4
+    graph["information_nodes"].extend([source, target])
+    graph["scheme_nodes"].append(
+        {
+            "id": "CA-TIME", "kind": "conflict", "attack_kind": "rebut",
+            "source": "C-ANNUAL", "target_type": "claim", "target": "C-Q4"
+        }
+    )
+    issues = validate_aif_interface(graph)
+    assert {issue.code for issue in issues} == {"rebut_context_projection_required"}
+
+
+def test_scope_alignment_creates_claim_from_q4_evidence_before_rebut():
+    graph = base_graph()
+    q4 = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-10-01", "end": "2025-12-31"},
+    }
+    projected = claim("C-Q4-POS", "profit_positive", asserted=False)
+    projected["context"] = q4
+    projected["provenance"] = {"generated_by": "I-PROJECT"}
+    q4_source = claim("C-Q4-SOURCE", "q4_source_reports_positive_profit")
+    q4_source["context"] = q4
+    negative = claim("C-Q4-NEG", "profit_positive", polarity="negative")
+    negative["context"] = q4
+    graph["information_nodes"].extend([q4_source, projected, negative])
+    graph["scheme_nodes"].extend(
+        [
+            {
+                "id": "I-PROJECT", "kind": "inference", "premises": ["C-Q4-SOURCE"],
+                "conclusion": "C-Q4-POS", "rule_kind": "strict", "rule_id": "q4-source-normalization"
+            },
+            {
+                "id": "CA-ALIGNED", "kind": "conflict", "attack_kind": "rebut",
+                "source": "C-Q4-NEG", "target_type": "claim", "target": "C-Q4-POS"
+            },
+        ]
+    )
+    assert validate_aif_interface(graph) == []
+
+
+def test_rebut_requires_opposite_polarity_or_explicit_contrary_rule():
+    graph = base_graph()
+    graph["information_nodes"].append(claim("C-OTHER", "unrelated_atom"))
+    graph["scheme_nodes"].append(
+        {
+            "id": "CA-UNRELATED", "kind": "conflict", "attack_kind": "rebut",
+            "source": "C-OTHER", "target_type": "claim", "target": "C-INCREASE"
+        }
+    )
+    issues = validate_aif_interface(graph)
+    assert {issue.code for issue in issues} == {"rebut_not_contrary"}
+
+
+def test_invalid_context_interval_is_reported_not_raised():
+    graph = base_graph()
+    bad = claim("C-BAD-TIME", "inventory_increased", polarity="negative")
+    bad["context"] = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-12-31", "end": "2025-01-01"},
+    }
+    target = next(node for node in graph["information_nodes"] if node["id"] == "C-INCREASE")
+    target["context"] = {
+        "company_scope": "consolidated",
+        "valid_time": {"type": "interval", "start": "2025-01-01", "end": "2025-12-31"},
+    }
+    graph["information_nodes"].append(bad)
+    graph["scheme_nodes"].append(
+        {
+            "id": "CA-BAD-TIME", "kind": "conflict", "attack_kind": "rebut",
+            "source": "C-BAD-TIME", "target_type": "claim", "target": "C-INCREASE"
+        }
+    )
+    issues = validate_aif_interface(graph)
+    assert {issue.code for issue in issues} == {"invalid_context"}

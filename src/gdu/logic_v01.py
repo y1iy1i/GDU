@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import asdict, dataclass
+from datetime import date
 from itertools import product
 from typing import Any, Iterable, Mapping
 
@@ -36,8 +37,73 @@ def _by_id(items: Iterable[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
     return {str(item["id"]): item for item in items}
 
 
-def _same_scope(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
-    return left.get("context", {}) == right.get("context", {})
+def _interval_relation(left: Mapping[str, Any], right: Mapping[str, Any]) -> str:
+    left_start = date.fromisoformat(str(left["start"]))
+    left_end = date.fromisoformat(str(left["end"]))
+    right_start = date.fromisoformat(str(right["start"]))
+    right_end = date.fromisoformat(str(right["end"]))
+    if left_start > left_end or right_start > right_end:
+        raise ValueError("context interval start must not exceed end")
+    if left_end < right_start or right_end < left_start:
+        return "disjoint"
+    if left_start == right_start and left_end == right_end:
+        return "equal"
+    if left_start <= right_start and left_end >= right_end:
+        return "contains"
+    if right_start <= left_start and right_end >= left_end:
+        return "contained_by"
+    return "overlaps"
+
+
+def _dimension_relation(left: Any, right: Any) -> str:
+    if left == right:
+        return "equal"
+    if isinstance(left, Mapping) and isinstance(right, Mapping):
+        if left.get("type") == right.get("type") == "interval":
+            return _interval_relation(left, right)
+        if left.get("type") == right.get("type") == "set":
+            left_values = set(left.get("values", []))
+            right_values = set(right.get("values", []))
+            if left_values.isdisjoint(right_values):
+                return "disjoint"
+            if left_values > right_values:
+                return "contains"
+            if left_values < right_values:
+                return "contained_by"
+            return "overlaps"
+    # Different categorical values are not assumed disjoint.  For example,
+    # consolidated and parent-company figures refer to different aggregates
+    # but may involve overlapping entities; neither can be projected to the
+    # other without an explicit rule.
+    return "incomparable"
+
+
+def compare_contexts(left: Mapping[str, Any], right: Mapping[str, Any]) -> dict[str, Any]:
+    """Compare multidimensional contexts without inventing scope hierarchies."""
+
+    dimensions = sorted(set(left) | set(right))
+    per_dimension = {
+        key: (
+            _dimension_relation(left[key], right[key])
+            if key in left and key in right
+            else "incomparable"
+        )
+        for key in dimensions
+    }
+    relations = set(per_dimension.values())
+    if "disjoint" in relations:
+        overall = "disjoint"
+    elif "incomparable" in relations:
+        overall = "incomparable"
+    elif relations == {"equal"} or not relations:
+        overall = "equal"
+    elif relations <= {"equal", "contains"}:
+        overall = "contains"
+    elif relations <= {"equal", "contained_by"}:
+        overall = "contained_by"
+    else:
+        overall = "overlaps"
+    return {"relation": overall, "dimensions": per_dimension}
 
 
 def _inference_order(schemes: Mapping[str, Mapping[str, Any]]) -> list[str] | None:
@@ -138,10 +204,42 @@ def validate_aif_interface(graph: Mapping[str, Any]) -> list[InterfaceIssue]:
                 if target is None or target.get("kind") != "claim":
                     issues.append(InterfaceIssue("invalid_attack_target", scheme_id, "攻击目标不是Claim"))
                 elif attack_kind == "rebut" and source is not None:
-                    if not _same_scope(source, target) and not scheme.get("scope_alignment", False):
+                    if not scheme.get("contrary_rule_id") and not (
+                        source.get("atom") == target.get("atom")
+                        and source.get("polarity") != target.get("polarity")
+                    ):
                         issues.append(
                             InterfaceIssue(
-                                "rebut_scope_mismatch", scheme_id, "不同Context不能自动构成rebut"
+                                "rebut_not_contrary",
+                                scheme_id,
+                                "rebut需要同一命题的相反极性或显式contrary规则",
+                            )
+                        )
+                    try:
+                        context_relation = compare_contexts(
+                            source.get("context", {}), target.get("context", {})
+                        )["relation"]
+                    except (KeyError, TypeError, ValueError) as exc:
+                        issues.append(
+                            InterfaceIssue(
+                                "invalid_context",
+                                scheme_id,
+                                f"Context无法比较：{type(exc).__name__}",
+                            )
+                        )
+                        continue
+                    if context_relation != "equal":
+                        if context_relation in {"contains", "contained_by", "overlaps"}:
+                            code = "rebut_context_projection_required"
+                        elif context_relation == "disjoint":
+                            code = "rebut_context_disjoint"
+                        else:
+                            code = "rebut_context_incomparable"
+                        issues.append(
+                            InterfaceIssue(
+                                code,
+                                scheme_id,
+                                f"Context关系为{context_relation}，不能直接构成rebut",
                             )
                         )
             elif target_type == "inference":
