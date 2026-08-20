@@ -31,6 +31,7 @@ def enabled_config() -> RemoteTransportConfig:
         base_url="https://api.example.test/v1",
         model="test-model",
         api_key_env="GDU_TEST_API_KEY",
+        json_output_mode="native",
         max_calls=1,
         timeout_seconds=10,
         max_output_tokens=1000,
@@ -75,14 +76,18 @@ class RemoteConfigTests(unittest.TestCase):
         with self.assertRaisesRegex(TechnicalFailure, "SHA-256 mismatch"):
             load_remote_transport_config(path, SCHEMA, "0" * 64)
 
-    def test_deepseek_example_is_enabled_and_call_capped(self) -> None:
-        path = ROOT / "remote-adapter-v1.deepseek.example.json"
+    def test_aliyun_deepseek_example_is_prompt_only_and_call_capped(self) -> None:
+        path = ROOT / "remote-adapter-v1.aliyun-deepseek.example.json"
         config = load_remote_transport_config(path, SCHEMA, digest(path))
         self.assertTrue(config.enabled)
-        self.assertEqual(config.provider_id, "deepseek-official")
-        self.assertEqual(config.base_url, "https://api.deepseek.com")
+        self.assertEqual(config.provider_id, "aliyun-bailian-beijing-workspace")
+        self.assertEqual(
+            config.base_url,
+            "https://ws-vi78tem3ych0571a.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+        )
         self.assertEqual(config.model, "deepseek-v4-flash")
-        self.assertEqual(config.api_key_env, "DEEPSEEK_API_KEY")
+        self.assertEqual(config.api_key_env, "DASHSCOPE_API_KEY")
+        self.assertEqual(config.json_output_mode, "prompt_only")
         self.assertEqual(config.max_calls, 1)
 
     def test_non_https_remote_url_is_rejected(self) -> None:
@@ -95,6 +100,7 @@ class RemoteConfigTests(unittest.TestCase):
                 "model": "test",
                 "api_key_env": "GDU_TEST_API_KEY",
                 "api_style": "openai_chat_completions",
+                "json_output_mode": "native",
                 "max_calls": 1,
                 "timeout_seconds": 10,
                 "max_output_tokens": 1000,
@@ -144,9 +150,30 @@ class RemoteTransportTests(unittest.TestCase):
             sent = urlopen.call_args.args[0]
             self.assertEqual(sent.full_url, "https://api.example.test/v1/chat/completions")
             self.assertEqual(sent.get_header("Authorization"), "Bearer secret-test-key")
+            body = json.loads(sent.data.decode("utf-8"))
+            self.assertEqual(body["response_format"], {"type": "json_object"})
             with self.assertRaisesRegex(TechnicalFailure, "limit exhausted"):
                 transport.invoke(permitted_request())
             self.assertEqual(urlopen.call_count, 1)
+
+    @patch.dict(os.environ, {"GDU_TEST_API_KEY": "secret-test-key"}, clear=True)
+    def test_prompt_only_mode_omits_native_json_parameter(self) -> None:
+        envelope = {
+            "choices": [{"message": {"content": json.dumps({"stage": "cp1"})}}]
+        }
+        config = RemoteTransportConfig(
+            **{**enabled_config().__dict__, "json_output_mode": "prompt_only"}
+        )
+        transport = OpenAICompatibleRemoteTransport(
+            config, explicit_authorization=True
+        )
+        with patch(
+            "urllib.request.urlopen", return_value=FakeResponse(envelope)
+        ) as urlopen:
+            transport.invoke(permitted_request())
+            sent = urlopen.call_args.args[0]
+            body = json.loads(sent.data.decode("utf-8"))
+            self.assertNotIn("response_format", body)
 
     @patch.dict(os.environ, {"GDU_TEST_API_KEY": "secret-test-key"}, clear=True)
     def test_malformed_remote_envelope_is_a_technical_failure(self) -> None:

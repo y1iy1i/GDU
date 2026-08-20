@@ -20,6 +20,7 @@ class RemoteTransportConfig:
     base_url: str = ""
     model: str = ""
     api_key_env: str = ""
+    json_output_mode: str = ""
     max_calls: int = 0
     timeout_seconds: int = 0
     max_output_tokens: int = 0
@@ -61,6 +62,7 @@ def load_remote_transport_config(
         base_url=value["base_url"].rstrip("/"),
         model=value["model"],
         api_key_env=value["api_key_env"],
+        json_output_mode=value["json_output_mode"],
         max_calls=value["max_calls"],
         timeout_seconds=value["timeout_seconds"],
         max_output_tokens=value["max_output_tokens"],
@@ -127,11 +129,12 @@ class OpenAICompatibleRemoteTransport:
                     ),
                 },
             ],
-            "response_format": {"type": "json_object"},
             "temperature": 0,
             "max_tokens": self.config.max_output_tokens,
             "stream": False,
         }
+        if self.config.json_output_mode == "native":
+            body["response_format"] = {"type": "json_object"}
         wire_request = urllib.request.Request(
             f"{self.config.base_url}/chat/completions",
             data=json.dumps(body, ensure_ascii=False).encode("utf-8"),

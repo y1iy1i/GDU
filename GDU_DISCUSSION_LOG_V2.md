@@ -2760,3 +2760,11 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **配置**：新增启用样例，Key 只从 `DEEPSEEK_API_KEY` 读取，首轮最多调用 1 次，最大输出 8192 tokens。
 - **保留边界**：允许消耗已有 API 余额，但项目不充值、不购买余额、不自动续费；额度不足或 API 拒绝时停止。
 - **当前状态**：配置已建立，尚无 Key、真实请求、模型输出或费用。
+
+### V2-207 切换至阿里云百炼工作空间端点
+
+- **用户决定**：将 Base URL 改为用户提供的北京区 MaaS OpenAI-compatible 工作空间地址。
+- **供应商边界**：推理模型仍为 `deepseek-v4-flash`，实际 API 服务与计费方改为阿里云百炼。
+- **兼容修正**：阿里云官方注明该模型不支持原生结构化输出，因此配置使用 `prompt_only`，不发送 `response_format`，返回内容仍由 Adapter JSON Schema 严格拒绝或接收。
+- **Key 注入**：改用 `DASHSCOPE_API_KEY` 环境变量。
+- **当前状态**：尚未发出请求，首轮上限仍为 1 次。

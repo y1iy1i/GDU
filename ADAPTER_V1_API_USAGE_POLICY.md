@@ -19,9 +19,10 @@
 
 ## 当前选择
 
-- 提供商：DeepSeek 官方 API；
+- 提供商：阿里云百炼北京区工作空间；
 - 模型：`deepseek-v4-flash`；
-- Base URL：`https://api.deepseek.com`；
-- Key 环境变量：`DEEPSEEK_API_KEY`；
+- Base URL：`https://ws-vi78tem3ych0571a.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`；
+- Key 环境变量：`DASHSCOPE_API_KEY`；
+- JSON 模式：`prompt_only`，由提示词要求 JSON，再在本地按 Schema 严格验证；
 - 首轮最大调用次数：1；
 - 当前状态：已配置，尚未发起真实请求。
