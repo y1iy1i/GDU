@@ -5,6 +5,7 @@ from gdu.logic_v01 import (
     compare_contexts,
     compile_structured_arguments,
     grounded_labels,
+    incremental_recompute_after_invalidation,
     recompute_after_invalidation,
     validate_aif_interface,
 )
@@ -361,3 +362,76 @@ def test_invalid_context_interval_is_reported_not_raised():
     )
     issues = validate_aif_interface(graph)
     assert {issue.code for issue in issues} == {"invalid_context"}
+
+
+def incremental_graph():
+    graph = base_graph()
+    graph["information_nodes"].extend(
+        [
+            claim("C-A", "source_a"),
+            claim("C-B", "source_b"),
+            claim("C-MID", "intermediate", asserted=False),
+            claim("C-FINAL", "final", asserted=False),
+            claim("C-SIDE", "unaffected_side", asserted=False),
+        ]
+    )
+    graph["scheme_nodes"].extend(
+        [
+            {
+                "id": "I-A", "kind": "inference", "premises": ["C-A"],
+                "conclusion": "C-MID", "rule_kind": "defeasible", "rule_id": "from-a"
+            },
+            {
+                "id": "I-B", "kind": "inference", "premises": ["C-B"],
+                "conclusion": "C-MID", "rule_kind": "defeasible", "rule_id": "from-b"
+            },
+            {
+                "id": "I-FINAL", "kind": "inference", "premises": ["C-MID"],
+                "conclusion": "C-FINAL", "rule_kind": "defeasible", "rule_id": "continue"
+            },
+            {
+                "id": "I-SIDE", "kind": "inference", "premises": ["C-SIGN"],
+                "conclusion": "C-SIDE", "rule_kind": "strict", "rule_id": "side"
+            },
+        ]
+    )
+    return graph
+
+
+def assert_incremental_equals_full(graph, invalid):
+    full = recompute_after_invalidation(graph, invalid, event_id="FULL")
+    incremental = incremental_recompute_after_invalidation(graph, invalid, event_id="INC")
+    assert incremental["active_claim_ids"] == full["active_claim_ids"]
+    assert incremental["active_inference_ids"] == full["active_inference_ids"]
+
+    full_arguments, full_attacks = compile_structured_arguments(full["graph"])
+    inc_arguments, inc_attacks = compile_structured_arguments(incremental["graph"])
+    assert set(inc_arguments) == set(full_arguments)
+    assert inc_attacks == full_attacks
+    assert grounded_labels(inc_arguments, inc_attacks) == grounded_labels(
+        full_arguments, full_attacks
+    )
+    return incremental
+
+
+def test_incremental_recompute_matches_full_with_alternative_support():
+    result = assert_incremental_equals_full(incremental_graph(), ["C-A"])
+    assert "C-MID" in result["active_claim_ids"]
+    assert "C-FINAL" in result["active_claim_ids"]
+    assert "I-B" in result["active_inference_ids"]
+    assert "I-SIDE" not in result["affected_inference_ids"]
+
+
+def test_incremental_recompute_matches_full_when_all_supports_fail():
+    result = assert_incremental_equals_full(incremental_graph(), ["C-A", "C-B"])
+    assert "C-MID" not in result["active_claim_ids"]
+    assert "C-FINAL" not in result["active_claim_ids"]
+    assert "C-SIDE" in result["active_claim_ids"]
+
+
+def test_incremental_matches_full_for_all_seed_invalidation_subsets():
+    graph = incremental_graph()
+    seeds = ["C-A", "C-B", "C-SIGN"]
+    for mask in range(1, 1 << len(seeds)):
+        invalid = [seed for index, seed in enumerate(seeds) if mask & (1 << index)]
+        assert_incremental_equals_full(graph, invalid)

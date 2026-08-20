@@ -37,6 +37,10 @@ def _by_id(items: Iterable[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
     return {str(item["id"]): item for item in items}
 
 
+def _scheme_enabled(scheme: Mapping[str, Any]) -> bool:
+    return bool(scheme.get("active", True)) and bool(scheme.get("effective", True))
+
+
 def _interval_relation(left: Mapping[str, Any], right: Mapping[str, Any]) -> str:
     left_start = date.fromisoformat(str(left["start"]))
     left_end = date.fromisoformat(str(left["end"]))
@@ -112,7 +116,7 @@ def _inference_order(schemes: Mapping[str, Mapping[str, Any]]) -> list[str] | No
     inferences = {
         scheme_id: scheme
         for scheme_id, scheme in schemes.items()
-        if scheme.get("kind") == "inference" and scheme.get("active", True)
+        if scheme.get("kind") == "inference" and _scheme_enabled(scheme)
     }
     producers: dict[str, set[str]] = {}
     for scheme_id, inference in inferences.items():
@@ -328,7 +332,7 @@ def compile_structured_arguments(
 
     attacks: set[tuple[str, str]] = set()
     for conflict in schemes.values():
-        if conflict.get("kind") != "conflict" or not conflict.get("active", True):
+        if conflict.get("kind") != "conflict" or not _scheme_enabled(conflict):
             continue
         sources = claim_arguments.get(str(conflict["source"]), set())
         if conflict["target_type"] == "claim":
@@ -425,7 +429,10 @@ def recompute_after_invalidation(
         for inference in inferences:
             if inference["id"] in active_inferences or not inference.get("active", True):
                 continue
-            if set(inference["premises"]) <= active_claims:
+            if (
+                str(inference["conclusion"]) not in invalid
+                and set(inference["premises"]) <= active_claims
+            ):
                 active_inferences.add(str(inference["id"]))
                 before = len(active_claims)
                 active_claims.add(str(inference["conclusion"]))
@@ -444,5 +451,108 @@ def recompute_after_invalidation(
         "active_claim_ids": sorted(active_claims),
         "active_inference_ids": sorted(active_inferences),
         "invalidated_claim_ids": sorted(invalid),
+        "event_id": event_id,
+    }
+
+
+def incremental_recompute_after_invalidation(
+    graph: Mapping[str, Any], invalid_claim_ids: Iterable[str], *, event_id: str
+) -> dict[str, Any]:
+    """Recompute the dependency closure only, retaining independent supports."""
+
+    invalid = set(invalid_claim_ids)
+    baseline = recompute_after_invalidation(graph, [], event_id="baseline")
+    baseline_graph = baseline["graph"]
+    schemes = _by_id(baseline_graph.get("scheme_nodes", []))
+    inferences = {
+        scheme_id: scheme
+        for scheme_id, scheme in schemes.items()
+        if scheme.get("kind") == "inference" and scheme.get("active", True)
+    }
+
+    affected_claims = set(invalid)
+    affected_inferences: set[str] = set()
+    changed = True
+    while changed:
+        changed = False
+        for inference_id, inference in inferences.items():
+            if inference_id not in affected_inferences and affected_claims.intersection(
+                inference.get("premises", [])
+            ):
+                affected_inferences.add(inference_id)
+                changed = True
+            if inference_id in affected_inferences:
+                conclusion = str(inference["conclusion"])
+                if conclusion not in affected_claims:
+                    affected_claims.add(conclusion)
+                    changed = True
+        # Any independent producer of an affected Claim must be reconsidered;
+        # otherwise an alternative support could be accidentally discarded.
+        for inference_id, inference in inferences.items():
+            if (
+                str(inference["conclusion"]) in affected_claims
+                and inference_id not in affected_inferences
+            ):
+                affected_inferences.add(inference_id)
+                changed = True
+
+    updated = deepcopy(baseline_graph)
+    info = _by_id(updated.get("information_nodes", []))
+    baseline_active_claims = set(baseline["active_claim_ids"])
+    baseline_active_inferences = set(baseline["active_inference_ids"])
+    active_claims = baseline_active_claims - affected_claims
+    active_inference_ids = baseline_active_inferences - affected_inferences
+
+    for claim_id in affected_claims:
+        node = info.get(claim_id)
+        if (
+            node is not None
+            and node.get("kind") == "claim"
+            and node.get("asserted", False)
+            and claim_id not in invalid
+        ):
+            active_claims.add(claim_id)
+
+    order = _inference_order(
+        {
+            scheme_id: {
+                **scheme,
+                # The dependency order must include affected inferences even
+                # though the baseline marked some of them ineffective.
+                "effective": True,
+            }
+            for scheme_id, scheme in schemes.items()
+        }
+    )
+    if order is None:
+        raise ValueError("cyclic inference dependency")
+    for inference_id in order:
+        if inference_id not in affected_inferences:
+            continue
+        inference = inferences[inference_id]
+        if (
+            str(inference["conclusion"]) not in invalid
+            and set(inference.get("premises", [])) <= active_claims
+        ):
+            active_inference_ids.add(inference_id)
+            active_claims.add(str(inference["conclusion"]))
+
+    for node in updated.get("information_nodes", []):
+        if node.get("kind") != "claim":
+            continue
+        node["active"] = node["id"] in active_claims
+        if node["id"] in invalid:
+            node.setdefault("provenance", {})["invalidated_by"] = event_id
+    for scheme in updated.get("scheme_nodes", []):
+        if scheme.get("kind") == "inference":
+            scheme["effective"] = scheme["id"] in active_inference_ids
+
+    return {
+        "graph": updated,
+        "active_claim_ids": sorted(active_claims),
+        "active_inference_ids": sorted(active_inference_ids),
+        "invalidated_claim_ids": sorted(invalid),
+        "affected_claim_ids": sorted(affected_claims),
+        "affected_inference_ids": sorted(affected_inferences),
         "event_id": event_id,
     }
