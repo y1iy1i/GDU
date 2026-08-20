@@ -1,0 +1,89 @@
+{
+  "format": "gdu-growth-gold-v1",
+  "document_id": "lafang-2025-annual-report",
+  "question": "为什么公司2025年净利润为负，但经营活动现金流量净额仍为正？哪些调节因素共同解释这种差异，回答时必须保留什么边界？",
+  "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+  "evidence": [
+    {
+      "id": "E-156-A",
+      "physical_page": 156,
+      "section": "现金流量表补充资料",
+      "carrier": "table",
+      "text": "将净利润调节为经营活动现金流量：净利润 -30,937,240.23；资产减值准备 22,765,149.80；信用减值损失 233,996.15；固定资产折旧 11,554,161.74；使用权资产摊销 1,848,820.06；无形资产摊销 1,674,744.83；长期待摊费用摊销 263,730.80；投资损失 17,383,596.22。"
+    },
+    {
+      "id": "E-156-B",
+      "physical_page": 156,
+      "section": "现金流量表补充资料",
+      "carrier": "table",
+      "text": "存货的减少（增加以‘－’号填列） -2,182,144.36；经营性应收项目的减少（增加以‘－’号填列）30,817,871.28。"
+    },
+    {
+      "id": "E-157-A",
+      "physical_page": 157,
+      "section": "现金流量表补充资料（续）",
+      "carrier": "table_continuation",
+      "text": "经营性应付项目的增加（减少以‘－’号填列）21,413,794.57；其他 -614,647.78；经营活动产生的现金流量净额 72,545,781.16。"
+    },
+    {
+      "id": "E-157-B",
+      "physical_page": 157,
+      "section": "现金流量表补充资料（续）",
+      "carrier": "table_continuation",
+      "text": "现金的期末余额 966,796,041.70；现金的期初余额1,154,680,964.08；现金及现金等价物净增加额 -187,884,922.38。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "OBS-PROFIT",
+      "role": "observation",
+      "statement": "2025年合并净利润为负30,937,240.23元",
+      "status": "validated",
+      "evidence_refs": ["E-156-A"]
+    },
+    {
+      "id": "OBS-OCF",
+      "role": "observation",
+      "statement": "2025年经营活动现金流量净额为正72,545,781.16元",
+      "status": "validated",
+      "evidence_refs": ["E-157-A"]
+    },
+    {
+      "id": "OBS-CASH",
+      "role": "limitation",
+      "statement": "正经营现金流不等于全年现金增加，现金及现金等价物全年仍减少187,884,922.38元",
+      "status": "validated",
+      "evidence_refs": ["E-157-B"]
+    },
+    {
+      "id": "MECH-NONCASH",
+      "role": "mechanism",
+      "mechanism_type": "noncash_adjustments",
+      "statement": "资产减值准备、折旧摊销和投资损失等调节项目共同形成净利润到经营现金流的调整",
+      "status": "validated",
+      "evidence_refs": ["E-156-A"]
+    },
+    {
+      "id": "MECH-WORKING-CAPITAL",
+      "role": "mechanism",
+      "mechanism_type": "working_capital_adjustments",
+      "statement": "经营性应收减少和经营性应付增加形成正向调节，存货项目则按表头规则显示增加并形成反向调节",
+      "status": "validated",
+      "evidence_refs": ["E-156-B", "E-157-A"]
+    },
+    {
+      "id": "BRIDGE-PROFIT-OCF",
+      "role": "bridge",
+      "statement": "非现金项目和营运资本变化共同解释了净利润为负而经营现金流为正；这不否定亏损，也不能单独证明整体资金状况改善",
+      "status": "validated",
+      "evidence_refs": ["E-156-A", "E-156-B", "E-157-A", "E-157-B"]
+    }
+  ],
+  "edges": [
+    {"id": "G-R1", "source": "MECH-NONCASH", "target": "BRIDGE-PROFIT-OCF", "type": "composes"},
+    {"id": "G-R2", "source": "MECH-WORKING-CAPITAL", "target": "BRIDGE-PROFIT-OCF", "type": "composes"},
+    {"id": "G-R3", "source": "OBS-PROFIT", "target": "BRIDGE-PROFIT-OCF", "type": "supports"},
+    {"id": "G-R4", "source": "OBS-OCF", "target": "BRIDGE-PROFIT-OCF", "type": "supports"},
+    {"id": "G-R5", "source": "OBS-CASH", "target": "BRIDGE-PROFIT-OCF", "type": "limits"}
+  ]
+}
