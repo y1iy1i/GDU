@@ -1,0 +1,94 @@
+{
+  "format": "gdu-reasoning-graph-v1",
+  "document_id": "lafang-2025-annual-report",
+  "purpose": "人工校验的现金流推理切片；用于把图价值与Builder质量分开测试",
+  "evidence": [
+    {
+      "id": "E-006",
+      "physical_page": 6,
+      "text": "经营活动产生的现金流量净额 72,545,781.16 161,421,214.02 -55.06",
+      "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23"
+    },
+    {
+      "id": "E-156-NP",
+      "physical_page": 156,
+      "text": "净利润 -30,937,240.23 40,952,384.35",
+      "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23"
+    },
+    {
+      "id": "E-156-INV",
+      "physical_page": 156,
+      "text": "存货的减少（增加以‘－’号填列） -2,182,144.36 45,758,502.42",
+      "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+      "normalization": {
+        "kind": "signed_decrease_increase",
+        "raw_value": -2182144.36,
+        "subject": "拉芳家化",
+        "period": 2025,
+        "metric": "存货",
+        "unit": "元"
+      }
+    },
+    {
+      "id": "E-157",
+      "physical_page": 157,
+      "text": "现金及现金等价物净增加额 -187,884,922.38 -83,907,763.38",
+      "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "A-CF-01",
+      "statement": "2025年经营活动现金流量净额为正7254.58万元，但同比下降55.06%",
+      "role": "fact",
+      "status": "validated",
+      "version": 1,
+      "evidence_refs": ["E-006"]
+    },
+    {
+      "id": "A-CF-02",
+      "statement": "2025年合并净利润为负3093.72万元",
+      "role": "fact",
+      "status": "validated",
+      "version": 1,
+      "evidence_refs": ["E-156-NP"]
+    },
+    {
+      "id": "A-CF-03",
+      "statement": "2025年拉芳家化存货增加2182144.36元",
+      "role": "fact",
+      "status": "validated",
+      "version": 1,
+      "structured_claim": {
+        "metric": "inventory",
+        "direction": "increase",
+        "magnitude": 2182144.36,
+        "unit": "元"
+      },
+      "evidence_refs": ["E-156-INV"]
+    },
+    {
+      "id": "A-CF-04",
+      "statement": "2025年现金及现金等价物全年减少1.8788亿元",
+      "role": "fact",
+      "status": "validated",
+      "version": 1,
+      "evidence_refs": ["E-157"]
+    },
+    {
+      "id": "A-CF-05",
+      "statement": "正经营现金流不能否定当期亏损，也不能单独证明整体现金增加",
+      "role": "limitation",
+      "status": "validated",
+      "version": 1,
+      "evidence_refs": ["E-006", "E-156-NP", "E-157"]
+    }
+  ],
+  "edges": [
+    {"id": "R-01", "source": "A-CF-01", "target": "A-CF-05", "type": "supports"},
+    {"id": "R-02", "source": "A-CF-02", "target": "A-CF-05", "type": "supports"},
+    {"id": "R-03", "source": "A-CF-04", "target": "A-CF-05", "type": "supports"},
+    {"id": "R-04", "source": "A-CF-03", "target": "A-CF-05", "type": "limits"}
+  ],
+  "repair_log": []
+}
