@@ -75,6 +75,16 @@ class RemoteConfigTests(unittest.TestCase):
         with self.assertRaisesRegex(TechnicalFailure, "SHA-256 mismatch"):
             load_remote_transport_config(path, SCHEMA, "0" * 64)
 
+    def test_deepseek_example_is_enabled_and_call_capped(self) -> None:
+        path = ROOT / "remote-adapter-v1.deepseek.example.json"
+        config = load_remote_transport_config(path, SCHEMA, digest(path))
+        self.assertTrue(config.enabled)
+        self.assertEqual(config.provider_id, "deepseek-official")
+        self.assertEqual(config.base_url, "https://api.deepseek.com")
+        self.assertEqual(config.model, "deepseek-v4-flash")
+        self.assertEqual(config.api_key_env, "DEEPSEEK_API_KEY")
+        self.assertEqual(config.max_calls, 1)
+
     def test_non_https_remote_url_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "remote.json"

@@ -2752,3 +2752,11 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **验证**：全项目共运行 110 项，106 项通过，4 项因公开仓库缺少本地 Pilot 原文跳过；Builder v0 冻结清单 28 项全部 OK。
 - **费用状态**：只用 mock 返回包测试，没有真实网络请求、没有 API 消耗、没有自动续费能力。
 - **下一门**：用户指定提供商、模型、Key 环境变量和单轮最大调用次数后，才生成启用配置并运行首个真实小页包。
+
+### V2-206 选择 DeepSeek V4 Flash
+
+- **用户决定**：删除“零费用”限制，允许使用外部模型 API；提供商为 DeepSeek，目标模型口述为 `deekseekv4flash`。
+- **官方校正**：按 DeepSeek 官方模型列表将可调用 ID 校正为 `deepseek-v4-flash`，Base URL 为 `https://api.deepseek.com`。
+- **配置**：新增启用样例，Key 只从 `DEEPSEEK_API_KEY` 读取，首轮最多调用 1 次，最大输出 8192 tokens。
+- **保留边界**：允许消耗已有 API 余额，但项目不充值、不购买余额、不自动续费；额度不足或 API 拒绝时停止。
+- **当前状态**：配置已建立，尚无 Key、真实请求、模型输出或费用。

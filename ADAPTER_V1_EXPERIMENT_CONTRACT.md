@@ -51,3 +51,5 @@ Adapter 不能自行分配规范 ID，不能在 CP6 暗改对象，propose 不�
 ## 6. 远程接线边界
 
 `remote-adapter-v1.schema.json` 只兼容 HTTPS 上的 OpenAI-style Chat Completions JSON 接口。真正发出请求前必须同时通过：启用配置、配置哈希、当次显式授权、请求策略、API Key 环境变量和双重调用次数上限。当前只用假响应测试，未发起网络请求。
+
+当前首个远程候选为 DeepSeek 官方 `deepseek-v4-flash`，配置见 `remote-adapter-v1.deepseek.example.json`。配置文件本身不会触发请求。

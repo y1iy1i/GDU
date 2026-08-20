@@ -11,10 +11,11 @@
 - `src/gdu/adapter_v1/structured_adapter.py`：Builder 数据类与结构化 JSON 之间的转换与验证；
 - `TranscriptTransport`：按预登记顺序离线重放响应，不访问网络或模型。
 - `OpenAICompatibleRemoteTransport`：默认关闭，只在安全门全部通过时具备发送能力。
+- DeepSeek 配置样例：使用官方 `https://api.deepseek.com` 和模型 ID `deepseek-v4-flash`，首轮上限 1 次。
 
 ## 2. 新增测试
 
-15 项 Adapter v1 测试覆盖：
+16 项 Adapter v1 测试覆盖：
 
 - request 不包含 PDF 路径，且付费远程调用和外部知识均为 false；
 - response 阶段必须与 request 一致；
@@ -26,11 +27,12 @@
 
 ## 3. 全项目结果
 
-- Conda `gdu`（Python 3.12.13）：共运行 110 项，106 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
+- Conda `gdu`（Python 3.12.13）：共运行 111 项，107 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
 - compileall：通过；
 - `GDU_BUILDER_V0_BASELINE.sha256`：28 项全部 OK；
 - 付费 API 调用：0；
 - 本地生成模型调用：0。
+- DeepSeek API 调用：0。
 
 ## 4. 结论边界
 
