@@ -78,8 +78,10 @@ class RemoteConfigTests(unittest.TestCase):
         with self.assertRaisesRegex(TechnicalFailure, "SHA-256 mismatch"):
             load_remote_transport_config(path, SCHEMA, "0" * 64)
 
-    def test_aliyun_qwen_example_is_native_json_and_call_capped(self) -> None:
-        path = API_CONFIG / "aliyun-token-plan-qwen3.7-plus.example.json"
+    def test_aliyun_deepseek_example_is_native_json_and_call_capped(self) -> None:
+        path = API_CONFIG / (
+            "aliyun-token-plan-deepseek-v4-flash-0731.example.json"
+        )
         config = load_remote_transport_config(path, SCHEMA, digest(path))
         self.assertTrue(config.enabled)
         self.assertEqual(config.provider_id, "aliyun-bailian-token-plan-beijing")
@@ -87,7 +89,7 @@ class RemoteConfigTests(unittest.TestCase):
             config.base_url,
             "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
         )
-        self.assertEqual(config.model, "qwen3.7-plus")
+        self.assertEqual(config.model, "deepseek-v4-flash-0731")
         self.assertEqual(config.api_key_env, "DASHSCOPE_API_KEY")
         self.assertEqual(config.json_output_mode, "native")
         self.assertEqual(config.thinking_mode, "disabled")

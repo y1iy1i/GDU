@@ -20,10 +20,11 @@
 ## 当前选择
 
 - 提供商：阿里云百炼北京区 Token Plan；
-- 模型：`qwen3.7-plus`；
+- 默认模型：`deepseek-v4-flash-0731`；
+- 对照模型：`qwen3.7-plus`（保留旧实验配置，不再用于后续正式实验）；
 - Base URL：`https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`；
 - Key 环境变量：`DASHSCOPE_API_KEY`；
 - JSON 模式：`native`，由接口保证 JSON 格式，再在本地按 Schema 严格验证；
 - 思考模式：`disabled`，首轮结构实验优先减少延迟和 Credits；
 - 首轮最大调用次数：1；
-- 当前状态：最小连接测试和第三次 CP1 运行成功；用户已授权继续实验，不再逐次确认费用。
+- 当前状态：Qwen 的 CP1 候选通过机械校验，但在 8–12 页边界任务中仍只给出 8–8；DeepSeek 在同条件下正确给出第二节 8–12 和第三节起点。后续正式实验使用 DeepSeek。用户已授权继续实验，不再逐次确认费用。

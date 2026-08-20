@@ -63,10 +63,11 @@ def trusted_manifest(
     source_identity: Any,
     extracted_text: Path,
     config_hash: str,
+    model_id: str,
 ) -> dict[str, Any]:
     return {
         "gdu_identity": {
-            "gdu_id": "gdu-remote-cp1-qwen37",
+            "gdu_id": "gdu-remote-cp1-deepseek-v4-flash-0731",
             "schema_version": "gdu-v0",
             "artifact_version": "0.1.0-remote-cp1-experiment",
             "status": "provisional",
@@ -87,7 +88,7 @@ def trusted_manifest(
             "protocol_name": "gdu-builder-protocol",
             "protocol_version": "v2",
             "protocol_sha256": sha256_file(ROOT / "BUILDER_PROTOCOL_V2.md"),
-            "model_id": "qwen3.7-plus",
+            "model_id": model_id,
             "reasoning_effort": "provider-default",
             "config_or_prompt_sha256": config_hash,
             "build_log_ref": "remote-cp1-experiment-not-published",
@@ -194,6 +195,14 @@ def main() -> int:
     parser.add_argument("--pdf", type=Path, required=True)
     parser.add_argument("--text", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--section-end",
+        type=int,
+        default=8,
+        choices=range(8, 13),
+        metavar="8..12",
+        help="last physical page supplied for the observed second-section boundary",
+    )
     args = parser.parse_args()
 
     if file_sha256(args.text) != TEXT_SHA256:
@@ -210,15 +219,19 @@ def main() -> int:
     source_identity = reader.inspect()
     packet = reader.read(
         SourceRequest(
-            purpose="Ground cover and visible section structure for CP1.",
-            page_ranges=((1, 1), (8, 8)),
+            purpose=(
+                "Ground cover and visible section structure for CP1, including "
+                "the observed boundary after the second section."
+            ),
+            page_ranges=((1, 1), (8, args.section_end)),
             modalities=("text",),
             locator_hints=("cover title", "second section heading"),
         )
     )
 
-    config_path = (
-        ROOT / "configs/api/aliyun-token-plan-qwen3.7-plus.example.json"
+    config_path = ROOT / (
+        "configs/api/"
+        "aliyun-token-plan-deepseek-v4-flash-0731.example.json"
     )
     config_hash = sha256_file(config_path)
     remote = load_remote_transport_config(
@@ -234,13 +247,13 @@ def main() -> int:
     )
     adapter = StructuredUnderstandingAdapter(
         transport,
-        ("qwen3.7-plus", "provider-default", config_hash),
+        (remote.model, "provider-default", config_hash),
         ROOT / "adapter-request-v1.schema.json",
         ROOT / "adapter-response-v1.schema.json",
         paid_remote_calls_allowed=True,
         max_remote_calls=1,
     )
-    manifest = trusted_manifest(source_identity, args.text, config_hash)
+    manifest = trusted_manifest(source_identity, args.text, config_hash, remote.model)
     result = adapter.propose("cp1", packet, guidance(manifest))
     if result.bundle is None:
         raise TechnicalFailure("remote_cp1_experiment", "CP1 returned no bundle")
@@ -249,7 +262,7 @@ def main() -> int:
     canonical = allocator.canonicalize(result.bundle)
     gdu_schema = load_json(ROOT / "gdu.schema.json")
     output = {
-        "experiment": "remote-cp1-qwen3.7-plus-v1",
+        "experiment": f"remote-cp1-{remote.model}-v1",
         "result_summary": result.result_summary,
         "calls_made": transport.calls_made,
         "source_pages": [fragment.page for fragment in packet.pdf_fragments],

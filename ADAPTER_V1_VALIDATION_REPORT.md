@@ -2,7 +2,7 @@
 
 日期：2026-08-20
 
-状态：请求/响应 Schema、离线 Transcript 和远程接线通过；Qwen 3.7 Plus 最小连接测试成功。
+状态：请求/响应 Schema、离线 Transcript 和远程接线通过；Qwen 完成接口与机械验证但未通过章节边界任务；DeepSeek V4 Flash 0731 已在同条件下通过 CP1 边界实验。
 
 ## 1. 已实现
 
@@ -11,7 +11,7 @@
 - `src/gdu/adapter_v1/structured_adapter.py`：Builder 数据类与结构化 JSON 之间的转换与验证；
 - `TranscriptTransport`：按预登记顺序离线重放响应，不访问网络或模型。
 - `OpenAICompatibleRemoteTransport`：默认关闭，只在安全门全部通过时具备发送能力。
-- 阿里云百炼配置样例：使用用户指定的北京区 Token Plan 地址和模型 ID `qwen3.7-plus`，首轮上限 1 次，采用原生 JSON Mode 加本地校验。
+- 阿里云百炼正式配置：使用用户指定的北京区 Token Plan 地址和模型 ID `deepseek-v4-flash-0731`，单次运行上限 1 次，采用原生 JSON Mode 加本地校验；Qwen 配置保留作对照。
 
 ## 2. 新增测试
 
@@ -34,14 +34,16 @@
 - Qwen CP1 API 调用：1 次；Adapter response Schema 通过，但 GDU physical_structure 字段 Schema 拒绝，未重试；
 - Qwen CP1 第二次运行：1 次请求在 120 秒读取超时，未自动重试；
 - Qwen CP1 第三次运行：关闭思考模式后成功，4 个对象通过 Adapter Schema、GDU 字段 Schema 和原文逐字接地检查；
+- Qwen CP1 边界运行：输入扩大至物理页 1、8–12，机械检查继续通过，但模型仍只引用第 1、8 页并输出第二节 8–8，未通过边界语义验收；
+- DeepSeek CP1 边界运行：同样输入物理页 1、8–12，返回 9 个对象，通过三层机械检查；第二节识别为 8–12，并在第 12 页识别出第三节起点，语义验收通过；
 - 本地生成模型调用：0。
 
 ## 4. 结论边界
 
 可以得出：当前地址、Key、模型 ID 和原生 JSON Mode 已连通；模型未来只要能稳定返回完整契约 JSON，就可以在不修改 Builder v0 的情况下接入。
 
-不能得出：一次小 JSON 连接成功不等于 Qwen 已具备生成完整 GDU 对象的能力。
+不能得出：接口连通或机械 Schema 通过，不等于模型已完成指定的文档理解任务。
 
 第一次真实 CP1 进一步证明：原生 JSON Mode 只能保证输出可解析，不能替代 GDU 字段级验证。
 
-第三次 CP1 可以得出：Qwen 3.7 Plus 在明确字段形状、关闭长思考并限制来源页后，能够提交机械合格且逐字接地的 CP1 候选。由于只观察第 8 页，章节范围保守记为 8–8，尚未验证完整章节终点。
+第三次 CP1 可以得出：Qwen 3.7 Plus 在明确字段形状、关闭长思考并限制来源页后，能够提交机械合格且逐字接地的 CP1 候选。随后的扩大页包实验表明，它没有据此识别完整章节终点。DeepSeek 在同条件输入下识别出第二节 8–12 和第 12 页的第三节起点，因而成为后续正式实验默认模型。

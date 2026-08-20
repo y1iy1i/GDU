@@ -21,10 +21,12 @@ GDU（Generative Document Understanding，生成式文档理解单元）是一�
 - 已实现确定性 Builder v0 候选：六检查点、有限修正、全局技术重试、证据授权、日志、停止门和原子发布；
 - 已实现最小 PDF 文本层 SourceReader、可验证的运行配置、Fixed GDU Adapter 和 CLI；
 - 当前 101 个唯一测试已在独立 Conda `gdu` 环境中全部通过；
-- 已建立 Adapter v1 结构化契约、离线 Transcript 与受限远程 Transport；阿里云 Token Plan 的 Qwen 3.7 Plus 最小连接测试已成功；
+- 已建立 Adapter v1 结构化契约、离线 Transcript 与受限远程 Transport；
 - 远程 API 的 Schema、提供商样例和使用规则统一位于 `configs/api/`；
 - 第一次 Qwen CP1 真实候选通过 Adapter JSON 契约，但因 `page_range` 字段形状错误被 GDU Schema 拒绝，未进入 Builder；
-- 关闭思考模式并补充字段形状后，第三次 CP1 返回 4 个候选并通过三层机械验证；章节终点仍需扩大页包验证；
+- Qwen CP1 在补充字段形状后通过三层机械验证，但扩大到第 8–12 页后仍把章节范围写为 8–8，没有完成边界理解目标；
+- 后续正式远程实验默认切换为 `deepseek-v4-flash-0731`，Qwen 结果保留作模型对照；
+- DeepSeek 已在相同第 1、8–12 页输入上返回 9 个机械合格对象，正确识别第二节 8–12 及第 12 页的第三节起点；
 - Pilot 03 已用“配置 + CLI”完成真实 PDF 到 frozen 三文件包的临时往返。
 
 当前的 Fixed Adapter 只重放已验证内容，它证明 Builder 基础设施可运行、可复现，不证明真实模型已会自动理解任意长文档。
