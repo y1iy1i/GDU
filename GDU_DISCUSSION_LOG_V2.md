@@ -2728,3 +2728,18 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 ## 98. 下一阶段
 
 在不修改 Builder v0 基线的前提下，先建立“真实 Adapter 实验契约”：定义模型 Adapter 能看到的 SourcePacket、必须返回的结构化对象、无 API Key/无额度时的停止规则，以及本地免费替代方案的能力边界；契约确认前不调用付费模型。
+
+### V2-204 Adapter v1 结构化契约与 Transcript 接线
+
+- **请求 Schema**：新增 `adapter-request-v1.schema.json`，只暴露授权 SourcePacket、公开 WorkingGDU、运行身份和有界修正请求，不暴露 PDF 路径、Key 或 Gold。
+- **响应 Schema**：新增 `adapter-response-v1.schema.json`，限定候选对象、manifest、GenerativePlan、mutation、revision 和 stop gate 的阶段边界。
+- **转换器**：新增 `src/gdu/adapter_v1/`，在 Builder dataclass 与 JSON 契约之间转换；非结构响应和结构违规稳定转为 technical failure。
+- **离线 Transport**：TranscriptTransport 按预登记顺序重放响应，不使用网络或模型。
+- **端到端**：六份 Transcript 响应成功推动冻结 Builder v0 产生 frozen 三文件包。
+- **测试**：新增 6 项，全项目 101 项全部通过；Builder v0 冻结清单 28 项全部 OK。
+- **费用澄清**：用户指的“额度”是 Codex 使用额度；额度耗尽后停止当前协作，不自动续费。用户允许后续外接其他模型 API，但真正调用前仍需锁定提供商、模型、Key 注入方式和最高费用。
+- **状态**：Adapter v1 契约层已验证，尚无真实生成模型结果。
+
+## 99. 下一阶段
+
+实现一个默认关闭、必须显式授权才能开启的远程结构化 Transport 配置，优先兼容 OpenAI-style JSON API；未配置提供商、模型、Key 环境变量和最高调用次数时必须拒绝启动。

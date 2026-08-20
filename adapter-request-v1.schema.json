@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdu-research.local/schema/adapter-request-v1.schema.json",
+  "title": "GDU Understanding Adapter v1 request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "mode",
+    "stage",
+    "run_identity",
+    "source_packet",
+    "public_working_view",
+    "policy"
+  ],
+  "properties": {
+    "contract_version": { "const": "gdu-adapter-v1" },
+    "mode": { "enum": ["propose", "revise"] },
+    "stage": { "enum": ["cp1", "cp2", "cp3", "cp4", "cp5", "cp6"] },
+    "run_identity": { "$ref": "#/$defs/runIdentity" },
+    "source_packet": { "$ref": "#/$defs/sourcePacket" },
+    "public_working_view": { "type": "object" },
+    "correction_request": { "type": "object" },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_knowledge_allowed", "paid_remote_calls_allowed"],
+      "properties": {
+        "external_knowledge_allowed": { "const": false },
+        "paid_remote_calls_allowed": { "const": false }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "mode": { "const": "revise" } } },
+      "then": {
+        "required": ["correction_request"],
+        "properties": { "stage": { "enum": ["cp1", "cp2", "cp3", "cp4", "cp5"] } }
+      },
+      "else": { "not": { "required": ["correction_request"] } }
+    }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "runIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "reasoning_effort", "config_or_prompt_sha256"],
+      "properties": {
+        "model_id": { "type": "string", "minLength": 1 },
+        "reasoning_effort": { "type": "string", "minLength": 1 },
+        "config_or_prompt_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "fragment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page", "locator", "excerpt", "fragment_sha256"],
+      "properties": {
+        "page": { "type": "integer", "minimum": 1 },
+        "locator": { "type": "string", "minLength": 1 },
+        "excerpt": { "type": "string", "minLength": 1 },
+        "fragment_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sourcePacket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_document_id", "request_identity", "pdf_fragments", "navigation_text", "retrieval_notes"],
+      "properties": {
+        "source_document_id": { "type": "string", "minLength": 1 },
+        "request_identity": { "$ref": "#/$defs/sha256" },
+        "pdf_fragments": { "type": "array", "items": { "$ref": "#/$defs/fragment" } },
+        "navigation_text": { "type": "array", "items": { "type": "string" } },
+        "retrieval_notes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdu-research.local/schema/adapter-response-v1.schema.json",
+  "title": "GDU Understanding Adapter v1 response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "mode", "stage", "result_summary", "objects", "mutations", "revisions", "observed_run_identity"],
+  "properties": {
+    "contract_version": { "const": "gdu-adapter-v1" },
+    "mode": { "enum": ["propose", "revise"] },
+    "stage": { "enum": ["cp1", "cp2", "cp3", "cp4", "cp5", "cp6"] },
+    "result_summary": { "type": "string", "minLength": 1 },
+    "objects": { "type": "array", "items": { "$ref": "#/$defs/candidateObject" } },
+    "manifest": { "type": "object" },
+    "generative_plan": { "type": "object" },
+    "mutations": { "type": "array", "items": { "$ref": "#/$defs/mutation" } },
+    "revisions": { "type": "array", "items": { "$ref": "#/$defs/revision" } },
+    "stop_gate": { "$ref": "#/$defs/stopGate" },
+    "observed_run_identity": { "$ref": "#/$defs/runIdentity" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "stage": { "const": "cp1" } } },
+      "then": { "required": ["manifest"], "not": { "required": ["stop_gate"] } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "cp5" } } },
+      "then": { "required": ["generative_plan"], "not": { "required": ["stop_gate"] } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "cp6" } } },
+      "then": {
+        "required": ["stop_gate"],
+        "properties": {
+          "mode": { "const": "propose" },
+          "objects": { "maxItems": 0 },
+          "mutations": { "maxItems": 0 },
+          "revisions": { "maxItems": 0 }
+        },
+        "not": { "anyOf": [{ "required": ["manifest"] }, { "required": ["generative_plan"] }] }
+      },
+      "else": { "not": { "required": ["stop_gate"] } }
+    },
+    {
+      "if": { "properties": { "mode": { "const": "propose" } } },
+      "then": { "properties": { "mutations": { "maxItems": 0 }, "revisions": { "maxItems": 0 } } },
+      "else": {
+        "properties": {
+          "stage": { "enum": ["cp1", "cp2", "cp3", "cp4", "cp5"] },
+          "revisions": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "runIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "reasoning_effort", "config_or_prompt_sha256"],
+      "properties": {
+        "model_id": { "type": "string", "minLength": 1 },
+        "reasoning_effort": { "type": "string", "minLength": 1 },
+        "config_or_prompt_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "candidateObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "handle", "fields", "source_authority"],
+      "properties": {
+        "kind": { "enum": ["physical_structure", "semantic_unit", "assertion", "interpretation_group", "relation", "evidence"] },
+        "handle": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+        "fields": { "type": "object" },
+        "source_authority": { "enum": ["pdf", "navigation"] }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "target_ref", "replacement_fields"],
+      "properties": {
+        "operation": { "enum": ["replace", "downgrade", "withdraw"] },
+        "target_ref": { "type": "string", "minLength": 1 },
+        "replacement_fields": { "type": "object" }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["before_summary", "after_summary", "change_type", "trigger_evidence_refs", "affected_refs", "surviving_alternative_refs", "rationale"],
+      "properties": {
+        "before_summary": { "type": "string", "minLength": 1 },
+        "after_summary": { "type": "string", "minLength": 1 },
+        "change_type": { "enum": ["promote", "replace", "downgrade", "retain_alternative", "withdraw"] },
+        "trigger_evidence_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "affected_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "surviving_alternative_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "rationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gap_id", "gate_dimension", "check_kind", "affected_refs", "source_scope", "reason", "earliest_checkpoint", "requested_action"],
+      "properties": {
+        "gap_id": { "type": "string", "minLength": 1 },
+        "gate_dimension": { "enum": ["coverage", "evidence", "stability"] },
+        "check_kind": { "enum": ["ordinary", "cross_carrier", "cross_section", "negative_boundary"] },
+        "affected_refs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start", "end"],
+            "properties": { "start": { "type": "integer", "minimum": 1 }, "end": { "type": "integer", "minimum": 1 } }
+          }
+        },
+        "reason": { "type": "string", "minLength": 1 },
+        "earliest_checkpoint": { "enum": ["cp1", "cp2", "cp3", "cp4", "cp5"] },
+        "requested_action": { "type": "string", "minLength": 1 }
+      }
+    },
+    "stopGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage", "evidence", "stability", "cross_carrier", "cross_section", "negative_boundary", "gaps", "summary"],
+      "properties": {
+        "coverage": { "enum": ["passed", "failed"] },
+        "evidence": { "enum": ["passed", "failed"] },
+        "stability": { "enum": ["passed", "failed"] },
+        "cross_carrier": { "enum": ["passed", "failed"] },
+        "cross_section": { "enum": ["passed", "failed"] },
+        "negative_boundary": { "enum": ["passed", "failed"] },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/gap" } },
+        "summary": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
