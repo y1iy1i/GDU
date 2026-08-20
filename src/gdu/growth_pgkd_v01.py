@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import json
 import re
 from copy import deepcopy
-from hashlib import sha256
 from typing import Any, Mapping
 
-from .logic_v01 import validate_aif_interface
+from .promotion_v01 import (
+    merge_validation_results,
+    promote_candidate_transaction,
+    validate_candidate_envelope,
+)
 
 
 REQUIRED_GATES = {
@@ -20,33 +22,23 @@ REQUIRED_GATES = {
 }
 
 
-def _hash(value: Mapping[str, Any]) -> str:
-    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return sha256(payload.encode("utf-8")).hexdigest()
-
-
 def _compact(text: str) -> str:
     return re.sub(r"[^0-9a-z]+", "", text.lower())
 
 
 def validate_pgkd_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
+    envelope = validate_candidate_envelope(
+        candidate,
+        required_gates=REQUIRED_GATES,
+        expected_document_id="pgkd-emnlp-2024",
+    )
     errors: list[str] = []
-    if candidate.get("document_id") != "pgkd-emnlp-2024":
-        errors.append("wrong_document")
-    if candidate.get("planner_result", {}).get("growth_policy") != "quarantine_before_validation":
-        errors.append("candidate_not_quarantined")
-    if set(candidate.get("promotion_gate", [])) != REQUIRED_GATES:
-        errors.append("promotion_gate_mismatch")
 
     evidence = {str(item["id"]): item for item in candidate.get("candidate_evidence", [])}
     if {item.get("carrier") for item in evidence.values()} != {"prose", "figure", "algorithm"}:
         errors.append("cross_carrier_evidence_missing")
     if {item.get("physical_page") for item in evidence.values()} != {3, 4}:
         errors.append("required_pages_missing")
-    if any(item.get("status") != "visually_verified_candidate" for item in evidence.values()):
-        errors.append("evidence_not_visually_verified")
-    if any(not item.get("source_locator") for item in evidence.values()):
-        errors.append("source_locator_missing")
 
     algorithm = _compact(str(evidence.get("CE-PGKD-P4-ALGORITHM", {}).get("text", "")))
     for pattern, code in (
@@ -66,13 +58,6 @@ def validate_pgkd_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
     }
     if set(claims) != required_claims:
         errors.append("candidate_claim_set_mismatch")
-    for claim in claims.values():
-        if claim.get("status") != "candidate_pending_logic_validation":
-            errors.append(f"candidate_status_invalid:{claim.get('id')}")
-        refs = set(claim.get("evidence_refs", []))
-        if not refs or not refs <= set(evidence):
-            errors.append(f"candidate_evidence_invalid:{claim.get('id')}")
-
     ambiguity = str(claims.get("CC-PGKD-IDENTITY-UNRESOLVED", {}).get("statement", ""))
     limitation = str(claims.get("CC-PGKD-NOT-RESOLVED", {}).get("statement", ""))
     if not all(term in ambiguity for term in ("未消解歧义", "更新后模型", "旧模型")):
@@ -82,7 +67,7 @@ def validate_pgkd_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
     if any(term in ambiguity + limitation for term in ("必然是排版错误", "确定是排版错误")):
         errors.append("unsupported_typo_resolution")
 
-    return {"valid": not errors, "errors": sorted(set(errors)), "candidate_hash": _hash(candidate)}
+    return merge_validation_results(envelope, {"errors": errors})
 
 
 def promote_pgkd_candidate(
@@ -95,10 +80,6 @@ def promote_pgkd_candidate(
     validation = validate_pgkd_candidate(candidate)
     if not validation["valid"]:
         raise ValueError(validation["errors"])
-    if validate_aif_interface(graph):
-        raise ValueError("base graph does not pass the logic interface")
-
-    grown = deepcopy(graph)
     context = {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"}
     source_hash = str(candidate["source_pdf_sha256"])
     candidate_evidence = {item["id"]: item for item in candidate["candidate_evidence"]}
@@ -156,21 +137,13 @@ def promote_pgkd_candidate(
         {"id": "CA-PGKD-NOT-RESOLVED-REBUT", "kind": "conflict", "attack_kind": "rebut", "source": "C-PGKD-NOT-RESOLVED", "target_type": "claim", "target": "C-PGKD-SILENT-CORRECTION"},
         {"id": "CA-PGKD-NOT-RESOLVED-UNDERCUT", "kind": "conflict", "attack_kind": "undercut", "source": "C-PGKD-NOT-RESOLVED", "target_type": "inference", "target": "I-PGKD-SILENT-CORRECTION-HEURISTIC"}
     ]
-    grown["information_nodes"].extend(evidence_nodes + claims)
-    grown["scheme_nodes"].extend(schemes)
-    grown["format"] = "gdu-logic-method-slice-v0.2"
-    grown.setdefault("revision_history", []).append(
-        {
-            "event_id": event_id,
-            "recorded_at": recorded_at,
-            "operation": "promote_pgkd_source_conflict_candidate",
-            "parent_format": graph.get("format"),
-            "candidate_hash": validation["candidate_hash"],
-            "added_information_node_ids": [node["id"] for node in evidence_nodes + claims],
-            "added_scheme_node_ids": [node["id"] for node in schemes],
-        }
+    return promote_candidate_transaction(
+        graph,
+        candidate,
+        validation=validation,
+        event_id=event_id,
+        recorded_at=recorded_at,
+        output_format="gdu-logic-method-slice-v0.2",
+        operation="promote_pgkd_source_conflict_candidate",
+        build_additions=lambda _candidate, _event_id: (evidence_nodes + claims, schemes),
     )
-    issues = validate_aif_interface(grown)
-    if issues:
-        raise ValueError([issue.to_dict() for issue in issues])
-    return grown

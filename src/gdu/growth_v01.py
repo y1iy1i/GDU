@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import json
 from copy import deepcopy
 from decimal import Decimal
-from hashlib import sha256
 from typing import Any, Mapping
 
-from .logic_v01 import validate_aif_interface
+from .promotion_v01 import (
+    merge_validation_results,
+    promote_candidate_transaction,
+    validate_candidate_envelope,
+)
 
 
 REQUIRED_PROMOTION_GATES = {
@@ -20,36 +22,21 @@ REQUIRED_PROMOTION_GATES = {
 }
 
 
-def _canonical_hash(value: Mapping[str, Any]) -> str:
-    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return sha256(payload.encode("utf-8")).hexdigest()
-
-
 def validate_growth_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
     """Validate the quarantined investment-cash-flow growth candidate."""
 
+    envelope = validate_candidate_envelope(
+        candidate,
+        required_gates=REQUIRED_PROMOTION_GATES,
+        expected_document_id="lafang-2025-annual-report",
+    )
     errors: list[str] = []
-    if candidate.get("planner_result", {}).get("growth_policy") != "quarantine_before_validation":
-        errors.append("candidate_not_quarantined")
-    if set(candidate.get("promotion_gate", [])) != REQUIRED_PROMOTION_GATES:
-        errors.append("promotion_gate_mismatch")
 
     evidence = {str(item["id"]): item for item in candidate.get("candidate_evidence", [])}
-    if any(item.get("status") != "visually_verified_candidate" for item in evidence.values()):
-        errors.append("evidence_not_visually_verified")
     if {item.get("physical_page") for item in evidence.values()} != {15, 72, 73}:
         errors.append("required_pages_missing")
-    if any(not item.get("source_locator") for item in evidence.values()):
-        errors.append("source_locator_missing")
 
     claims = candidate.get("candidate_claims", [])
-    available_evidence = set(evidence)
-    for claim in claims:
-        if claim.get("status") != "candidate_pending_logic_validation":
-            errors.append(f"candidate_status_invalid:{claim.get('id')}")
-        refs = set(claim.get("evidence_refs", []))
-        if not refs or not refs <= available_evidence:
-            errors.append(f"candidate_evidence_invalid:{claim.get('id')}")
 
     checks = candidate.get("numeric_checks", {})
     try:
@@ -94,11 +81,7 @@ def validate_growth_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
     if "不能单独解释全部变化" not in str(limitation.get("statement", "")):
         errors.append("single_cause_limitation_missing")
 
-    return {
-        "valid": not errors,
-        "errors": sorted(set(errors)),
-        "candidate_hash": _canonical_hash(candidate),
-    }
+    return merge_validation_results(envelope, {"errors": errors})
 
 
 def promote_growth_candidate(
@@ -113,10 +96,6 @@ def promote_growth_candidate(
     validation = validate_growth_candidate(candidate)
     if not validation["valid"]:
         raise ValueError(validation["errors"])
-    if validate_aif_interface(graph):
-        raise ValueError("base graph does not pass the logic interface")
-
-    grown = deepcopy(graph)
     context = {
         "company_scope": "consolidated",
         "valid_time": {"type": "interval", "start": "2025-01-01", "end": "2025-12-31"},
@@ -189,21 +168,13 @@ def promote_growth_candidate(
         {"id": "CA-GROW-NOT-SOLE-REBUT", "kind": "conflict", "attack_kind": "rebut", "source": "C-INVEST-NOT-SOLE-CAUSE", "target_type": "claim", "target": "C-INVEST-SOLE-CAUSE-HEURISTIC"},
         {"id": "CA-GROW-NOT-SOLE-UNDERCUT", "kind": "conflict", "attack_kind": "undercut", "source": "C-INVEST-NOT-SOLE-CAUSE", "target_type": "inference", "target": "I-GROW-SOLE-CAUSE-HEURISTIC"},
     ]
-    grown["information_nodes"].extend(evidence_nodes + claim_nodes)
-    grown["scheme_nodes"].extend(schemes)
-    grown["format"] = "gdu-logic-real-slice-v0.2"
-    grown.setdefault("revision_history", []).append(
-        {
-            "event_id": event_id,
-            "recorded_at": recorded_at,
-            "operation": "promote_query_gap_candidate",
-            "parent_format": graph.get("format"),
-            "candidate_hash": validation["candidate_hash"],
-            "added_information_node_ids": [node["id"] for node in evidence_nodes + claim_nodes],
-            "added_scheme_node_ids": [node["id"] for node in schemes],
-        }
+    return promote_candidate_transaction(
+        graph,
+        candidate,
+        validation=validation,
+        event_id=event_id,
+        recorded_at=recorded_at,
+        output_format="gdu-logic-real-slice-v0.2",
+        operation="promote_query_gap_candidate",
+        build_additions=lambda _candidate, _event_id: (evidence_nodes + claim_nodes, schemes),
     )
-    promoted_issues = validate_aif_interface(grown)
-    if promoted_issues:
-        raise ValueError([issue.to_dict() for issue in promoted_issues])
-    return grown

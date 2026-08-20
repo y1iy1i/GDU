@@ -28,7 +28,7 @@ GDU（生成式文档理解单元）研究如何把长文档转换为可追溯�
 → 可审计回答
 ```
 
-项目已经完成两次提问驱动生长：一次是财务数字闭合，一次是论文正文、流程图与算法之间的来源冲突。当前全仓测试结果为 `203 passed, 5 skipped`。
+项目已经完成两次提问驱动生长：一次是财务数字闭合，一次是论文正文、流程图与算法之间的来源冲突。两者已共用同一个通用晋升事务层，冻结的实验输出保持不变。当前全仓测试结果为 `209 passed, 5 skipped`。
 
 ## 阅读入口
 
@@ -41,6 +41,7 @@ GDU（生成式文档理解单元）研究如何把长文档转换为可追溯�
 5. [查询规划理论与实验](docs/current/GDU_QUERY_PLANNER_THEORY_AND_EXPERIMENT_V0_1.md)
 6. [第一次正式生长闭环](docs/current/GDU_FIRST_CLOSED_LOOP_GROWTH_REPORT_V0_1.md)
 7. [第二次非财务生长实验](docs/current/GDU_SECOND_NONFINANCIAL_GROWTH_REPORT_V0_1.md)
+8. [通用生长晋升框架](docs/current/GDU_GENERIC_PROMOTION_FRAMEWORK_REPORT_V0_1.md)
 
 完整文档导航见 [docs/README.md](docs/README.md)。
 
@@ -66,7 +67,8 @@ schemas/                  辅助 Schema
 - `src/gdu/logic_v01.py`：逻辑接口、论证编译、接受语义和局部失效重算；
 - `src/gdu/answer_v01.py`：从被接受的论证生成可审计答案；
 - `src/gdu/query_planner_v01.py`：问题结构、Context、目标命题和缺口规划；
-- `src/gdu/growth_v01.py`：隔离候选验证、正式提升和版本记录；
+- `src/gdu/promotion_v01.py`：通用候选包络验证和原子化晋升事务；
+- `src/gdu/growth_v01.py` 与 `growth_pgkd_v01.py`：财务与论文方法的领域验证规则；
 - `scripts/run_growth_promotion_v01.py`：从固定输入重放 v0.2 生长事件。
 
 ## 本地验证
@@ -93,4 +95,4 @@ PYTHONPATH=src python -m gdu.builder_v0.cli run \
 - 当前两跳扩散适合大规模图；
 - 当前结构中的每个模块都不可进一步删除。
 
-下一项研究是抽取两个生长提升器的共同验证框架，减少为每个领域重复编写提升代码。
+下一项研究是用第三类文档任务测量新领域的接入成本，判断通用晋升框架是否真正降低了 GDU 的迁移复杂度。
