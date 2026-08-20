@@ -3,6 +3,7 @@
   "document_id": "lafang-2025-annual-report",
   "question": "为什么2025年净利润为负而经营活动现金流量净额为正，能否据此判断全年现金增加？",
   "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+  "default_context": {"company_scope": "consolidated", "year": 2025},
   "logic_profile": {
     "main_trunk": ["AIF-like representation", "ASPIC+-like arguments", "Dung grounded semantics"],
     "cross_cutting": ["Belnap four-valued state", "TMS and W3C PROV-style provenance"]

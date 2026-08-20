@@ -1,0 +1,80 @@
+{
+  "format": "gdu-query-gap-candidate-v0.1",
+  "document_id": "lafang-2025-annual-report",
+  "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+  "question": "哪项投资活动导致全年现金减少？",
+  "planner_result": {
+    "status": "gap",
+    "missing_atom": "investment_cash_change_driver",
+    "growth_policy": "quarantine_before_validation"
+  },
+  "candidate_evidence": [
+    {
+      "id": "CE-15-CAUSE",
+      "physical_page": 15,
+      "text": "投资活动产生的现金流量净额变动原因说明：主要系对外投资款支出增加所致。",
+      "source_locator": "paper.pdf#physical-page=15&section=major-item-change-reasons",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-72-INVEST",
+      "physical_page": 72,
+      "text": "合并现金流量表：投资活动现金流入小计69,525,306.42；购建长期资产支付132,958,641.47；投资支付158,196,484.74。",
+      "source_locator": "paper.pdf#physical-page=72&section=consolidated-cash-flow",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-73-INVEST",
+      "physical_page": 73,
+      "text": "支付其他与投资活动有关的现金15,000,000.00；投资活动现金流出小计306,155,126.21；投资活动现金流量净额-236,629,819.79。",
+      "source_locator": "paper.pdf#physical-page=73&section=consolidated-cash-flow-continuation",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-73-CLOSURE",
+      "physical_page": 73,
+      "text": "经营、投资、筹资活动现金流量净额分别为72,545,781.16、-236,629,819.79、-23,890,866.02；汇率影响89,982.27；现金及现金等价物净增加额-187,884,922.38。",
+      "source_locator": "paper.pdf#physical-page=73&section=consolidated-cash-flow-closure",
+      "status": "visually_verified_candidate"
+    }
+  ],
+  "candidate_claims": [
+    {
+      "id": "CC-INVEST-NET-OUTFLOW",
+      "atom": "investment_cash_flow_net_amount",
+      "statement": "2025年合并投资活动现金流量净额为-236,629,819.79元。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-72-INVEST", "CE-73-INVEST"]
+    },
+    {
+      "id": "CC-INVEST-DRIVER",
+      "atom": "investment_cash_change_driver",
+      "statement": "投资活动形成大额净流出，其中投资支付158,196,484.74元、购建长期资产支付132,958,641.47元；报告将同比变化主要归因为对外投资款支出增加。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-15-CAUSE", "CE-72-INVEST", "CE-73-INVEST"]
+    },
+    {
+      "id": "CC-CASH-DECREASE-COMPOSITION",
+      "atom": "cash_decrease_component_explanation",
+      "statement": "投资活动净流出是全年现金减少的重要组成部分，但不能单独解释全部变化；经营、投资、筹资现金流和汇率影响合计后才与全年现金净减少完全一致。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-73-CLOSURE"]
+    }
+  ],
+  "numeric_checks": {
+    "investment_inflow": "69525306.42",
+    "investment_outflow": "306155126.21",
+    "calculated_investment_net": "-236629819.79",
+    "reported_investment_net": "-236629819.79",
+    "calculated_total_cash_change": "-187884922.38",
+    "reported_total_cash_change": "-187884922.38",
+    "residual": "0.00"
+  },
+  "promotion_gate": [
+    "context_matches_consolidated_2025",
+    "cross_page_table_reconciles",
+    "component_sum_reconciles_to_total_cash_change",
+    "causal_wording_preserves_report_scope",
+    "limitation_prevents_single-cause_overclaim"
+  ]
+}
