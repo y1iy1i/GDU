@@ -46,7 +46,7 @@ def _query_structure(parsed: Mapping[str, Any]) -> dict[str, Any]:
         return {
             "name": "missing_causal_driver",
             "target_atoms": ["investment_cash_change_driver"],
-            "limitation_atoms": [],
+            "limitation_atoms": ["investment_is_sole_cash_decrease_cause"],
             "source_terms": ["投资活动产生的现金流量净额", "投资支付的现金", "对外投资款支出"],
         }
     if {"net_profit", "operating_cash_flow"} <= concepts:

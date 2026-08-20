@@ -49,7 +49,10 @@ def test_misleading_premise_maps_to_counterevidence_not_rejected_claim():
 def test_missing_investment_driver_triggers_bounded_source_fallback():
     plan = plan_query(load_graph(), "哪项投资活动导致全年现金减少？")
     assert plan["status"] == "gap"
-    assert plan["missing_atoms"] == ["investment_cash_change_driver"]
+    assert plan["missing_atoms"] == [
+        "investment_cash_change_driver",
+        "investment_is_sole_cash_decrease_cause",
+    ]
     assert plan["source_lookup"]["required"] is True
     assert plan["source_lookup"]["mode"] == "bounded_fallback_only"
     assert plan["expansion"]["max_hops"] == 2

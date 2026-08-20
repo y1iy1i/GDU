@@ -1,0 +1,1032 @@
+{
+  "format": "gdu-logic-real-slice-v0.2",
+  "document_id": "lafang-2025-annual-report",
+  "question": "为什么2025年净利润为负而经营活动现金流量净额为正，能否据此判断全年现金增加？",
+  "source_pdf_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+  "default_context": {
+    "company_scope": "consolidated",
+    "year": 2025
+  },
+  "logic_profile": {
+    "main_trunk": [
+      "AIF-like representation",
+      "ASPIC+-like arguments",
+      "Dung grounded semantics"
+    ],
+    "cross_cutting": [
+      "Belnap four-valued state",
+      "TMS and W3C PROV-style provenance"
+    ]
+  },
+  "information_nodes": [
+    {
+      "id": "E-156-A",
+      "kind": "evidence",
+      "text": "现金流量表补充资料本期金额：净利润及非现金、估值、投资、税项调节项目。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=156&section=79(1)",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "carrier": "table"
+      }
+    },
+    {
+      "id": "E-156-B",
+      "kind": "evidence",
+      "text": "现金流量表补充资料本期金额：存货减少-2,182,144.36，经营性应收项目减少30,817,871.28。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=156&section=79(1)",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "carrier": "table"
+      }
+    },
+    {
+      "id": "E-157-A",
+      "kind": "evidence",
+      "text": "补充资料续表：经营性应付项目增加21,413,794.57，其他-614,647.78，经营活动现金流量净额72,545,781.16。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=157&section=79(1)",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "carrier": "table_continuation"
+      }
+    },
+    {
+      "id": "E-157-B",
+      "kind": "evidence",
+      "text": "现金期末余额966,796,041.70，期初余额1,154,680,964.08，现金及现金等价物净增加额-187,884,922.38。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=157&section=79(1).3",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "carrier": "table"
+      }
+    },
+    {
+      "id": "C-NET-PROFIT",
+      "kind": "claim",
+      "atom": "net_profit_amount",
+      "polarity": "negative",
+      "asserted": true,
+      "active": true,
+      "value": {
+        "amount": "-30937240.23",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-156-A"
+        ]
+      }
+    },
+    {
+      "id": "C-NONCASH-ROWS",
+      "kind": "claim",
+      "atom": "noncash_adjustment_rows_reported",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "values": [
+        {
+          "label": "资产减值准备",
+          "amount": "22765149.80"
+        },
+        {
+          "label": "信用减值损失",
+          "amount": "233996.15"
+        },
+        {
+          "label": "固定资产折旧",
+          "amount": "11554161.74"
+        },
+        {
+          "label": "使用权资产摊销",
+          "amount": "1848820.06"
+        },
+        {
+          "label": "无形资产摊销",
+          "amount": "1674744.83"
+        },
+        {
+          "label": "长期待摊费用摊销",
+          "amount": "263730.80"
+        },
+        {
+          "label": "处置长期资产损失",
+          "amount": "15439.90"
+        },
+        {
+          "label": "固定资产报废损失",
+          "amount": "42654.96"
+        }
+      ],
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-156-A"
+        ]
+      }
+    },
+    {
+      "id": "C-WORKING-CAPITAL-ROWS",
+      "kind": "claim",
+      "atom": "working_capital_adjustment_rows_reported",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "values": [
+        {
+          "label": "存货的减少",
+          "amount": "-2182144.36"
+        },
+        {
+          "label": "经营性应收项目的减少",
+          "amount": "30817871.28"
+        },
+        {
+          "label": "经营性应付项目的增加",
+          "amount": "21413794.57"
+        }
+      ],
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-156-B",
+          "E-157-A"
+        ]
+      }
+    },
+    {
+      "id": "C-OTHER-ROWS",
+      "kind": "claim",
+      "atom": "other_adjustment_rows_reported",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "values": [
+        {
+          "label": "公允价值变动损失",
+          "amount": "-1779163.26"
+        },
+        {
+          "label": "财务费用",
+          "amount": "35844.96"
+        },
+        {
+          "label": "投资损失",
+          "amount": "17383596.22"
+        },
+        {
+          "label": "递延所得税资产减少",
+          "amount": "9171.52"
+        },
+        {
+          "label": "递延所得税负债增加",
+          "amount": "0.00"
+        },
+        {
+          "label": "其他",
+          "amount": "-614647.78"
+        }
+      ],
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-156-A",
+          "E-157-A"
+        ]
+      }
+    },
+    {
+      "id": "C-OCF-REPORTED",
+      "kind": "claim",
+      "atom": "operating_cash_flow_amount",
+      "polarity": "positive",
+      "statement": "2025年经营活动产生的现金流量净额为72,545,781.16元。",
+      "asserted": true,
+      "active": true,
+      "value": {
+        "amount": "72545781.16",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-157-A"
+        ]
+      }
+    },
+    {
+      "id": "C-CASH-INCREASE-OBSERVED",
+      "kind": "claim",
+      "atom": "cash_and_equivalents_increased",
+      "polarity": "negative",
+      "statement": "经营现金流为正不等于全年现金增加；现金及现金等价物本年净减少187,884,922.38元。",
+      "asserted": true,
+      "active": true,
+      "value": {
+        "amount": "-187884922.38",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-157-B"
+        ]
+      }
+    },
+    {
+      "id": "C-CATEGORY-DISTINCT",
+      "kind": "claim",
+      "atom": "operating_cash_flow_is_not_total_cash_change",
+      "polarity": "positive",
+      "statement": "经营活动现金流量净额与现金及现金等价物净增加额是两个不同指标。",
+      "asserted": true,
+      "active": true,
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-157-A",
+          "E-157-B"
+        ]
+      }
+    },
+    {
+      "id": "C-NONCASH-TOTAL",
+      "kind": "claim",
+      "atom": "noncash_adjustments_total",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "value": {
+        "amount": "38398698.24",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-SUM-NONCASH"
+      }
+    },
+    {
+      "id": "C-WORKING-CAPITAL-TOTAL",
+      "kind": "claim",
+      "atom": "working_capital_adjustments_total",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "value": {
+        "amount": "50049521.49",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-SUM-WORKING-CAPITAL"
+      }
+    },
+    {
+      "id": "C-OTHER-TOTAL",
+      "kind": "claim",
+      "atom": "other_adjustments_total",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "value": {
+        "amount": "15034801.66",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-SUM-OTHER"
+      }
+    },
+    {
+      "id": "C-OCF-CALCULATED",
+      "kind": "claim",
+      "atom": "operating_cash_flow_amount",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "value": {
+        "amount": "72545781.16",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-RECONCILE-OCF"
+      }
+    },
+    {
+      "id": "C-RECONCILIATION-MATCH",
+      "kind": "claim",
+      "atom": "calculated_ocf_matches_reported_ocf",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "value": {
+        "difference": "0.00",
+        "currency": "CNY"
+      },
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-COMPARE-OCF"
+      }
+    },
+    {
+      "id": "C-PROFIT-OCF-BRIDGE",
+      "kind": "claim",
+      "atom": "negative_profit_positive_ocf_explained",
+      "polarity": "positive",
+      "statement": "净利润为负而经营现金流为正，能够由非现金调节、营运资本变化以及估值、投资、税项和其他调节共同解释；完整调节后的金额与原文经营现金流完全一致。",
+      "asserted": false,
+      "active": true,
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-BUILD-BRIDGE"
+      }
+    },
+    {
+      "id": "C-CASH-INCREASE-HEURISTIC",
+      "kind": "claim",
+      "atom": "cash_and_equivalents_increased",
+      "polarity": "positive",
+      "statement": "经营活动现金流为正，因此全年现金及现金等价物增加。",
+      "asserted": false,
+      "active": true,
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-OCF-TO-CASH-HEURISTIC"
+      }
+    },
+    {
+      "id": "E-GROW-15",
+      "kind": "evidence",
+      "text": "投资活动产生的现金流量净额变动原因说明：主要系对外投资款支出增加所致。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=15",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "E-GROW-72",
+      "kind": "evidence",
+      "text": "合并现金流量表：投资活动现金流入小计69,525,306.42；购建长期资产支付132,958,641.47；投资支付158,196,484.74。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=72",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "E-GROW-73",
+      "kind": "evidence",
+      "text": "支付其他与投资活动有关的现金15,000,000.00；投资活动现金流出小计306,155,126.21；投资活动现金流量净额-236,629,819.79。 经营、投资、筹资活动现金流量净额分别为72,545,781.16、-236,629,819.79、-23,890,866.02；汇率影响89,982.27；现金及现金等价物净增加额-187,884,922.38。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=73",
+        "source_hash": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "C-INVEST-INFLOW-REPORTED",
+      "kind": "claim",
+      "atom": "investment_cash_inflow_amount",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "2025年投资活动现金流入为69,525,306.42元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-72"
+        ],
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "69525306.42",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-INVEST-OUTFLOW-REPORTED",
+      "kind": "claim",
+      "atom": "investment_cash_outflow_amount",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "2025年投资活动现金流出为306,155,126.21元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-72",
+          "E-GROW-73"
+        ],
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "306155126.21",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-INVEST-NET-REPORTED",
+      "kind": "claim",
+      "atom": "investment_cash_flow_net_amount",
+      "polarity": "negative",
+      "asserted": true,
+      "active": true,
+      "statement": "2025年投资活动现金流量净额为-236,629,819.79元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-73"
+        ],
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "-236629819.79",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-FINANCING-NET-REPORTED",
+      "kind": "claim",
+      "atom": "financing_cash_flow_net_amount",
+      "polarity": "negative",
+      "asserted": true,
+      "active": true,
+      "statement": "2025年筹资活动现金流量净额为-23,890,866.02元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-73"
+        ],
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "-23890866.02",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-FX-EFFECT-REPORTED",
+      "kind": "claim",
+      "atom": "exchange_rate_effect_amount",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "汇率变动对现金及现金等价物的影响为89,982.27元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-73"
+        ],
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "89982.27",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-INVEST-YOY-CAUSE-REPORTED",
+      "kind": "claim",
+      "atom": "investment_cash_flow_yoy_driver",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "报告将投资活动现金流同比变化主要归因为对外投资款支出增加。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-15"
+        ],
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "C-INVEST-NET-CALCULATED",
+      "kind": "claim",
+      "atom": "investment_cash_flow_net_amount",
+      "polarity": "negative",
+      "asserted": false,
+      "active": true,
+      "statement": "投资活动流入减流出为-236,629,819.79元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-CALC-INVEST-NET",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "-236629819.79",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-INVEST-NET-MATCH",
+      "kind": "claim",
+      "atom": "investment_cash_flow_reconciliation_matches",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "计算的投资活动净流量与报告金额完全一致。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-MATCH-INVEST-NET",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "C-INVEST-CASH-CONTRIBUTION",
+      "kind": "claim",
+      "atom": "investment_cash_change_driver",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "投资活动净流出236,629,819.79元，是全年现金减少的重要组成部分。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-BUILD-INVEST-CONTRIBUTION",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "C-CASH-CHANGE-CALCULATED",
+      "kind": "claim",
+      "atom": "cash_change_calculated_amount",
+      "polarity": "negative",
+      "asserted": false,
+      "active": true,
+      "statement": "经营、投资、筹资现金流与汇率影响合计为-187,884,922.38元。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-CALC-CASH-CHANGE",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      },
+      "value": {
+        "amount": "-187884922.38",
+        "currency": "CNY"
+      }
+    },
+    {
+      "id": "C-CASH-CLOSURE-MATCH",
+      "kind": "claim",
+      "atom": "cash_change_reconciliation_matches",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "四项现金变动的计算结果与报告的全年现金净变化完全一致。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-MATCH-CASH-CHANGE",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "C-INVEST-NOT-SOLE-CAUSE",
+      "kind": "claim",
+      "atom": "investment_is_sole_cash_decrease_cause",
+      "polarity": "negative",
+      "asserted": false,
+      "active": true,
+      "statement": "投资活动净流出不是全年现金减少的唯一组成部分；经营、筹资现金流和汇率影响也必须计入。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-NOT-SOLE-CAUSE",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    },
+    {
+      "id": "C-INVEST-SOLE-CAUSE-HEURISTIC",
+      "kind": "claim",
+      "atom": "investment_is_sole_cash_decrease_cause",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "投资活动净流出是全年现金减少的唯一原因。",
+      "context": {
+        "company_scope": "consolidated",
+        "valid_time": {
+          "type": "interval",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        }
+      },
+      "provenance": {
+        "generated_by": "I-GROW-SOLE-CAUSE-HEURISTIC",
+        "growth_event": "GROWTH-2025-INVEST-001"
+      }
+    }
+  ],
+  "scheme_nodes": [
+    {
+      "id": "I-SUM-NONCASH",
+      "kind": "inference",
+      "premises": [
+        "C-NONCASH-ROWS"
+      ],
+      "conclusion": "C-NONCASH-TOTAL",
+      "rule_kind": "strict",
+      "rule_id": "decimal-sum-v1"
+    },
+    {
+      "id": "I-SUM-WORKING-CAPITAL",
+      "kind": "inference",
+      "premises": [
+        "C-WORKING-CAPITAL-ROWS"
+      ],
+      "conclusion": "C-WORKING-CAPITAL-TOTAL",
+      "rule_kind": "strict",
+      "rule_id": "decimal-sum-v1"
+    },
+    {
+      "id": "I-SUM-OTHER",
+      "kind": "inference",
+      "premises": [
+        "C-OTHER-ROWS"
+      ],
+      "conclusion": "C-OTHER-TOTAL",
+      "rule_kind": "strict",
+      "rule_id": "decimal-sum-v1"
+    },
+    {
+      "id": "I-RECONCILE-OCF",
+      "kind": "inference",
+      "premises": [
+        "C-NET-PROFIT",
+        "C-NONCASH-TOTAL",
+        "C-WORKING-CAPITAL-TOTAL",
+        "C-OTHER-TOTAL"
+      ],
+      "conclusion": "C-OCF-CALCULATED",
+      "rule_kind": "strict",
+      "rule_id": "profit-to-ocf-reconciliation-v1"
+    },
+    {
+      "id": "I-COMPARE-OCF",
+      "kind": "inference",
+      "premises": [
+        "C-OCF-CALCULATED",
+        "C-OCF-REPORTED"
+      ],
+      "conclusion": "C-RECONCILIATION-MATCH",
+      "rule_kind": "strict",
+      "rule_id": "exact-decimal-equality-v1"
+    },
+    {
+      "id": "I-BUILD-BRIDGE",
+      "kind": "inference",
+      "premises": [
+        "C-NET-PROFIT",
+        "C-NONCASH-TOTAL",
+        "C-WORKING-CAPITAL-TOTAL",
+        "C-OTHER-TOTAL",
+        "C-RECONCILIATION-MATCH"
+      ],
+      "conclusion": "C-PROFIT-OCF-BRIDGE",
+      "rule_kind": "strict",
+      "rule_id": "audited-reconciliation-explanation-v1"
+    },
+    {
+      "id": "I-OCF-TO-CASH-HEURISTIC",
+      "kind": "inference",
+      "premises": [
+        "C-OCF-REPORTED"
+      ],
+      "conclusion": "C-CASH-INCREASE-HEURISTIC",
+      "rule_kind": "defeasible",
+      "rule_id": "positive-ocf-implies-cash-increase-heuristic-v1"
+    },
+    {
+      "id": "CA-CATEGORY-UNDERCUT",
+      "kind": "conflict",
+      "attack_kind": "undercut",
+      "source": "C-CATEGORY-DISTINCT",
+      "target_type": "inference",
+      "target": "I-OCF-TO-CASH-HEURISTIC"
+    },
+    {
+      "id": "CA-CASH-REBUT",
+      "kind": "conflict",
+      "attack_kind": "rebut",
+      "source": "C-CASH-INCREASE-OBSERVED",
+      "target_type": "claim",
+      "target": "C-CASH-INCREASE-HEURISTIC"
+    },
+    {
+      "id": "I-GROW-CALC-INVEST-NET",
+      "kind": "inference",
+      "premises": [
+        "C-INVEST-INFLOW-REPORTED",
+        "C-INVEST-OUTFLOW-REPORTED"
+      ],
+      "conclusion": "C-INVEST-NET-CALCULATED",
+      "rule_kind": "strict",
+      "rule_id": "cash-inflow-minus-outflow-v1"
+    },
+    {
+      "id": "I-GROW-MATCH-INVEST-NET",
+      "kind": "inference",
+      "premises": [
+        "C-INVEST-NET-CALCULATED",
+        "C-INVEST-NET-REPORTED"
+      ],
+      "conclusion": "C-INVEST-NET-MATCH",
+      "rule_kind": "strict",
+      "rule_id": "exact-decimal-equality-v1"
+    },
+    {
+      "id": "I-GROW-BUILD-INVEST-CONTRIBUTION",
+      "kind": "inference",
+      "premises": [
+        "C-INVEST-NET-REPORTED",
+        "C-INVEST-NET-MATCH",
+        "C-INVEST-YOY-CAUSE-REPORTED"
+      ],
+      "conclusion": "C-INVEST-CASH-CONTRIBUTION",
+      "rule_kind": "strict",
+      "rule_id": "audited-cash-component-v1"
+    },
+    {
+      "id": "I-GROW-CALC-CASH-CHANGE",
+      "kind": "inference",
+      "premises": [
+        "C-OCF-REPORTED",
+        "C-INVEST-NET-REPORTED",
+        "C-FINANCING-NET-REPORTED",
+        "C-FX-EFFECT-REPORTED"
+      ],
+      "conclusion": "C-CASH-CHANGE-CALCULATED",
+      "rule_kind": "strict",
+      "rule_id": "cash-flow-component-sum-v1"
+    },
+    {
+      "id": "I-GROW-MATCH-CASH-CHANGE",
+      "kind": "inference",
+      "premises": [
+        "C-CASH-CHANGE-CALCULATED",
+        "C-CASH-INCREASE-OBSERVED"
+      ],
+      "conclusion": "C-CASH-CLOSURE-MATCH",
+      "rule_kind": "strict",
+      "rule_id": "exact-decimal-equality-v1"
+    },
+    {
+      "id": "I-GROW-NOT-SOLE-CAUSE",
+      "kind": "inference",
+      "premises": [
+        "C-OCF-REPORTED",
+        "C-FINANCING-NET-REPORTED",
+        "C-FX-EFFECT-REPORTED",
+        "C-CASH-CLOSURE-MATCH"
+      ],
+      "conclusion": "C-INVEST-NOT-SOLE-CAUSE",
+      "rule_kind": "strict",
+      "rule_id": "nonzero-multiple-cash-components-v1"
+    },
+    {
+      "id": "I-GROW-SOLE-CAUSE-HEURISTIC",
+      "kind": "inference",
+      "premises": [
+        "C-INVEST-NET-REPORTED"
+      ],
+      "conclusion": "C-INVEST-SOLE-CAUSE-HEURISTIC",
+      "rule_kind": "defeasible",
+      "rule_id": "largest-outflow-is-sole-cause-heuristic-v1"
+    },
+    {
+      "id": "CA-GROW-NOT-SOLE-REBUT",
+      "kind": "conflict",
+      "attack_kind": "rebut",
+      "source": "C-INVEST-NOT-SOLE-CAUSE",
+      "target_type": "claim",
+      "target": "C-INVEST-SOLE-CAUSE-HEURISTIC"
+    },
+    {
+      "id": "CA-GROW-NOT-SOLE-UNDERCUT",
+      "kind": "conflict",
+      "attack_kind": "undercut",
+      "source": "C-INVEST-NOT-SOLE-CAUSE",
+      "target_type": "inference",
+      "target": "I-GROW-SOLE-CAUSE-HEURISTIC"
+    }
+  ],
+  "revision_history": [
+    {
+      "event_id": "GROWTH-2025-INVEST-001",
+      "recorded_at": "2026-08-20T18:00:00+08:00",
+      "operation": "promote_query_gap_candidate",
+      "parent_format": "gdu-logic-real-slice-v0.1",
+      "candidate_hash": "63a6e553585968537d5d72d4d20788a238e35de61efd58af88ae8a4a50d279e6",
+      "added_information_node_ids": [
+        "E-GROW-15",
+        "E-GROW-72",
+        "E-GROW-73",
+        "C-INVEST-INFLOW-REPORTED",
+        "C-INVEST-OUTFLOW-REPORTED",
+        "C-INVEST-NET-REPORTED",
+        "C-FINANCING-NET-REPORTED",
+        "C-FX-EFFECT-REPORTED",
+        "C-INVEST-YOY-CAUSE-REPORTED",
+        "C-INVEST-NET-CALCULATED",
+        "C-INVEST-NET-MATCH",
+        "C-INVEST-CASH-CONTRIBUTION",
+        "C-CASH-CHANGE-CALCULATED",
+        "C-CASH-CLOSURE-MATCH",
+        "C-INVEST-NOT-SOLE-CAUSE",
+        "C-INVEST-SOLE-CAUSE-HEURISTIC"
+      ],
+      "added_scheme_node_ids": [
+        "I-GROW-CALC-INVEST-NET",
+        "I-GROW-MATCH-INVEST-NET",
+        "I-GROW-BUILD-INVEST-CONTRIBUTION",
+        "I-GROW-CALC-CASH-CHANGE",
+        "I-GROW-MATCH-CASH-CHANGE",
+        "I-GROW-NOT-SOLE-CAUSE",
+        "I-GROW-SOLE-CAUSE-HEURISTIC",
+        "CA-GROW-NOT-SOLE-REBUT",
+        "CA-GROW-NOT-SOLE-UNDERCUT"
+      ]
+    }
+  ]
+}
