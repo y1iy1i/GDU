@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import asdict, dataclass
+from itertools import product
 from typing import Any, Iterable, Mapping
 
 
@@ -37,6 +38,40 @@ def _by_id(items: Iterable[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
 
 def _same_scope(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
     return left.get("context", {}) == right.get("context", {})
+
+
+def _inference_order(schemes: Mapping[str, Mapping[str, Any]]) -> list[str] | None:
+    """Return a stable producer-before-consumer order, or None for a cycle."""
+
+    inferences = {
+        scheme_id: scheme
+        for scheme_id, scheme in schemes.items()
+        if scheme.get("kind") == "inference" and scheme.get("active", True)
+    }
+    producers: dict[str, set[str]] = {}
+    for scheme_id, inference in inferences.items():
+        producers.setdefault(str(inference["conclusion"]), set()).add(scheme_id)
+    dependencies = {
+        scheme_id: {
+            producer
+            for premise in inference.get("premises", [])
+            for producer in producers.get(str(premise), set())
+        }
+        for scheme_id, inference in inferences.items()
+    }
+    ready = sorted(scheme_id for scheme_id, deps in dependencies.items() if not deps)
+    order: list[str] = []
+    while ready:
+        current = ready.pop(0)
+        order.append(current)
+        for scheme_id in sorted(dependencies):
+            if current not in dependencies[scheme_id]:
+                continue
+            dependencies[scheme_id].remove(current)
+            if not dependencies[scheme_id] and scheme_id not in order and scheme_id not in ready:
+                ready.append(scheme_id)
+                ready.sort()
+    return order if len(order) == len(inferences) else None
 
 
 def validate_aif_interface(graph: Mapping[str, Any]) -> list[InterfaceIssue]:
@@ -128,6 +163,14 @@ def validate_aif_interface(graph: Mapping[str, Any]) -> list[InterfaceIssue]:
                 issues.append(InterfaceIssue("attack_target_type_missing", scheme_id, str(target_type)))
         else:
             issues.append(InterfaceIssue("invalid_scheme_kind", scheme_id, str(kind)))
+    if _inference_order(schemes) is None:
+        issues.append(
+            InterfaceIssue(
+                "cyclic_inference_dependency",
+                "scheme_nodes",
+                "v0.1不允许推理依赖环；攻击环仍然允许",
+            )
+        )
     return issues
 
 
@@ -153,33 +196,37 @@ def compile_structured_arguments(
         )
         claim_arguments.setdefault(claim_id, set()).add(argument_id)
 
-    pending = [item for item in schemes.values() if item.get("kind") == "inference" and item.get("active", True)]
-    changed = True
-    while changed:
-        changed = False
-        for inference in list(pending):
-            premise_argument_sets = [claim_arguments.get(ref, set()) for ref in inference["premises"]]
-            if not premise_argument_sets or any(not values for values in premise_argument_sets):
-                continue
-            # The laboratory uses one canonical argument per claim/inference.
-            chosen = [sorted(values)[0] for values in premise_argument_sets]
+    order = _inference_order(schemes)
+    if order is None:  # guarded by validation; keeps the type contract explicit
+        raise ValueError("cyclic inference dependency")
+    for inference_id in order:
+        inference = schemes[inference_id]
+        premise_argument_sets = [
+            sorted(claim_arguments.get(str(ref), set())) for ref in inference["premises"]
+        ]
+        if not premise_argument_sets or any(not values for values in premise_argument_sets):
+            continue
+        combinations = list(product(*premise_argument_sets))
+        for index, chosen in enumerate(combinations, 1):
             subarguments = set(chosen)
             ordinary_premises = set()
             for argument_id in chosen:
                 subarguments.update(arguments[argument_id].subarguments)
                 ordinary_premises.update(arguments[argument_id].ordinary_premises)
-            argument_id = f"ARG-I-{inference['id']}"
+            argument_id = (
+                f"ARG-I-{inference_id}"
+                if len(combinations) == 1
+                else f"ARG-I-{inference_id}-{index:03d}"
+            )
             arguments[argument_id] = StructuredArgument(
                 argument_id,
                 str(inference["conclusion"]),
                 frozenset(ordinary_premises),
                 frozenset(subarguments),
-                str(inference["id"]),
+                str(inference_id),
                 str(inference["rule_kind"]),
             )
             claim_arguments.setdefault(str(inference["conclusion"]), set()).add(argument_id)
-            pending.remove(inference)
-            changed = True
 
     attacks: set[tuple[str, str]] = set()
     for conflict in schemes.values():
@@ -195,11 +242,15 @@ def compile_structured_arguments(
                     arg.id for arg in arguments.values() if target_claim in arg.ordinary_premises
                 }
         else:  # undercut
-            target_argument = f"ARG-I-{conflict['target']}"
+            target_roots = {
+                arg.id
+                for arg in arguments.values()
+                if arg.top_inference == str(conflict["target"])
+            }
             targets = {
                 arg.id
                 for arg in arguments.values()
-                if arg.id == target_argument or target_argument in arg.subarguments
+                if arg.id in target_roots or not target_roots.isdisjoint(arg.subarguments)
             }
         attacks.update((source, target) for source in sources for target in targets if source != target)
     return arguments, attacks

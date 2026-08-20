@@ -163,3 +163,92 @@ def test_validation_is_non_mutating():
     before = deepcopy(graph)
     validate_aif_interface(graph)
     assert graph == before
+
+
+def test_all_independent_derivation_paths_are_preserved():
+    graph = base_graph()
+    graph["information_nodes"].extend(
+        [
+            claim("C-A", "source_a"),
+            claim("C-B", "source_b"),
+            claim("C-MID", "intermediate", asserted=False),
+            claim("C-FINAL", "final", asserted=False),
+        ]
+    )
+    graph["scheme_nodes"].extend(
+        [
+            {
+                "id": "I-A", "kind": "inference", "premises": ["C-A"],
+                "conclusion": "C-MID", "rule_kind": "defeasible", "rule_id": "from-a"
+            },
+            {
+                "id": "I-B", "kind": "inference", "premises": ["C-B"],
+                "conclusion": "C-MID", "rule_kind": "defeasible", "rule_id": "from-b"
+            },
+            {
+                "id": "I-FINAL", "kind": "inference", "premises": ["C-MID", "C-RULE"],
+                "conclusion": "C-FINAL", "rule_kind": "defeasible", "rule_id": "combine"
+            },
+        ]
+    )
+    arguments, _ = compile_structured_arguments(graph)
+    mid_paths = [arg for arg in arguments.values() if arg.conclusion == "C-MID"]
+    final_paths = [arg for arg in arguments.values() if arg.conclusion == "C-FINAL"]
+    assert len(mid_paths) == 2
+    assert len(final_paths) == 2
+    assert {arg.ordinary_premises for arg in final_paths} == {
+        frozenset({"C-A", "C-RULE"}),
+        frozenset({"C-B", "C-RULE"}),
+    }
+
+
+def test_undercut_one_branch_leaves_independent_branch_accepted():
+    graph = base_graph()
+    graph["information_nodes"].extend(
+        [
+            claim("C-A", "source_a"),
+            claim("C-B", "source_b"),
+            claim("C-MID", "intermediate", asserted=False),
+            claim("C-FINAL", "final", asserted=False),
+            claim("C-U", "source_a_rule_inapplicable"),
+        ]
+    )
+    graph["scheme_nodes"].extend(
+        [
+            {
+                "id": "I-A", "kind": "inference", "premises": ["C-A"],
+                "conclusion": "C-MID", "rule_kind": "defeasible", "rule_id": "from-a"
+            },
+            {
+                "id": "I-B", "kind": "inference", "premises": ["C-B"],
+                "conclusion": "C-MID", "rule_kind": "defeasible", "rule_id": "from-b"
+            },
+            {
+                "id": "I-FINAL", "kind": "inference", "premises": ["C-MID"],
+                "conclusion": "C-FINAL", "rule_kind": "defeasible", "rule_id": "continue"
+            },
+            {
+                "id": "CA-A", "kind": "conflict", "attack_kind": "undercut",
+                "source": "C-U", "target_type": "inference", "target": "I-A"
+            },
+        ]
+    )
+    arguments, attacks = compile_structured_arguments(graph)
+    labels = grounded_labels(arguments, attacks)
+    final_paths = [arg for arg in arguments.values() if arg.conclusion == "C-FINAL"]
+    path_from_a = next(arg for arg in final_paths if "C-A" in arg.ordinary_premises)
+    path_from_b = next(arg for arg in final_paths if "C-B" in arg.ordinary_premises)
+    assert labels[path_from_a.id] == "rejected"
+    assert labels[path_from_b.id] == "accepted"
+
+
+def test_inference_dependency_cycle_is_rejected_but_attack_cycle_is_allowed():
+    graph = base_graph()
+    graph["scheme_nodes"].append(
+        {
+            "id": "I-CYCLE", "kind": "inference", "premises": ["C-INCREASE"],
+            "conclusion": "C-SIGN", "rule_kind": "defeasible", "rule_id": "cycle"
+        }
+    )
+    issues = validate_aif_interface(graph)
+    assert "cyclic_inference_dependency" in {issue.code for issue in issues}
