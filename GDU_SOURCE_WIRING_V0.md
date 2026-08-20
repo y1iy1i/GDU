@@ -1,6 +1,6 @@
 # GDU SourceReader-Orchestrator 接线 v0
 
-状态：实现候选，尚未冻结；使用 Fixed Adapter，不包含模型 API。
+状态：已作为 Builder v0 确定性基础设施的一部分冻结；使用 Fixed Adapter，不包含模型 API。
 
 ## 1. 大白话说明
 

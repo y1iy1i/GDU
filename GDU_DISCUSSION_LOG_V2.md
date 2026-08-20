@@ -2711,3 +2711,20 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 ## 97. 下一阶段
 
 对 Builder v0 的设计草案、实现、SourceReader、配置、CLI、92 个测试和说明文档做冻结前审计；只有审计通过才生成 Builder 基线清单与 SHA-256，不修改既有四组冻结基线。
+
+### V2-203 Builder v0 冻结前审计与基线
+
+- **异常页范围**：预登记越界页在 Adapter 调用前输入拒绝；修正越界页稳定转为有界技术失败，不再暴露未处理 `ValueError`。
+- **字节级复现**：配置新增带时区的固定 `run_timestamp`；同一 Pilot 03 配置连续运行两次，三文件逐字节一致。
+- **提取器守卫**：配置锁定 `extraction_system` 为 `pypdf 6.16.1`，运行环境不一致时在启动前拒绝。
+- **环境锁定**：`requirements-builder.txt` 与 `requirements-test.txt` 锁定直接版本，`requirements-lock.txt` 与 `gdu` 环境 `pip freeze` 一致，`pip check` 通过。
+- **测试**：Conda `gdu`（Python 3.12.13）中 95 项全部通过，0 失败，0 跳过；compileall 与 py_compile 通过。
+- **静态边界**：Builder 源码未发现网络、付费 API、动态执行、pickle 或 shell 调用入口。
+- **上游完整性**：设计、Schema、Validator 和 Build Log 四组既有基线 SHA-256 全部通过，无原位修改。
+- **冻结范围**：新增 `GDU_BUILDER_V0_BASELINE.md` 与 `GDU_BUILDER_V0_BASELINE.sha256`，冻结代码、配置、测试、环境和验证文档；三份 `_DRAFT` 设计文档仅保留为背景。
+- **费用边界**：本轮未使用付费模型/API；后续若需付费资源，必须先停止并向用户说明，不购买、不续费、不开启自动续费。
+- **状态**：Builder v0 确定性基础设施已冻结。
+
+## 98. 下一阶段
+
+在不修改 Builder v0 基线的前提下，先建立“真实 Adapter 实验契约”：定义模型 Adapter 能看到的 SourcePacket、必须返回的结构化对象、无 API Key/无额度时的停止规则，以及本地免费替代方案的能力边界；契约确认前不调用付费模型。

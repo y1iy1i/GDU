@@ -441,6 +441,11 @@ class BuilderV0P0Tests(unittest.TestCase):
         self.assertEqual(result.technical_retries_used, 1)
 
     def test_p0_10_illegal_inputs_are_rejected_before_adapter(self) -> None:
+        out_of_range_plan = dict(self.spec.checkpoint_source_requests)
+        out_of_range_plan["cp4"] = SourceRequest(
+            purpose="invalid preregistered page",
+            page_ranges=((238, 238),),
+        )
         variants = [
             replace(self.spec, source_pdf=self.work / "missing.pdf"),
             replace(self.spec, gdu_schema_sha256="0" * 64),
@@ -449,6 +454,8 @@ class BuilderV0P0Tests(unittest.TestCase):
             replace(self.spec, external_knowledge_allowed=True),
             replace(self.spec, single_builder=False),
             replace(self.spec, output_dir=self.work),
+            replace(self.spec, expected_extraction_system="different-backend"),
+            replace(self.spec, checkpoint_source_requests=out_of_range_plan),
         ]
         for index, spec in enumerate(variants):
             with self.subTest(index=index):
@@ -456,6 +463,27 @@ class BuilderV0P0Tests(unittest.TestCase):
                 _, result = self.run_builder(adapter, spec)
                 self.assertEqual(result.outcome, "input_rejected")
                 self.assertEqual(adapter.call_trace, [])
+
+    def test_invalid_correction_page_becomes_bounded_technical_failure(self) -> None:
+        invalid_gap = replace(
+            self.failed_gate("invalid-page").gaps[0],
+            source_scope=((238, 238),),
+        )
+        gate = StopGateResult(
+            coverage="passed",
+            evidence="failed",
+            stability="passed",
+            cross_carrier="passed",
+            cross_section="passed",
+            negative_boundary="passed",
+            gaps=(invalid_gap,),
+            summary="Correction requested an invalid physical page.",
+        )
+        _, result = self.run_builder(self.adapter([gate]))
+
+        self.assertEqual("technical_failed", result.outcome)
+        self.assertEqual(1, result.technical_retries_used)
+        self.assertIn("outside 1-237", result.public_summary)
 
     def test_p0_11_orchestrator_allocates_ids_with_local_scope(self) -> None:
         allocator = CanonicalIdAllocator()

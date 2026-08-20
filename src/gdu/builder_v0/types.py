@@ -89,6 +89,7 @@ class BuilderRunSpec:
     output_dir: Path
     expected_source_sha256: str | None = None
     expected_extracted_text_sha256: str | None = None
+    expected_extraction_system: str | None = None
     checkpoint_source_requests: Mapping[str, SourceRequest] = field(
         default_factory=dict
     )

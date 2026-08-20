@@ -2,7 +2,7 @@
 
 日期：2026-08-19
 
-状态：配置、Fixed Adapter、CLI 和真实 Pilot 03 往返通过，尚未冻结。
+状态：配置、Fixed Adapter、CLI、真实 Pilot 03 和字节级复现验证通过；已纳入 Builder v0 冻结基线。
 
 ## 1. 验证结果
 
@@ -27,18 +27,20 @@
 
 ## 3. 全项目测试
 
-当前共 92 个唯一测试。
+当前共 95 个唯一测试。
 
 | 运行方式 | 结果 |
 |---|---|
-| 新建 Conda `gdu`（Python 3.12.13） | 92 通过，0 失败，0 跳过 |
+| 新建 Conda `gdu`（Python 3.12.13） | 95 通过，0 失败，0 跳过 |
 | Python compileall | 通过 |
 
-环境依赖由 `requirements-test.txt` 统一声明：Builder 运行依赖加 ReportLab 测试依赖。
+环境依赖由 `requirements-builder.txt`、`requirements-test.txt` 和 `requirements-lock.txt` 统一声明与锁定。冻结审计新增越界页稳定失败、固定时间、提取器版本守卫和两次产物逐字节一致测试。
 
 ## 4. 环境备注
 
-一次尝试在 Python 3.13 中直接加载 Python 3.12 的 ReportLab/Pillow 二进制依赖，出现 `_imaging` 导入错误。这是不同 Python ABI 的环境混用，不是 GDU 逻辑失败。为消除该变量，已新建独立 Conda `gdu` 环境，以 Python 3.12.13 安装匹配的 jsonschema、pypdf、ReportLab 和 Pillow，并在该单一环境中完整通过 92 项测试。
+一次尝试在 Python 3.13 中直接加载 Python 3.12 的 ReportLab/Pillow 二进制依赖，出现 `_imaging` 导入错误。这是不同 Python ABI 的环境混用，不是 GDU 逻辑失败。为消除该变量，已新建独立 Conda `gdu` 环境，以 Python 3.12.13 安装匹配的 jsonschema、pypdf、ReportLab 和 Pillow，并在该单一环境中完整通过 95 项测试。
+
+同一 Pilot 03 配置连续运行两次时，`gdu.json`、`build_log.jsonl` 和 `ARTIFACTS.sha256` 均逐字节一致。
 
 ## 5. 结论边界
 

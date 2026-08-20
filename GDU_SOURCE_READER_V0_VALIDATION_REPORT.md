@@ -2,7 +2,7 @@
 
 日期：2026-08-19
 
-状态：最小契约与真实 PDF 烟雾测试通过，尚未冻结。
+状态：最小契约、真实 PDF 和 Builder 接线验证通过；已纳入 Builder v0 冻结基线。
 
 ## 1. 契约测试
 
@@ -30,7 +30,9 @@ Anaconda 环境执行全项目：
   -m unittest tests.test_source_reader_v0.PypdfBackendIntegrationTests -v
 ```
 
-结果：1 个真实两页 PDF 往返测试通过。因此 74 个唯一测试均已在具备相应依赖的环境中通过。
+结果：1 个真实两页 PDF 往返测试通过。因此当时 74 个唯一测试均已在具备相应依赖的环境中通过。
+
+后续冻结前统一到 Conda `gdu`（Python 3.12.13）环境，包含真实 PDF 测试在内的全项目 95 项测试一次性全部通过，0 跳过。
 
 ## 3. 三轮 Pilot 只读烟雾验证
 

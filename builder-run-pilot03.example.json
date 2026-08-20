@@ -1,11 +1,13 @@
 {
   "run_id": "pilot03-fixed-fixture-replay-v0",
+  "run_timestamp": "2026-08-20T00:00:00+08:00",
   "source": {
     "document_id": "litong-2025-annual-report",
     "pdf": "research_inputs/pilot_03_litong_2025/paper.pdf",
     "pdf_sha256": "fbb9875c7eca1f921ca0635cabbe53727b7ff57658750fa0eeefd92402730c59",
     "extracted_text": "research_inputs/pilot_03_litong_2025/paper.txt",
-    "extracted_text_sha256": "d3258943647ba57408471fd43ece8d52415e75ec4f39df16c63861d4af450c9a"
+    "extracted_text_sha256": "d3258943647ba57408471fd43ece8d52415e75ec4f39df16c63861d4af450c9a",
+    "extraction_system": "pypdf 6.16.1"
   },
   "contracts": {
     "gdu_schema": "gdu.schema.json",

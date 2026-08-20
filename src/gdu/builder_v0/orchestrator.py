@@ -407,11 +407,13 @@ class BuilderOrchestrator:
             raise TechnicalFailure(
                 "source_reader", "Builder requires an injected SourceReader"
             )
-        return self._invoke_technical(
-            stage,
-            "source_reader",
-            lambda: self.source_reader.read(request, self.navigation_text),
-        )
+        def read_packet() -> SourcePacket:
+            try:
+                return self.source_reader.read(request, self.navigation_text)
+            except (ValueError, OSError, IndexError) as exc:
+                raise TechnicalFailure("source_reader", str(exc)) from exc
+
+        return self._invoke_technical(stage, "source_reader", read_packet)
 
     @staticmethod
     def _validate_evidence_against_packet(
@@ -687,6 +689,25 @@ class BuilderOrchestrator:
             return f"SourceReader input rejected: {exc.summary}"
         if identity.source_sha256 != self._sha256(self.spec.source_pdf):
             return "SourceReader identity does not match Builder source"
+        if (
+            self.spec.expected_extraction_system is not None
+            and identity.extraction_system
+            != self.spec.expected_extraction_system
+        ):
+            return "SourceReader extraction system does not match BuilderRunSpec"
+        for stage, request in self.source_plan.items():
+            if not request.purpose.strip():
+                return f"{stage} source request purpose must be non-empty"
+            if request.modalities != ("text",):
+                return f"{stage} source request must use text-only modality"
+            if not request.page_ranges:
+                return f"{stage} source request must include a page range"
+            for start, end in request.page_ranges:
+                if start < 1 or end < start or end > identity.pdf_page_count:
+                    return (
+                        f"{stage} source page range {start}-{end} is outside "
+                        f"1-{identity.pdf_page_count}"
+                    )
         self.source_identity = identity
         return None
 

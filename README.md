@@ -20,7 +20,7 @@ GDU（Generative Document Understanding，生成式文档理解单元）是一�
 - 已在两篇英文 NLP 论文和一份 237 页中文上市公司年报上完成三轮 Pilot；
 - 已实现确定性 Builder v0 候选：六检查点、有限修正、全局技术重试、证据授权、日志、停止门和原子发布；
 - 已实现最小 PDF 文本层 SourceReader、可验证的运行配置、Fixed GDU Adapter 和 CLI；
-- 当前 92 个唯一测试已在匹配依赖的环境中通过；
+- 当前 95 个唯一测试已在独立 Conda `gdu` 环境中全部通过；
 - Pilot 03 已用“配置 + CLI”完成真实 PDF 到 frozen 三文件包的临时往返。
 
 当前的 Fixed Adapter 只重放已验证内容，它证明 Builder 基础设施可运行、可复现，不证明真实模型已会自动理解任意长文档。
@@ -74,4 +74,4 @@ PYTHONPATH=src python -m gdu.builder_v0.cli run \
 - 当前纯文本 SourceReader 已解决 OCR、图像、表格视觉结构或公式；
 - 强模型上的可行性可直接推广到小模型。
 
-下一个研究节点是冻结前审计 Builder v0 基础设施，然后将真实模型 Adapter 和长文档选页/分段作为独立变量开始实验。
+Builder v0 确定性基础设施已冻结。下一个研究节点是将真实模型 Adapter 和长文档选页/分段作为独立变量开始实验。

@@ -2,7 +2,7 @@
 
 日期：2026-08-19
 
-状态：P0、P1 与对象修正操作验证通过，尚未冻结。
+状态：P0、P1、对象修正、SourceReader、配置与 CLI 验证通过；Builder v0 基线已冻结。
 
 ## 1. 验证对象
 
@@ -96,3 +96,13 @@ P1 与通用修正操作已经通过；本阶段当时尚未包含 SourceReader�
 ## 8. 后续 SourceReader 接线验证
 
 本报告形成后，最小 SourceReader 及其 Orchestrator 接线继续完成。Builder 测试增至 40 个，全项目增至 84 个唯一测试；真实 Pilot 03 PDF 的临时端到端 frozen 往返通过。详见 `GDU_SOURCE_READER_V0_VALIDATION_REPORT.md` 与 `GDU_SOURCE_WIRING_V0_VALIDATION_REPORT.md`。
+
+## 9. 冻结前最终审计
+
+- 独立 Conda `gdu`（Python 3.12.13）中 95 项测试全部通过，0 跳过；
+- Python compileall、py_compile 和 `pip check` 通过；
+- 同一配置连续运行两次，三份产物逐字节相同；
+- 配置锁定运行时间、PDF/文本/契约哈希和 pypdf 6.16.1；
+- 预登记越界页在 Adapter 前拒绝，修正越界页稳定转为有界技术失败；
+- 源码扫描未发现网络、付费 API、动态执行、pickle 或 shell 调用入口；
+- 既有四组冻结基线 SHA-256 全部通过。

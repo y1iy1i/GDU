@@ -1,6 +1,6 @@
 # GDU SourceReader v0 最小实现说明
 
-状态：实现候选，尚未冻结；已接入 Builder 状态机并通过 Fixed Adapter 验证。
+状态：已作为 Builder v0 确定性基础设施的一部分冻结。
 
 ## 1. 大白话说明
 
@@ -53,13 +53,8 @@ SourceReader 是“原文证据管理员”。它不负责理解文章，也不�
 
 真实后端需要 `pypdf`，完整 Builder 验证还需要 `jsonschema`，记录在 `requirements-builder.txt`。
 
-当前工作机上：
-
-- Anaconda Python 有 jsonschema，运行全项目契约与回归测试；
-- Codex 工作区 PDF Python 有 pypdf/reportlab，运行真实 PDF 往返测试。
-
-实现没有写死上述私有运行时路径，也没有联网安装依赖。
+标准验证环境是 Conda `gdu`（Python 3.12.13）；直接依赖在 `requirements-builder.txt` 与 `requirements-test.txt` 锁定，完整环境记录在 `requirements-lock.txt`。实例运行配置还会校验提取后端身份 `pypdf 6.16.1`。
 
 ## 6. 下一步
 
-SourceReader 已通过依赖注入接到 Orchestrator。下一阶段先建立可保存的 BuilderRunSpec 配置和命令行入口；在固定 Adapter 可脱离测试代码复现前，不接真实模型。
+SourceReader 已通过依赖注入接到 Orchestrator，并已由可保存配置和 CLI 完成字节级可复现往返。后续的自动选页、分段、OCR 和视觉读取必须作为新版本，不原位改动 v0。

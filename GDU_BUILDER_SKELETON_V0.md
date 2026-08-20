@@ -1,6 +1,6 @@
 # GDU Builder v0 最小骨架说明
 
-状态：实现候选，尚未冻结；不包含真实模型或真实长文档读取。
+状态：Builder v0 确定性基础设施已冻结；不包含真实模型 Adapter 或长文档自动选页。
 
 ## 1. 大白话说明
 
@@ -24,8 +24,8 @@
 | `src/gdu/builder_v0/config.py` | 运行配置、安全路径和文件哈希验证 |
 | `src/gdu/builder_v0/fixture_adapter.py` | 已验证 GDU 夹具的六检查点重放 |
 | `src/gdu/builder_v0/cli.py` | 可脱离测试调用的命令行入口 |
-| `tests/test_builder_v0.py` | P0、P1、对象操作与来源接线共 40 个测试 |
-| `tests/test_builder_config_cli_v0.py` | 配置、Fixed Adapter 和 CLI 共 8 个测试 |
+| `tests/test_builder_v0.py` | P0、P1、对象操作、来源接线与异常页范围测试 |
+| `tests/test_builder_config_cli_v0.py` | 配置、Fixed Adapter、CLI 与字节级复现测试 |
 
 ## 3. 已实现能力
 
@@ -67,4 +67,4 @@
 
 ## 6. 下一阶段建议
 
-配置与 CLI 已完成。下一步先审计并冻结确定性 Builder 基础设施候选；冻结后再把真实模型 Adapter 和长文档选页/分段作为新的、可替换的研究变量。
+Builder v0 基础设施已冻结。下一步把真实模型 Adapter 和长文档选页/分段作为新的、可替换研究变量，不原位修改本基线。

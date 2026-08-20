@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -17,6 +18,7 @@ class ConfigError(ValueError):
 class LoadedBuilderConfig:
     config_path: Path
     spec: BuilderRunSpec
+    run_timestamp: str
     document_id: str
     fixture_gdu_path: Path
     fixture_gdu_sha256: str
@@ -34,6 +36,7 @@ def load_builder_config(
     raw = _load_json(config_path, "builder run configuration")
     schema = _load_json(schema_path, "builder run configuration schema")
     _validate_json(raw, schema, "builder run configuration")
+    _validate_timestamp(raw["run_timestamp"])
 
     base = config_path.parent
     source = raw["source"]
@@ -98,6 +101,7 @@ def load_builder_config(
         output_dir=output_dir,
         expected_source_sha256=source["pdf_sha256"],
         expected_extracted_text_sha256=source["extracted_text_sha256"],
+        expected_extraction_system=source["extraction_system"],
         checkpoint_source_requests=source_requests,
         max_semantic_corrections=limits["max_semantic_corrections"],
         max_technical_retries=limits["max_technical_retries"],
@@ -107,6 +111,7 @@ def load_builder_config(
     return LoadedBuilderConfig(
         config_path=config_path,
         spec=spec,
+        run_timestamp=raw["run_timestamp"],
         document_id=source["document_id"],
         fixture_gdu_path=resolved["fixture_gdu"],
         fixture_gdu_sha256=adapter["fixture_gdu_sha256"],
@@ -125,6 +130,15 @@ def _source_request(value: Mapping[str, Any]) -> SourceRequest:
         modalities=tuple(value["modalities"]),
         locator_hints=tuple(value["locator_hints"]),
     )
+
+
+def _validate_timestamp(value: str) -> None:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ConfigError(f"invalid run_timestamp: {value}") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ConfigError("run_timestamp must include an explicit timezone")
 
 
 def _resolve_safe(base: Path, relative: str) -> Path:

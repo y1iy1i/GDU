@@ -2,7 +2,7 @@
 
 日期：2026-08-19
 
-状态：实现候选，尚未冻结。
+状态：已作为 Builder v0 确定性基础设施的一部分冻结。
 
 ## 1. 大白话说明
 
@@ -23,6 +23,7 @@
 - PDF 与预抽取文本的相对路径和 SHA-256；
 - GDU Schema、Build Log Schema 和 Builder Protocol 的路径、版本与 SHA-256；
 - Fixed GDU 夹具和 SHA-256；
+- 固定运行时间和 PDF 提取后端身份；
 - 模型/适配器身份三元组；
 - CP1–CP6 恰好六个 SourceRequest；
 - 两次语义修正、一次全局技术重试、单 Builder 和禁止外部知识。
@@ -45,6 +46,8 @@ PYTHONPATH=src python -m gdu.builder_v0.cli run \
 ```
 
 配置的输出目录必须不存在。临时实验可以使用 `--output-dir` 覆盖。
+
+同一配置的 `run_timestamp`、文件哈希和 `extraction_system` 均被锁定；在对应环境中重复运行应产生逐字节一致的三文件包。
 
 退出码：
 

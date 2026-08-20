@@ -36,7 +36,9 @@ class BuilderConfigSchemaTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
         cls.schema = json.loads(CONFIG_SCHEMA_PATH.read_text(encoding="utf-8"))
-        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.validator = jsonschema.Draft202012Validator(
+            cls.schema, format_checker=jsonschema.FormatChecker()
+        )
 
     def assert_invalid(self, value: dict) -> None:
         self.assertTrue(list(self.validator.iter_errors(value)))
@@ -45,11 +47,13 @@ class BuilderConfigSchemaTests(unittest.TestCase):
     def test_example_config_loads_and_resolves_all_six_checkpoints(self) -> None:
         loaded = load_builder_config(CONFIG_PATH)
         self.assertEqual("pilot03-fixed-fixture-replay-v0", loaded.spec.run_id)
+        self.assertEqual("2026-08-20T00:00:00+08:00", loaded.run_timestamp)
         self.assertEqual(
             {"cp1", "cp2", "cp3", "cp4", "cp5", "cp6"},
             set(loaded.spec.checkpoint_source_requests),
         )
         self.assertTrue(loaded.spec.source_pdf.is_absolute())
+        self.assertEqual("pypdf 6.16.1", loaded.spec.expected_extraction_system)
         self.assertEqual("gdu.example.json", loaded.fixture_gdu_path.name)
 
     def test_schema_rejects_parent_path_escape(self) -> None:
@@ -70,6 +74,11 @@ class BuilderConfigSchemaTests(unittest.TestCase):
     def test_schema_rejects_loosened_frozen_limits(self) -> None:
         value = copy.deepcopy(self.config)
         value["limits"]["max_semantic_corrections"] = 3
+        self.assert_invalid(value)
+
+    def test_schema_requires_a_valid_fixed_run_timestamp(self) -> None:
+        value = copy.deepcopy(self.config)
+        value["run_timestamp"] = "now"
         self.assert_invalid(value)
 
     def test_loader_rejects_reversed_page_range(self) -> None:
@@ -159,6 +168,32 @@ class BuilderCliIntegrationTests(unittest.TestCase):
                 {"gdu.json", "build_log.jsonl", "ARTIFACTS.sha256"},
                 {path.name for path in output.iterdir()},
             )
+
+    def test_same_config_produces_byte_identical_packages(self) -> None:
+        tmp_parent = ROOT / "tmp"
+        tmp_parent.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=tmp_parent) as temporary:
+            outputs = [Path(temporary) / name for name in ("first", "second")]
+            for output in outputs:
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(
+                    io.StringIO()
+                ):
+                    exit_code = main(
+                        [
+                            "run",
+                            "--config",
+                            str(CONFIG_PATH),
+                            "--output-dir",
+                            str(output),
+                        ]
+                    )
+                self.assertEqual(0, exit_code)
+            for filename in ("gdu.json", "build_log.jsonl", "ARTIFACTS.sha256"):
+                self.assertEqual(
+                    (outputs[0] / filename).read_bytes(),
+                    (outputs[1] / filename).read_bytes(),
+                    filename,
+                )
 
 
 if __name__ == "__main__":

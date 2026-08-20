@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import copy
 import json
 import sys
 from dataclasses import replace
-from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
@@ -16,9 +14,12 @@ from .source_reader import PypdfBackend, SourceReader
 from .types import TechnicalFailure
 
 
-class SystemClock:
+class ConfiguredClock:
+    def __init__(self, timestamp: str) -> None:
+        self.timestamp = timestamp
+
     def now(self) -> str:
-        return datetime.now().astimezone().isoformat(timespec="seconds")
+        return self.timestamp
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -48,10 +49,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         result = BuilderOrchestrator(
             spec=spec,
             adapter=adapter,
-            clock=SystemClock(),
+            clock=ConfiguredClock(loaded.run_timestamp),
             source_reader=reader,
         ).build()
-    except (ConfigError, TechnicalFailure, OSError, json.JSONDecodeError) as exc:
+    except (
+        ConfigError,
+        TechnicalFailure,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         _print_json(
             {
                 "outcome": "setup_failed",
