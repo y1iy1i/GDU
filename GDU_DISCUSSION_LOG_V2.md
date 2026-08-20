@@ -2896,3 +2896,13 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **调用纪律**：1 次独立单请求运行，0 次自动重试，0 次模型定向修正。
 - **结论**：受限 CP5 局部计划原型通过；不能据此形成整份年报的全局理解主张。
 - **下一步**：进入 CP6 停止门实验。由于覆盖仅限第二节，正确结果应是拒绝冻结完整文档并产生具体 coverage gap，而不是把局部成功误判成完整成功。
+
+### V2-222 DeepSeek CP6 停止门与 provisional 结论
+
+- **首次结果**：模型返回 coverage failed、evidence passed、stability passed、cross_carrier failed、cross_section failed、negative_boundary passed。
+- **三个 Gap**：全文未覆盖（返回 CP1）、表格等视觉载体未核验（返回 CP1）、跨章节关系不可检查（返回 CP2）。
+- **发布决定**：`provisional_only_do_not_freeze`，禁止把第二节局部纵向实验发布为完整文档 frozen GDU。
+- **结果身份**：原始结果 SHA-256 为 `c07067f873cf0870b7ac6c710da4bc8c65e079b79e2c95ccbe146b46eeecdf7d`。
+- **调用纪律**：1 次独立单请求运行，0 次自动重试，0 次定向修正。
+- **阶段意义**：CP1–CP6 首条真实模型局部纵向链路完成；成功体现为正确停止和暴露缺口，而不是错误宣布全文理解完成。
+- **下一步**：优先补全文覆盖与跨章节样本；表格视觉核验作为独立 Builder/SourceReader 能力变量研究，不修改冻结 Schema。
