@@ -126,6 +126,17 @@ class RemoteTransportTests(unittest.TestCase):
         with self.assertRaisesRegex(TechnicalFailure, "policy forbids"):
             transport.invoke({"policy": {"paid_remote_calls_allowed": False}})
 
+    def test_semantic_call_requires_response_contract_before_network(self) -> None:
+        transport = OpenAICompatibleRemoteTransport(
+            enabled_config(), explicit_authorization=True
+        )
+        request = permitted_request()
+        request["mode"] = "propose"
+        with patch("urllib.request.urlopen") as urlopen:
+            with self.assertRaisesRegex(TechnicalFailure, "response contract"):
+                transport.invoke(request)
+            urlopen.assert_not_called()
+
     @patch.dict(os.environ, {}, clear=True)
     def test_missing_key_stops_before_network(self) -> None:
         transport = OpenAICompatibleRemoteTransport(
@@ -156,6 +167,28 @@ class RemoteTransportTests(unittest.TestCase):
             with self.assertRaisesRegex(TechnicalFailure, "limit exhausted"):
                 transport.invoke(permitted_request())
             self.assertEqual(urlopen.call_count, 1)
+
+    @patch.dict(os.environ, {"GDU_TEST_API_KEY": "secret-test-key"}, clear=True)
+    def test_response_contract_is_supplied_to_semantic_model(self) -> None:
+        envelope = {
+            "choices": [{"message": {"content": json.dumps({"stage": "cp1"})}}]
+        }
+        transport = OpenAICompatibleRemoteTransport(
+            enabled_config(),
+            explicit_authorization=True,
+            response_contract={"type": "object", "required": ["stage"]},
+        )
+        request = permitted_request()
+        request["mode"] = "propose"
+        with patch(
+            "urllib.request.urlopen", return_value=FakeResponse(envelope)
+        ) as urlopen:
+            transport.invoke(request)
+            sent = urlopen.call_args.args[0]
+            body = json.loads(sent.data.decode("utf-8"))
+            system = body["messages"][0]["content"]
+            self.assertIn("RESPONSE_JSON_SCHEMA=", system)
+            self.assertIn('"required":["stage"]', system)
 
     @patch.dict(os.environ, {"GDU_TEST_API_KEY": "secret-test-key"}, clear=True)
     def test_prompt_only_mode_omits_native_json_parameter(self) -> None:

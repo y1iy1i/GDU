@@ -74,10 +74,19 @@ class OpenAICompatibleRemoteTransport:
     """Explicitly authorized, call-capped Chat Completions transport."""
 
     def __init__(
-        self, config: RemoteTransportConfig, *, explicit_authorization: bool = False
+        self,
+        config: RemoteTransportConfig,
+        *,
+        explicit_authorization: bool = False,
+        response_contract: Mapping[str, Any] | None = None,
     ) -> None:
         self.config = config
         self.explicit_authorization = explicit_authorization
+        self.response_contract = (
+            copy.deepcopy(dict(response_contract))
+            if response_contract is not None
+            else None
+        )
         self.calls_made = 0
 
     def invoke(self, request: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -86,6 +95,11 @@ class OpenAICompatibleRemoteTransport:
         if not self.explicit_authorization:
             raise TechnicalFailure(
                 "adapter_transport", "explicit remote-call authorization is missing"
+            )
+        if request.get("mode") in {"propose", "revise"} and self.response_contract is None:
+            raise TechnicalFailure(
+                "adapter_transport",
+                "a response contract is required for semantic model calls",
             )
         policy = request.get("policy")
         if not isinstance(policy, Mapping) or not policy.get(
@@ -109,15 +123,23 @@ class OpenAICompatibleRemoteTransport:
                 f"API key environment variable {self.config.api_key_env} is missing",
             )
 
+        system_content = (
+            "Return only one JSON object conforming to the supplied GDU Adapter "
+            "response contract. Do not use markdown."
+        )
+        if self.response_contract is not None:
+            system_content += " RESPONSE_JSON_SCHEMA=" + json.dumps(
+                self.response_contract,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
         body = {
             "model": self.config.model,
             "messages": [
                 {
                     "role": "system",
-                    "content": (
-                        "Return only one JSON object conforming to the supplied "
-                        "GDU Adapter response contract. Do not use markdown."
-                    ),
+                    "content": system_content,
                 },
                 {
                     "role": "user",

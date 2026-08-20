@@ -23,6 +23,7 @@ GDU（Generative Document Understanding，生成式文档理解单元）是一�
 - 当前 101 个唯一测试已在独立 Conda `gdu` 环境中全部通过；
 - 已建立 Adapter v1 结构化契约、离线 Transcript 与受限远程 Transport；阿里云 Token Plan 的 Qwen 3.7 Plus 最小连接测试已成功；
 - 远程 API 的 Schema、提供商样例和使用规则统一位于 `configs/api/`；
+- 第一次 Qwen CP1 真实候选通过 Adapter JSON 契约，但因 `page_range` 字段形状错误被 GDU Schema 拒绝，未进入 Builder；
 - Pilot 03 已用“配置 + CLI”完成真实 PDF 到 frozen 三文件包的临时往返。
 
 当前的 Fixed Adapter 只重放已验证内容，它证明 Builder 基础设施可运行、可复现，不证明真实模型已会自动理解任意长文档。

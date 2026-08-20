@@ -2795,3 +2795,13 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **真实调用**：向 Token Plan Chat Completions 发出 1 次最小 JSON 请求，未重试。
 - **返回**：`ok=true`、`model=qwen3.7-plus`，连接、鉴权、模型路由与原生 JSON Mode 均通过。
 - **边界**：这只证明接口连通，不证明模型能生成合格 GDU；本轮 1 次调用上限已用完，不继续自动调用。
+
+### V2-212 第一次真实 Qwen CP1 候选
+
+- **输入**：Pilot 03 年报物理页 1 和 8；只允许 CP1 evidence 与 physical_structure。
+- **调用**：Qwen 3.7 Plus 真实请求 1 次，未重试。
+- **通过层**：连接、鉴权、模型路由、原生 JSON Mode 和 Adapter response v1 Schema。
+- **拒绝层**：首个 physical_structure 的 `page_range` 返回 `[1, 237]`，而 GDU Schema 要求 `{"start": 1, "end": 237}`。
+- **处理**：结果未进入 Builder；原文逐字接地检查因字段 Schema 先失败而未完成。
+- **研究意义**：JSON 可解析不等于 GDU 字段合格，双层 Schema 门有真实必要性。
+- **离线修正**：补充 CP1 字段准确形状示例，并让后续失败候选先写入 Git 忽略的 `tmp/` 供诊断；不自动发起第二次调用。

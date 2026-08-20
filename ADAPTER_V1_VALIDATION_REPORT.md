@@ -15,7 +15,7 @@
 
 ## 2. 新增测试
 
-17 项 Adapter v1 测试覆盖：
+19 项 Adapter v1 测试覆盖：
 
 - request 不包含 PDF 路径，且付费远程调用和外部知识均为 false；
 - response 阶段必须与 request 一致；
@@ -27,10 +27,11 @@
 
 ## 3. 全项目结果
 
-- Conda `gdu`（Python 3.12.13）：共运行 112 项，108 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
+- Conda `gdu`（Python 3.12.13）：共运行 114 项，110 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
 - compileall：通过；
 - `GDU_BUILDER_V0_BASELINE.sha256`：28 项全部 OK；
 - 阿里云 Token Plan API 调用：1 次最小连接测试，成功且未重试；
+- Qwen CP1 API 调用：1 次；Adapter response Schema 通过，但 GDU physical_structure 字段 Schema 拒绝，未重试；
 - 本地生成模型调用：0。
 
 ## 4. 结论边界
@@ -38,3 +39,5 @@
 可以得出：当前地址、Key、模型 ID 和原生 JSON Mode 已连通；模型未来只要能稳定返回完整契约 JSON，就可以在不修改 Builder v0 的情况下接入。
 
 不能得出：一次小 JSON 连接成功不等于 Qwen 已具备生成完整 GDU 对象的能力。
+
+第一次真实 CP1 进一步证明：原生 JSON Mode 只能保证输出可解析，不能替代 GDU 字段级验证。
