@@ -1,0 +1,14 @@
+{
+  "format": "gdu-normative-scenario-v0.1",
+  "scenario_id": "ai-video-labeling-001",
+  "question": "一个AI生成视频的显式标识只在开头出现1秒，文字高度为画面最短边的5%，文件元数据按附录E完整填写。这个视频是否完全符合GB 45438-2025？",
+  "facts": {
+    "content_type": "ai_generated_video",
+    "explicit_label_position": "video_start",
+    "explicit_label_duration_seconds": "1",
+    "explicit_label_text_height_shortest_edge_ratio": "0.05",
+    "metadata_appendix_e_complete": true
+  },
+  "expected_scope": "GB 45438-2025",
+  "status": "frozen_experiment_fixture"
+}

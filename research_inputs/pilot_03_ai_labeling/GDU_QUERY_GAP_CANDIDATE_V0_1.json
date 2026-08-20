@@ -1,0 +1,79 @@
+{
+  "format": "gdu-query-gap-candidate-ai-labeling-v0.1",
+  "document_id": "gb-45438-2025",
+  "source_pdf_sha256": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+  "question": "一个AI生成视频的显式标识只在开头出现1秒，文字高度为画面最短边的5%，文件元数据按附录E完整填写。这个视频是否完全符合GB 45438-2025？",
+  "planner_result": {
+    "status": "gap",
+    "missing_atoms": [
+      "gb45438_video_overall_compliance",
+      "gb45438_partial_pass_not_overall_pass"
+    ],
+    "growth_policy": "quarantine_before_validation"
+  },
+  "candidate_evidence": [
+    {
+      "id": "CE-GB-P7-VIDEO",
+      "physical_page": 7,
+      "section": "5.4",
+      "text": "视频内容显式标识应位于视频起始画面，可位于视频末尾和中间适当位置；文字高度不应低于画面最短边长度的5%；在视频正常播放速度下，显式标识持续时间不应少于2s。",
+      "source_locator": "paper.pdf#physical-page=7&section=5.4",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-GB-P8-METADATA",
+      "physical_page": 8,
+      "section": "6.1",
+      "text": "文件元数据隐式标识应包括生成合成标签、生成合成服务提供者、内容制作编号、内容传播服务提供者和内容传播编号等要素，格式应符合附录E。",
+      "source_locator": "paper.pdf#physical-page=8&section=6.1",
+      "status": "visually_verified_candidate"
+    },
+    {
+      "id": "CE-GB-P17-APPENDIX-E",
+      "physical_page": 17,
+      "section": "appendix-e",
+      "text": "规范性附录E要求在文件元数据中添加名称或关键词含AIGC的隐式标识扩展字段，并规定Label、ContentProducer、ProduceID、ContentPropagator和PropagateID等字段取值。",
+      "source_locator": "paper.pdf#physical-page=17&appendix=E",
+      "status": "visually_verified_candidate"
+    }
+  ],
+  "candidate_claims": [
+    {
+      "id": "CC-GB-VIDEO-DURATION-OBLIGATION",
+      "atom": "gb45438_video_minimum_label_duration",
+      "polarity": "positive",
+      "normative_force": "obligation",
+      "bearer": "video_content_provider",
+      "statement": "在正常播放速度下，视频内容显式标识持续时间不应少于2秒。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-GB-P7-VIDEO"]
+    },
+    {
+      "id": "CC-GB-VIDEO-HEIGHT-OBLIGATION",
+      "atom": "gb45438_video_minimum_label_height",
+      "polarity": "positive",
+      "normative_force": "obligation",
+      "bearer": "video_content_provider",
+      "statement": "视频内容显式标识的文字高度不应低于画面最短边长度的5%。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-GB-P7-VIDEO"]
+    },
+    {
+      "id": "CC-GB-METADATA-OBLIGATION",
+      "atom": "gb45438_metadata_appendix_e_requirement",
+      "polarity": "positive",
+      "normative_force": "obligation",
+      "bearer": "content_provider",
+      "statement": "文件元数据隐式标识应包含规定要素并符合规范性附录E的格式。",
+      "status": "candidate_pending_logic_validation",
+      "evidence_refs": ["CE-GB-P8-METADATA", "CE-GB-P17-APPENDIX-E"]
+    }
+  ],
+  "promotion_gate": [
+    "context_matches_gb45438_video",
+    "normative_force_preserved",
+    "mandatory_and_optional_language_distinguished",
+    "numeric_thresholds_preserved",
+    "normative_appendix_traced"
+  ]
+}

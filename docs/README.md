@@ -4,7 +4,7 @@
 
 ## 当前主线
 
-`current/` 只保留理解当前系统所必需的八份文档：
+`current/` 只保留理解当前系统所必需的九份文档：
 
 1. `GDU_REASONING_GRAPH_OBJECTIVE_V1.md`：研究目标和边界；
 2. `GDU_CANDIDATE_LOGIC_ARCHITECTURE_V0_1.md`：三层逻辑主干与两个横向模块；
@@ -14,6 +14,7 @@
 6. `GDU_FIRST_CLOSED_LOOP_GROWTH_REPORT_V0_1.md`：第一次正式数据库生长闭环。
 7. `GDU_SECOND_NONFINANCIAL_GROWTH_REPORT_V0_1.md`：跨正文、图与算法冲突的非财务生长。
 8. `GDU_GENERIC_PROMOTION_FRAMEWORK_REPORT_V0_1.md`：两个领域共用的生长安全事务层。
+9. `GDU_THIRD_NORMATIVE_GROWTH_REPORT_V0_1.md`：GB 45438-2025 义务、违规和局部合规推理。
 
 文件名中的 `V0_1` 表示对应接口或实验版本，不表示它属于已归档的旧 v0 设计。
 
@@ -52,4 +53,5 @@
 - 当前查询规划：`src/gdu/query_planner_v01.py`；
 - 当前通用生长晋升：`src/gdu/promotion_v01.py`；
 - 当前领域生长规则：`src/gdu/growth_v01.py` 与 `src/gdu/growth_pgkd_v01.py`；
+- 当前规范生长规则：`src/gdu/growth_ai_labeling_v01.py`；
 - 全部测试：`tests/`。

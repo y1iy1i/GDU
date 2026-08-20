@@ -1,0 +1,90 @@
+{
+  "format": "gdu-logic-normative-slice-v0.1",
+  "document_id": "gb-45438-2025",
+  "question": "一个AI生成视频的显式标识只在开头出现1秒，文字高度为画面最短边的5%，文件元数据按附录E完整填写。这个视频是否完全符合GB 45438-2025？",
+  "source_pdf_sha256": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+  "scenario_sha256": "415bd2b4216ead557631578103fd02ce179b95b0336d9af4c59d2279f760b9d9",
+  "default_context": {
+    "document_scope": "gb-45438-2025",
+    "scenario_scope": "ai-video-labeling-001"
+  },
+  "information_nodes": [
+    {
+      "id": "E-GB-P5-SCOPE",
+      "kind": "evidence",
+      "text": "GB 45438-2025规定人工智能生成合成内容标识方法，适用于生成合成服务提供者和内容传播服务提供者开展标识活动。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=5&section=1",
+        "source_hash": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95"
+      }
+    },
+    {
+      "id": "E-SCENARIO-VIDEO",
+      "kind": "evidence",
+      "text": "冻结场景：AI生成视频的显式标识位于开头，持续1秒，文字高度为画面最短边的5%，元数据按附录E完整填写。",
+      "provenance": {
+        "source_locator": "SCENARIO_V0_1.json#scenario_id=ai-video-labeling-001",
+        "source_hash": "415bd2b4216ead557631578103fd02ce179b95b0336d9af4c59d2279f760b9d9"
+      }
+    },
+    {
+      "id": "C-GB-STANDARD-APPLIES",
+      "kind": "claim",
+      "atom": "gb45438_applies_to_scenario",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "GB 45438-2025的标识方法适用于本次AI生成视频场景。",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {"quoted_from": ["E-GB-P5-SCOPE"]}
+    },
+    {
+      "id": "C-SCENARIO-VIDEO-DURATION",
+      "kind": "claim",
+      "atom": "scenario_video_explicit_label_duration_seconds",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "场景中的视频显式标识持续1秒。",
+      "value": {"amount": "1", "unit": "second"},
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {"quoted_from": ["E-SCENARIO-VIDEO"]}
+    },
+    {
+      "id": "C-SCENARIO-VIDEO-HEIGHT",
+      "kind": "claim",
+      "atom": "scenario_video_explicit_label_height_ratio",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "场景中的显式标识文字高度为画面最短边的5%。",
+      "value": {"amount": "0.05", "unit": "ratio"},
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {"quoted_from": ["E-SCENARIO-VIDEO"]}
+    },
+    {
+      "id": "C-SCENARIO-METADATA-COMPLETE",
+      "kind": "claim",
+      "atom": "scenario_appendix_e_metadata_complete",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "场景中的文件元数据已按附录E完整填写。",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {"quoted_from": ["E-SCENARIO-VIDEO"]}
+    }
+  ],
+  "scheme_nodes": []
+}

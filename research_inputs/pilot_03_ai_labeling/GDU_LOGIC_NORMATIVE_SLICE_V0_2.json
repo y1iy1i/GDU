@@ -1,0 +1,445 @@
+{
+  "format": "gdu-logic-normative-slice-v0.2",
+  "document_id": "gb-45438-2025",
+  "question": "一个AI生成视频的显式标识只在开头出现1秒，文字高度为画面最短边的5%，文件元数据按附录E完整填写。这个视频是否完全符合GB 45438-2025？",
+  "source_pdf_sha256": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+  "scenario_sha256": "415bd2b4216ead557631578103fd02ce179b95b0336d9af4c59d2279f760b9d9",
+  "default_context": {
+    "document_scope": "gb-45438-2025",
+    "scenario_scope": "ai-video-labeling-001"
+  },
+  "information_nodes": [
+    {
+      "id": "E-GB-P5-SCOPE",
+      "kind": "evidence",
+      "text": "GB 45438-2025规定人工智能生成合成内容标识方法，适用于生成合成服务提供者和内容传播服务提供者开展标识活动。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=5&section=1",
+        "source_hash": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95"
+      }
+    },
+    {
+      "id": "E-SCENARIO-VIDEO",
+      "kind": "evidence",
+      "text": "冻结场景：AI生成视频的显式标识位于开头，持续1秒，文字高度为画面最短边的5%，元数据按附录E完整填写。",
+      "provenance": {
+        "source_locator": "SCENARIO_V0_1.json#scenario_id=ai-video-labeling-001",
+        "source_hash": "415bd2b4216ead557631578103fd02ce179b95b0336d9af4c59d2279f760b9d9"
+      }
+    },
+    {
+      "id": "C-GB-STANDARD-APPLIES",
+      "kind": "claim",
+      "atom": "gb45438_applies_to_scenario",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "GB 45438-2025的标识方法适用于本次AI生成视频场景。",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GB-P5-SCOPE"
+        ]
+      }
+    },
+    {
+      "id": "C-SCENARIO-VIDEO-DURATION",
+      "kind": "claim",
+      "atom": "scenario_video_explicit_label_duration_seconds",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "场景中的视频显式标识持续1秒。",
+      "value": {
+        "amount": "1",
+        "unit": "second"
+      },
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-SCENARIO-VIDEO"
+        ]
+      }
+    },
+    {
+      "id": "C-SCENARIO-VIDEO-HEIGHT",
+      "kind": "claim",
+      "atom": "scenario_video_explicit_label_height_ratio",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "场景中的显式标识文字高度为画面最短边的5%。",
+      "value": {
+        "amount": "0.05",
+        "unit": "ratio"
+      },
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-SCENARIO-VIDEO"
+        ]
+      }
+    },
+    {
+      "id": "C-SCENARIO-METADATA-COMPLETE",
+      "kind": "claim",
+      "atom": "scenario_appendix_e_metadata_complete",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "场景中的文件元数据已按附录E完整填写。",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-SCENARIO-VIDEO"
+        ]
+      }
+    },
+    {
+      "id": "E-GROW-GB-P7-VIDEO",
+      "kind": "evidence",
+      "text": "视频内容显式标识应位于视频起始画面，可位于视频末尾和中间适当位置；文字高度不应低于画面最短边长度的5%；在视频正常播放速度下，显式标识持续时间不应少于2s。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=7&section=5.4",
+        "source_hash": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "E-GROW-GB-P8-METADATA",
+      "kind": "evidence",
+      "text": "文件元数据隐式标识应包括生成合成标签、生成合成服务提供者、内容制作编号、内容传播服务提供者和内容传播编号等要素，格式应符合附录E。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=8&section=6.1",
+        "source_hash": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "E-GROW-GB-P17-APPENDIX-E",
+      "kind": "evidence",
+      "text": "规范性附录E要求在文件元数据中添加名称或关键词含AIGC的隐式标识扩展字段，并规定Label、ContentProducer、ProduceID、ContentPropagator和PropagateID等字段取值。",
+      "provenance": {
+        "source_locator": "paper.pdf#physical-page=17&appendix=E",
+        "source_hash": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-VIDEO-DURATION-OBLIGATION",
+      "kind": "claim",
+      "atom": "gb45438_video_minimum_label_duration",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "在正常播放速度下，视频内容显式标识持续时间不应少于2秒。",
+      "normative_force": "obligation",
+      "bearer": "video_content_provider",
+      "constraint": {
+        "operator": ">=",
+        "value": "2",
+        "unit": "second"
+      },
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-GB-P7-VIDEO"
+        ],
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-VIDEO-HEIGHT-OBLIGATION",
+      "kind": "claim",
+      "atom": "gb45438_video_minimum_label_height",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "视频内容显式标识的文字高度不应低于画面最短边长度的5%。",
+      "normative_force": "obligation",
+      "bearer": "video_content_provider",
+      "constraint": {
+        "operator": ">=",
+        "value": "0.05",
+        "unit": "ratio"
+      },
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-GB-P7-VIDEO"
+        ],
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-METADATA-OBLIGATION",
+      "kind": "claim",
+      "atom": "gb45438_metadata_appendix_e_requirement",
+      "polarity": "positive",
+      "asserted": true,
+      "active": true,
+      "statement": "文件元数据隐式标识应包含规定要素并符合规范性附录E的格式。",
+      "normative_force": "obligation",
+      "bearer": "content_provider",
+      "constraint": {
+        "operator": "conforms_to",
+        "value": "appendix-e"
+      },
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "quoted_from": [
+          "E-GROW-GB-P8-METADATA",
+          "E-GROW-GB-P17-APPENDIX-E"
+        ],
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-DURATION-VIOLATION",
+      "kind": "claim",
+      "atom": "gb45438_video_duration_violation",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "1秒小于标准要求的2秒，因此视频显式标识持续时间违规。",
+      "compliance_status": "violation",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "generated_by": "I-GB-CHECK-DURATION",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-HEIGHT-COMPLIANT",
+      "kind": "claim",
+      "atom": "gb45438_video_height_compliance",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "文字高度等于画面最短边的5%，满足不低于5%的要求。",
+      "compliance_status": "satisfied",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "generated_by": "I-GB-CHECK-HEIGHT",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-METADATA-COMPLIANT",
+      "kind": "claim",
+      "atom": "gb45438_metadata_compliance",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "场景已按附录E完整填写元数据，因此该部分要求已满足。",
+      "compliance_status": "satisfied",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "generated_by": "I-GB-CHECK-METADATA",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-OVERALL-NONCOMPLIANT",
+      "kind": "claim",
+      "atom": "gb45438_video_overall_compliance",
+      "polarity": "negative",
+      "asserted": false,
+      "active": true,
+      "statement": "该视频不完全符合GB 45438-2025：显式标识只持续1秒，违反第5.4条不应少于2秒的要求。",
+      "compliance_status": "noncompliant",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "generated_by": "I-GB-DERIVE-OVERALL-NONCOMPLIANCE",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-PARTIAL-NOT-OVERALL",
+      "kind": "claim",
+      "atom": "gb45438_partial_pass_not_overall_pass",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "文字高度和元数据合格只能证明局部满足，不能抵消显式标识持续时间的违规。",
+      "compliance_status": "limitation",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "generated_by": "I-GB-DERIVE-PARTIAL-LIMITATION",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    },
+    {
+      "id": "C-GB-OVERALL-COMPLIANT-HEURISTIC",
+      "kind": "claim",
+      "atom": "gb45438_video_overall_compliance",
+      "polarity": "positive",
+      "asserted": false,
+      "active": true,
+      "statement": "视频已有显式标识且元数据完整，因此可视为完全符合标准。",
+      "compliance_status": "heuristic",
+      "context": {
+        "document_scope": "gb-45438-2025",
+        "scenario_scope": "ai-video-labeling-001"
+      },
+      "provenance": {
+        "generated_by": "I-GB-OVERALL-COMPLIANCE-HEURISTIC",
+        "growth_event": "GROWTH-GB45438-VIDEO-001"
+      }
+    }
+  ],
+  "scheme_nodes": [
+    {
+      "id": "I-GB-CHECK-DURATION",
+      "kind": "inference",
+      "premises": [
+        "C-GB-VIDEO-DURATION-OBLIGATION",
+        "C-SCENARIO-VIDEO-DURATION"
+      ],
+      "conclusion": "C-GB-DURATION-VIOLATION",
+      "rule_kind": "strict",
+      "rule_id": "obligation-threshold-violation-v1"
+    },
+    {
+      "id": "I-GB-CHECK-HEIGHT",
+      "kind": "inference",
+      "premises": [
+        "C-GB-VIDEO-HEIGHT-OBLIGATION",
+        "C-SCENARIO-VIDEO-HEIGHT"
+      ],
+      "conclusion": "C-GB-HEIGHT-COMPLIANT",
+      "rule_kind": "strict",
+      "rule_id": "obligation-threshold-satisfaction-v1"
+    },
+    {
+      "id": "I-GB-CHECK-METADATA",
+      "kind": "inference",
+      "premises": [
+        "C-GB-METADATA-OBLIGATION",
+        "C-SCENARIO-METADATA-COMPLETE"
+      ],
+      "conclusion": "C-GB-METADATA-COMPLIANT",
+      "rule_kind": "strict",
+      "rule_id": "normative-format-satisfaction-v1"
+    },
+    {
+      "id": "I-GB-DERIVE-OVERALL-NONCOMPLIANCE",
+      "kind": "inference",
+      "premises": [
+        "C-GB-STANDARD-APPLIES",
+        "C-GB-DURATION-VIOLATION"
+      ],
+      "conclusion": "C-GB-OVERALL-NONCOMPLIANT",
+      "rule_kind": "strict",
+      "rule_id": "mandatory-requirement-violation-v1"
+    },
+    {
+      "id": "I-GB-DERIVE-PARTIAL-LIMITATION",
+      "kind": "inference",
+      "premises": [
+        "C-GB-DURATION-VIOLATION",
+        "C-GB-HEIGHT-COMPLIANT",
+        "C-GB-METADATA-COMPLIANT"
+      ],
+      "conclusion": "C-GB-PARTIAL-NOT-OVERALL",
+      "rule_kind": "strict",
+      "rule_id": "partial-compliance-does-not-cure-violation-v1"
+    },
+    {
+      "id": "I-GB-OVERALL-COMPLIANCE-HEURISTIC",
+      "kind": "inference",
+      "premises": [
+        "C-GB-HEIGHT-COMPLIANT",
+        "C-GB-METADATA-COMPLIANT"
+      ],
+      "conclusion": "C-GB-OVERALL-COMPLIANT-HEURISTIC",
+      "rule_kind": "defeasible",
+      "rule_id": "visible-label-plus-metadata-heuristic-v1"
+    },
+    {
+      "id": "CA-GB-NONCOMPLIANCE-REBUT",
+      "kind": "conflict",
+      "attack_kind": "rebut",
+      "source": "C-GB-OVERALL-NONCOMPLIANT",
+      "target_type": "claim",
+      "target": "C-GB-OVERALL-COMPLIANT-HEURISTIC"
+    },
+    {
+      "id": "CA-GB-DURATION-UNDERCUT",
+      "kind": "conflict",
+      "attack_kind": "undercut",
+      "source": "C-GB-DURATION-VIOLATION",
+      "target_type": "inference",
+      "target": "I-GB-OVERALL-COMPLIANCE-HEURISTIC"
+    }
+  ],
+  "revision_history": [
+    {
+      "event_id": "GROWTH-GB45438-VIDEO-001",
+      "recorded_at": "2026-08-20T22:00:00+08:00",
+      "operation": "promote_normative_compliance_candidate",
+      "parent_format": "gdu-logic-normative-slice-v0.1",
+      "candidate_hash": "28f734135b77bb40312971e5d245d9834489435b96acbc8b0915e50661a6d9cd",
+      "added_information_node_ids": [
+        "E-GROW-GB-P7-VIDEO",
+        "E-GROW-GB-P8-METADATA",
+        "E-GROW-GB-P17-APPENDIX-E",
+        "C-GB-VIDEO-DURATION-OBLIGATION",
+        "C-GB-VIDEO-HEIGHT-OBLIGATION",
+        "C-GB-METADATA-OBLIGATION",
+        "C-GB-DURATION-VIOLATION",
+        "C-GB-HEIGHT-COMPLIANT",
+        "C-GB-METADATA-COMPLIANT",
+        "C-GB-OVERALL-NONCOMPLIANT",
+        "C-GB-PARTIAL-NOT-OVERALL",
+        "C-GB-OVERALL-COMPLIANT-HEURISTIC"
+      ],
+      "added_scheme_node_ids": [
+        "I-GB-CHECK-DURATION",
+        "I-GB-CHECK-HEIGHT",
+        "I-GB-CHECK-METADATA",
+        "I-GB-DERIVE-OVERALL-NONCOMPLIANCE",
+        "I-GB-DERIVE-PARTIAL-LIMITATION",
+        "I-GB-OVERALL-COMPLIANCE-HEURISTIC",
+        "CA-GB-NONCOMPLIANCE-REBUT",
+        "CA-GB-DURATION-UNDERCUT"
+      ]
+    }
+  ]
+}

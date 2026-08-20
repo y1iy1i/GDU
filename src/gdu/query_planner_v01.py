@@ -16,6 +16,8 @@ CONCEPT_ALIASES = {
     "investment_activity": ("投资活动", "投资款", "投资支出", "对外投资"),
     "pgkd": ("PGKD", "知识蒸馏", "学生模型"),
     "model_evaluation_identity": ("评估新模型", "评估旧模型", "评估的是", "新学生", "旧学生", "模型索引"),
+    "ai_generated_label": ("AI生成视频", "人工智能生成合成", "显式标识", "AIGC"),
+    "standards_compliance": ("完全符合", "符合GB", "合规", "违反了", "违反哪项"),
 }
 
 
@@ -32,7 +34,9 @@ def parse_question(question: str) -> dict[str, Any]:
         intent = "verify"
     else:
         intent = "lookup"
-    years = re.findall(r"20\d{2}", compact)
+    # A year after a hyphen is commonly a document-version suffix (for example
+    # GB 45438-2025), not a temporal constraint supplied by the user.
+    years = re.findall(r"(?<![-—])20\d{2}", compact)
     scope = "parent_company" if "母公司" in compact else "consolidated" if "合并" in compact else None
     return {
         "intent": intent,
@@ -44,6 +48,18 @@ def parse_question(question: str) -> dict[str, Any]:
 
 def _query_structure(parsed: Mapping[str, Any]) -> dict[str, Any]:
     concepts = set(parsed["concepts"])
+    if {"ai_generated_label", "standards_compliance"} <= concepts:
+        return {
+            "name": "normative_compliance_check",
+            "target_atoms": ["gb45438_video_overall_compliance"],
+            "limitation_atoms": ["gb45438_partial_pass_not_overall_pass"],
+            "source_terms": [
+                "视频内容显式标识",
+                "持续时间不应少于2s",
+                "文件元数据隐式标识",
+                "附录E",
+            ],
+        }
     if {"pgkd", "model_evaluation_identity"} <= concepts:
         return {
             "name": "source_conflict_resolution",
