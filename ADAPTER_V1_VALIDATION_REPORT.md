@@ -2,7 +2,7 @@
 
 日期：2026-08-20
 
-状态：请求/响应 Schema、离线 Transcript 和默认关闭的远程接线通过；尚未调用真实生成模型。
+状态：请求/响应 Schema、离线 Transcript 和远程接线通过；Qwen 3.7 Plus 最小连接测试成功。
 
 ## 1. 已实现
 
@@ -11,7 +11,7 @@
 - `src/gdu/adapter_v1/structured_adapter.py`：Builder 数据类与结构化 JSON 之间的转换与验证；
 - `TranscriptTransport`：按预登记顺序离线重放响应，不访问网络或模型。
 - `OpenAICompatibleRemoteTransport`：默认关闭，只在安全门全部通过时具备发送能力。
-- 阿里云百炼配置样例：使用用户指定的北京区 Token Plan 地址和模型 ID `deepseek-v4-flash`，首轮上限 1 次，采用 prompt-only JSON 加本地校验。
+- 阿里云百炼配置样例：使用用户指定的北京区 Token Plan 地址和模型 ID `qwen3.7-plus`，首轮上限 1 次，采用原生 JSON Mode 加本地校验。
 
 ## 2. 新增测试
 
@@ -30,12 +30,11 @@
 - Conda `gdu`（Python 3.12.13）：共运行 112 项，108 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
 - compileall：通过；
 - `GDU_BUILDER_V0_BASELINE.sha256`：28 项全部 OK；
-- 付费 API 调用：0；
+- 阿里云 Token Plan API 调用：1 次最小连接测试，成功且未重试；
 - 本地生成模型调用：0。
-- DeepSeek API 调用：0。
 
 ## 4. 结论边界
 
-可以得出：真实模型未来只要能稳定返回契约 JSON，就可以在不修改 Builder v0 的情况下接入。
+可以得出：当前地址、Key、模型 ID 和原生 JSON Mode 已连通；模型未来只要能稳定返回完整契约 JSON，就可以在不修改 Builder v0 的情况下接入。
 
-不能得出：任何本地或远程模型已经具备这种结构化生成能力。
+不能得出：一次小 JSON 连接成功不等于 Qwen 已具备生成完整 GDU 对象的能力。

@@ -2781,3 +2781,17 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **目录**：新增 `configs/api/`，集中保存远程配置 Schema、关闭示例、阿里云 Token Plan 示例、使用规则和中文说明。
 - **Key 边界**：真实 Key 不进入该目录，仍只由 Codex `gdu` 环境中的 `DASHSCOPE_API_KEY` 提供。
 - **兼容性**：测试和文档引用全部改为新路径，运行逻辑不变。
+
+### V2-210 用户切换至 Qwen 3.7 Plus
+
+- **用户操作**：已在集中配置中把模型改为 `qwen3.7-plus`，并完成 `DASHSCOPE_API_KEY` 注入。
+- **官方核对**：Token Plan 支持该准确模型 ID；Qwen3.7-Plus 系列支持原生 JSON Mode。
+- **配置修正**：文件名、模型断言、文档和授权记录改为 Qwen；`json_output_mode` 从 `prompt_only` 改为 `native`。
+- **调用边界**：本地验证通过前不发请求；首轮真实连接仍最多 1 次。
+
+### V2-211 Qwen 3.7 Plus 最小连接测试
+
+- **前置检查**：Conda `gdu` 可读取 `DASHSCOPE_API_KEY`；远程配置测试 10 项通过，全项目 112 项正常，Builder v0 冻结清单全部 OK。
+- **真实调用**：向 Token Plan Chat Completions 发出 1 次最小 JSON 请求，未重试。
+- **返回**：`ok=true`、`model=qwen3.7-plus`，连接、鉴权、模型路由与原生 JSON Mode 均通过。
+- **边界**：这只证明接口连通，不证明模型能生成合格 GDU；本轮 1 次调用上限已用完，不继续自动调用。

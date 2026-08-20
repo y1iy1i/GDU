@@ -2,13 +2,13 @@
   "enabled": true,
   "provider_id": "aliyun-bailian-token-plan-beijing",
   "base_url": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
-  "model": "deepseek-v4-flash",
+  "model": "qwen3.7-plus",
   "api_key_env": "DASHSCOPE_API_KEY",
   "api_style": "openai_chat_completions",
-  "json_output_mode": "prompt_only",
+  "json_output_mode": "native",
   "max_calls": 1,
   "timeout_seconds": 120,
   "max_output_tokens": 8192,
   "temperature": 0,
-  "authorization_id": "user-approved-aliyun-token-plan-deepseek-v4-flash-2026-08-20"
+  "authorization_id": "user-approved-aliyun-token-plan-qwen3.7-plus-2026-08-20"
 }

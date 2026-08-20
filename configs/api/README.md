@@ -6,7 +6,7 @@
 
 - `remote-adapter-v1.schema.json`：配置格式和安全限制；
 - `disabled.example.json`：完全关闭远程 API 的最小配置；
-- `aliyun-token-plan-deepseek-v4-flash.example.json`：当前阿里云百炼 Token Plan 配置；
+- `aliyun-token-plan-qwen3.7-plus.example.json`：当前阿里云百炼 Token Plan 配置；
 - `API_USAGE_POLICY.md`：调用、Key 和额度边界。
 
 ## 更换地址或模型

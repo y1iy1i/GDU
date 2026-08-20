@@ -20,9 +20,9 @@
 ## 当前选择
 
 - 提供商：阿里云百炼北京区 Token Plan；
-- 模型：`deepseek-v4-flash`；
+- 模型：`qwen3.7-plus`；
 - Base URL：`https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`；
 - Key 环境变量：`DASHSCOPE_API_KEY`；
-- JSON 模式：`prompt_only`，由提示词要求 JSON，再在本地按 Schema 严格验证；
+- JSON 模式：`native`，由接口保证 JSON 格式，再在本地按 Schema 严格验证；
 - 首轮最大调用次数：1；
-- 当前状态：已配置，尚未发起真实请求。
+- 当前状态：最小连接测试成功 1 次；后续调用必须重新明确授权和次数上限。
