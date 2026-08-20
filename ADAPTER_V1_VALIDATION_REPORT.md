@@ -11,7 +11,7 @@
 - `src/gdu/adapter_v1/structured_adapter.py`：Builder 数据类与结构化 JSON 之间的转换与验证；
 - `TranscriptTransport`：按预登记顺序离线重放响应，不访问网络或模型。
 - `OpenAICompatibleRemoteTransport`：默认关闭，只在安全门全部通过时具备发送能力。
-- 阿里云百炼配置样例：使用用户指定的北京区工作空间地址和模型 ID `deepseek-v4-flash`，首轮上限 1 次，采用 prompt-only JSON 加本地校验。
+- 阿里云百炼配置样例：使用用户指定的北京区 Token Plan 地址和模型 ID `deepseek-v4-flash`，首轮上限 1 次，采用 prompt-only JSON 加本地校验。
 
 ## 2. 新增测试
 

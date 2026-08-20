@@ -80,10 +80,10 @@ class RemoteConfigTests(unittest.TestCase):
         path = ROOT / "remote-adapter-v1.aliyun-deepseek.example.json"
         config = load_remote_transport_config(path, SCHEMA, digest(path))
         self.assertTrue(config.enabled)
-        self.assertEqual(config.provider_id, "aliyun-bailian-beijing-workspace")
+        self.assertEqual(config.provider_id, "aliyun-bailian-token-plan-beijing")
         self.assertEqual(
             config.base_url,
-            "https://ws-vi78tem3ych0571a.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+            "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
         )
         self.assertEqual(config.model, "deepseek-v4-flash")
         self.assertEqual(config.api_key_env, "DASHSCOPE_API_KEY")

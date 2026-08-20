@@ -2768,3 +2768,9 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 - **兼容修正**：阿里云官方注明该模型不支持原生结构化输出，因此配置使用 `prompt_only`，不发送 `response_format`，返回内容仍由 Adapter JSON Schema 严格拒绝或接收。
 - **Key 注入**：改用 `DASHSCOPE_API_KEY` 环境变量。
 - **当前状态**：尚未发出请求，首轮上限仍为 1 次。
+
+### V2-208 切换至阿里云百炼 Token Plan 端点
+
+- **用户决定**：Base URL 改为 `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`。
+- **配置变化**：供应商标识改为 `aliyun-bailian-token-plan-beijing`；模型、Key 环境变量、prompt-only JSON 模式和首轮 1 次上限不变。
+- **当前状态**：仅修改配置，尚未发出真实请求。
