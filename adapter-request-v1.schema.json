@@ -24,14 +24,38 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["external_knowledge_allowed", "paid_remote_calls_allowed"],
+      "required": ["external_knowledge_allowed", "paid_remote_calls_allowed", "max_remote_calls"],
       "properties": {
         "external_knowledge_allowed": { "const": false },
-        "paid_remote_calls_allowed": { "const": false }
+        "paid_remote_calls_allowed": { "type": "boolean" },
+        "max_remote_calls": { "type": "integer", "minimum": 0, "maximum": 8 }
       }
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "policy": {
+            "properties": { "paid_remote_calls_allowed": { "const": false } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "policy": {
+            "properties": { "max_remote_calls": { "const": 0 } }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "policy": {
+            "properties": { "max_remote_calls": { "minimum": 1 } }
+          }
+        }
+      }
+    },
     {
       "if": { "properties": { "mode": { "const": "revise" } } },
       "then": {

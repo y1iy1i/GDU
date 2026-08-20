@@ -10,9 +10,9 @@
 
 ## 机械规则
 
-1. Adapter request 必须包含 `paid_remote_calls_allowed: false`。
-2. v1 允许的 Transport 只有：离线 Transcript、人工导入响应、用户已有的本地模型。
-3. 未经用户对具体服务、最大金额和单次运行明确授权，不实现或调用远程付费 Transport。
+1. Adapter 默认必须包含 `paid_remote_calls_allowed: false` 和 `max_remote_calls: 0`。
+2. 远程 Transport 配置默认为 `enabled: false`；配置哈希不匹配时拒绝运行。
+3. 只有用户对具体提供商、模型、Key 环境变量和最大调用次数明确授权后，请求才可改为 `paid_remote_calls_allowed: true`。
 4. 无 API Key、无免费额度、额度耗尽或服务要求绑卡时，运行立即停止并报告，不自动切换到付费模型。
 5. 不保存、上传或打印 API Key。
 6. 下载本地模型前先报告预计磁盘和网络体积；模型下载本身不得触发付费。
@@ -23,3 +23,4 @@
 - 当前只有 `bge-m3` 嵌入模型，不能生成 GDU 候选对象；
 - 尚未下载本地生成模型；
 - 尚未调用任何付费 API。
+- 已建立默认关闭的 OpenAI-compatible 接线能力，但没有启用配置或 API Key。

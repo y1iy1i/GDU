@@ -56,9 +56,20 @@ class StructuredUnderstandingAdapter:
         run_identity: tuple[str, str, str],
         request_schema: Path,
         response_schema: Path,
+        *,
+        paid_remote_calls_allowed: bool = False,
+        max_remote_calls: int = 0,
     ) -> None:
+        if paid_remote_calls_allowed != (max_remote_calls > 0):
+            raise ValueError(
+                "paid_remote_calls_allowed and max_remote_calls must be enabled together"
+            )
+        if not 0 <= max_remote_calls <= 8:
+            raise ValueError("max_remote_calls must be between 0 and 8")
         self.transport = transport
         self.run_identity = run_identity
+        self.paid_remote_calls_allowed = paid_remote_calls_allowed
+        self.max_remote_calls = max_remote_calls
         self._request_validator = self._validator(request_schema)
         self._response_validator = self._validator(response_schema)
 
@@ -152,7 +163,8 @@ class StructuredUnderstandingAdapter:
             "public_working_view": copy.deepcopy(dict(public_view)),
             "policy": {
                 "external_knowledge_allowed": False,
-                "paid_remote_calls_allowed": False,
+                "paid_remote_calls_allowed": self.paid_remote_calls_allowed,
+                "max_remote_calls": self.max_remote_calls,
             },
         }
         if correction is not None:

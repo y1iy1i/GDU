@@ -5,9 +5,19 @@ from .structured_adapter import (
     TranscriptTransport,
     Transport,
 )
+from .remote_transport import (
+    OpenAICompatibleRemoteTransport,
+    RemoteTransportConfig,
+    load_remote_transport_config,
+    sha256_file,
+)
 
 __all__ = [
     "StructuredUnderstandingAdapter",
     "TranscriptTransport",
     "Transport",
+    "OpenAICompatibleRemoteTransport",
+    "RemoteTransportConfig",
+    "load_remote_transport_config",
+    "sha256_file",
 ]

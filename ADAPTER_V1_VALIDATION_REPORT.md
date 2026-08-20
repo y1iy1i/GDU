@@ -2,7 +2,7 @@
 
 日期：2026-08-20
 
-状态：请求/响应 Schema、解析器和离线 Transcript 接线通过；尚未调用真实生成模型。
+状态：请求/响应 Schema、离线 Transcript 和默认关闭的远程接线通过；尚未调用真实生成模型。
 
 ## 1. 已实现
 
@@ -10,10 +10,11 @@
 - `adapter-response-v1.schema.json`：限定候选对象、mutation、revision 和停止门；
 - `src/gdu/adapter_v1/structured_adapter.py`：Builder 数据类与结构化 JSON 之间的转换与验证；
 - `TranscriptTransport`：按预登记顺序离线重放响应，不访问网络或模型。
+- `OpenAICompatibleRemoteTransport`：默认关闭，只在安全门全部通过时具备发送能力。
 
 ## 2. 新增测试
 
-6 项 Adapter v1 测试覆盖：
+15 项 Adapter v1 测试覆盖：
 
 - request 不包含 PDF 路径，且付费远程调用和外部知识均为 false；
 - response 阶段必须与 request 一致；
@@ -21,10 +22,11 @@
 - 失败的停止门必须有具体 Gap；
 - Transcript 耗尽稳定转为技术失败；
 - 六份离线结构化响应能推动冻结 Builder v0 产生 frozen 三文件包。
+- 默认关闭、HTTPS 限制、配置哈希、显式授权、Key 缺失时不触网、调用上限和畸形响应拒绝。
 
 ## 3. 全项目结果
 
-- Conda `gdu`（Python 3.12.13）：101 项测试全部通过；
+- Conda `gdu`（Python 3.12.13）：共运行 110 项，106 项通过，4 项因公开仓库不含本地 Pilot 原文而跳过；
 - compileall：通过；
 - `GDU_BUILDER_V0_BASELINE.sha256`：28 项全部 OK；
 - 付费 API 调用：0；

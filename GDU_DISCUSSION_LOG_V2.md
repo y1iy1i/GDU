@@ -2743,3 +2743,12 @@ V2-039 选定的官方 PDF 已保存至 `research_inputs/pilot_01_mt_eval/paper.
 ## 99. 下一阶段
 
 实现一个默认关闭、必须显式授权才能开启的远程结构化 Transport 配置，优先兼容 OpenAI-style JSON API；未配置提供商、模型、Key 环境变量和最高调用次数时必须拒绝启动。
+
+### V2-205 默认关闭的远程 Transport 安全门
+
+- **实现**：新增 OpenAI-compatible Chat Completions Transport、配置 Schema 和禁用示例；未修改 Builder v0 冻结文件。
+- **硬门槛**：HTTPS、配置 SHA-256、`enabled`、当次显式授权、Adapter 请求许可、API Key 环境变量与配置/请求双重次数上限缺一不可。
+- **安全性**：API Key 不进入 Adapter request、文件或错误输出；远程异常只记录错误类型。
+- **验证**：全项目共运行 110 项，106 项通过，4 项因公开仓库缺少本地 Pilot 原文跳过；Builder v0 冻结清单 28 项全部 OK。
+- **费用状态**：只用 mock 返回包测试，没有真实网络请求、没有 API 消耗、没有自动续费能力。
+- **下一门**：用户指定提供商、模型、Key 环境变量和单轮最大调用次数后，才生成启用配置并运行首个真实小页包。

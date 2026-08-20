@@ -104,7 +104,19 @@ class AdapterV1ContractTests(unittest.TestCase):
         request = transport.requests[0]
         self.assertNotIn("path", json.dumps(request))
         self.assertFalse(request["policy"]["paid_remote_calls_allowed"])
+        self.assertEqual(request["policy"]["max_remote_calls"], 0)
         self.assertFalse(request["policy"]["external_knowledge_allowed"])
+
+    def test_remote_permission_and_limit_must_be_enabled_together(self) -> None:
+        with self.assertRaisesRegex(ValueError, "enabled together"):
+            StructuredUnderstandingAdapter(
+                TranscriptTransport([]),
+                IDENTITY,
+                REQUEST_SCHEMA,
+                RESPONSE_SCHEMA,
+                paid_remote_calls_allowed=True,
+                max_remote_calls=0,
+            )
 
     def test_response_stage_must_match_request(self) -> None:
         response = passed_cp6(stage="cp4")

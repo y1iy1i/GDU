@@ -19,7 +19,7 @@
 - SourceReader 授权的 SourcePacket；
 - Builder 的公开 WorkingGDU 副本；
 - 修正时的有界 CorrectionRequest；
-- 禁止外部知识和禁止付费远程调用的策略字段。
+- 禁止外部知识，并明示远程调用权限与单次运行次数上限的策略字段。
 
 请求不包含 PDF 文件路径、API Key、Gold 答案或未授权页面。
 
@@ -40,10 +40,14 @@ Adapter 不能自行分配规范 ID，不能在 CP6 暗改对象，propose 不�
 
 1. 先用 Transcript Transport 验证 JSON 边界和 Builder 接线；
 2. 再用人工错误响应验证拒绝路径；
-3. 最后才接本地生成模型 Transport；
+3. 再接本地生成模型，或经用户明确授权的受限远程 Transport；
 4. 真实模型首轮只做小文档/小页包，不直接读 237 页年报；
 5. 未通过结构契约前，不评价语义优劣。
 
 ## 5. 当前不作出的结论
 
 建立 Adapter 契约不等于已经实验过真实模型，也不等于本地小模型可以产生合格 GDU。
+
+## 6. 远程接线边界
+
+`remote-adapter-v1.schema.json` 只兼容 HTTPS 上的 OpenAI-style Chat Completions JSON 接口。真正发出请求前必须同时通过：启用配置、配置哈希、当次显式授权、请求策略、API Key 环境变量和双重调用次数上限。当前只用假响应测试，未发起网络请求。
