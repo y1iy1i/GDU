@@ -64,7 +64,7 @@ v0.1不承诺：
 
 ## 3. GDU规范化内核
 
-机器格式由[`schemas/gdu-v0.1.schema.json`](schemas/gdu-v0.1.schema.json)定义。本节说明语义约束；JSON Schema只能验证其中一部分。
+机器格式由[`schemas/gdu-v0.1.schema.json`](../../schemas/gdu-v0.1.schema.json)定义。本节说明语义约束；JSON Schema只能验证其中一部分。
 
 ### 3.1 `manifest`：身份与版本
 

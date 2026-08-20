@@ -1,90 +1,95 @@
 # GDU — Generative Document Understanding
 
-GDU（Generative Document Understanding，生成式文档理解单元）是一个面向长文档理解与知识持久化的研究项目。
+GDU（生成式文档理解单元）研究如何把长文档转换为可追溯、可推理、可修复并能持续生长的知识结构。
 
-项目文档统一采用“简介、机制说明、结果解读、执行规则”等正式栏目名称。少量已冻结基线中的早期口语化标题仅为保持哈希与实验可复现性而保留，不代表当前写作规范。
+它不以 Chunk 作为最终知识单元。原文分段只负责证据读取和缺口回查；正式回答来自通过逻辑检查的外显论证路径。
 
-它研究的不是“怎样把文档切得更碎”，而是：
+## 当前系统
 
-> 怎样让系统逐步形成、核验、修正并保存对整份文档的理解，同时让重要判断能够回到原文证据。
+当前采用“三层逻辑主干＋两个横向模块”：
 
-## 系统分工
+- 表示层：AIF-like 证据、命题、推理和冲突节点；
+- 论证层：ASPIC+-like 严格推理与可废止推理；
+- 接受层：Dung grounded semantics；
+- 信息状态：Belnap 四值状态；
+- 维护与追溯：TMS 依赖维护和 W3C PROV-style 来源记录。
 
-- **Builder**：离线读取文档，通过六个检查点形成并修正理解。
-- **GDU**：冻结后的持久表示，保存文档结构、语义单元、断言、关系、整体生成计划与证据。
-- **Reader**：在查询阶段读取冻结 GDU；它是后续对照实验的测量工具。
+已经完成的核心闭环：
 
-当前采用“四层主干＋贯穿机制”：原文与结构、局部理解、关系理解、整体生成理解；证据接地、不确定性/多解释和全局—局部修正贯穿其中。
+```text
+用户问题
+→ 查询规划
+→ 可接受论证路径搜索
+→ 缺口检测
+→ 受约束邻域扩散
+→ 原文回查
+→ 候选隔离与验证
+→ 生成新版 GDU
+→ 可审计回答
+```
 
-## 当前完成状态
+真实年报实验已经完成从 v0.1 到 v0.2 的第一次提问驱动生长。当前全仓测试结果为 `195 passed, 5 skipped`。
 
-- 已冻结 GDU v0 设计、Schema、离线 Validator 和 Build Log v0 基线；
-- 已在两篇英文 NLP 论文和一份 237 页中文上市公司年报上完成三轮 Pilot；
-- 已实现确定性 Builder v0 候选：六检查点、有限修正、全局技术重试、证据授权、日志、停止门和原子发布；
-- 已实现最小 PDF 文本层 SourceReader、可验证的运行配置、Fixed GDU Adapter 和 CLI；
-- 当前 101 个唯一测试已在独立 Conda `gdu` 环境中全部通过；
-- 已建立 Adapter v1 结构化契约、离线 Transcript 与受限远程 Transport；
-- 远程 API 的 Schema、提供商样例和使用规则统一位于 `configs/api/`；
-- 第一次 Qwen CP1 真实候选通过 Adapter JSON 契约，但因 `page_range` 字段形状错误被 GDU Schema 拒绝，未进入 Builder；
-- Qwen CP1 在补充字段形状后通过三层机械验证，但扩大到第 8–12 页后仍把章节范围写为 8–8，没有完成边界理解目标；
-- 后续正式远程实验默认切换为 `deepseek-v4-flash-0731`，Qwen 结果保留作模型对照；
-- DeepSeek 已在相同第 1、8–12 页输入上返回 9 个机械合格对象，正确识别第二节 8–12 及第 12 页的第三节起点；
-- CP2 已在第 8–12 页完成首个局部语义单元实验：模型在两次有界定向修正后，把归母净利润、扣非净利润和非经常性损益组织成 1 个语义单元、3 条内容断言和 1 条功能断言；
-- CP3 已在第 9–12 页完成并行解释实验：模型在一次定向修正后，同时保存“经营改善”和“投资公允价值变化”两个解释，并用 `undetermined` 约束明确禁止无证据的贡献排序；
-- CP4 已完成首个局部关系网络实验：模型在两次有界定向修正后生成 1 条组成、2 条支持和 2 条限定关系，把事实、并行解释与不确定性边界连接起来；
-- CP5 已完成五段局部生成计划原型：首次生成即可组织 purpose、core meaning、内容选择、顺序和约束，并明确不代表整份 237 页年报；
-- CP6 已正确拒绝冻结完整文档：全文覆盖、跨载体核验和跨章节关系三项 Gap 被明确记录，当前真实模型纵向链路保持 provisional；
-- Pilot 03 已用“配置 + CLI”完成真实 PDF 到 frozen 三文件包的临时往返。
+## 阅读入口
 
-当前的 Fixed Adapter 只重放已验证内容，它证明 Builder 基础设施可运行、可复现，不证明真实模型已会自动理解任意长文档。
+建议按以下顺序了解当前研究：
 
-## 七块存储结构
+1. [研究目标](docs/current/GDU_REASONING_GRAPH_OBJECTIVE_V1.md)
+2. [候选逻辑架构](docs/current/GDU_CANDIDATE_LOGIC_ARCHITECTURE_V0_1.md)
+3. [真实文档逻辑实验](docs/current/GDU_LOGIC_REAL_DOCUMENT_REPORT_V0_1.md)
+4. [可审计回答实验](docs/current/GDU_ANSWER_EXECUTION_REPORT_V0_1.md)
+5. [查询规划理论与实验](docs/current/GDU_QUERY_PLANNER_THEORY_AND_EXPERIMENT_V0_1.md)
+6. [第一次正式生长闭环](docs/current/GDU_FIRST_CLOSED_LOOP_GROWTH_REPORT_V0_1.md)
 
-GDU v0 使用七个规范化存储分工（不等于七层理解架构）：
+完整文档导航见 [docs/README.md](docs/README.md)。
 
-- `manifest`
-- `physical_structure`
-- `semantic_units`
-- `assertions`
-- `relations`
-- `generative_plan`
-- `evidence`
+## 仓库结构
 
-## 快速入口
+```text
+docs/current/             当前研究主线
+docs/experiments/         可复现实验计划与报告
+docs/archive/v0/          已冻结或已被后续主线取代的 v0 资产
+docs/history/             讨论记录、交接说明和早期研究材料
+src/gdu/                  GDU 实现
+tests/                    自动测试
+research_inputs/          冻结输入、Gold 和版本化真实图
+scripts/                  实验与重放脚本
+configs/api/              API 配置样例，不保存密钥
+schemas/                  辅助 Schema
+```
 
-- [`GDU_V0_DESIGN_BASELINE.md`](GDU_V0_DESIGN_BASELINE.md)：冻结设计基线；
-- [`gdu.schema.json`](gdu.schema.json)：当前冻结 Schema；
-- [`gdu.example.json`](gdu.example.json)：最小人工 GDU 实例；
-- [`GDU_VALIDATOR_V0.md`](GDU_VALIDATOR_V0.md)：离线验证器；
-- [`BUILDER_PROTOCOL_V2.md`](BUILDER_PROTOCOL_V2.md)：Builder 协议；
-- [`GDU_BUILDER_SKELETON_V0.md`](GDU_BUILDER_SKELETON_V0.md)：Builder 实现说明；
-- [`GDU_BUILDER_RUNNER_V0.md`](GDU_BUILDER_RUNNER_V0.md)：配置、Fixed Adapter 和 CLI；
-- [`GDU_DISCUSSION_LOG_V2.md`](GDU_DISCUSSION_LOG_V2.md)：完整研究决策记录。
+根目录只保留运行入口、Schema、依赖文件和仍被代码直接引用的 `BUILDER_PROTOCOL_V2.md`。
+
+## 当前主要实现
+
+- `src/gdu/logic_v01.py`：逻辑接口、论证编译、接受语义和局部失效重算；
+- `src/gdu/answer_v01.py`：从被接受的论证生成可审计答案；
+- `src/gdu/query_planner_v01.py`：问题结构、Context、目标命题和缺口规划；
+- `src/gdu/growth_v01.py`：隔离候选验证、正式提升和版本记录；
+- `scripts/run_growth_promotion_v01.py`：从固定输入重放 v0.2 生长事件。
 
 ## 本地验证
 
 ```bash
 conda activate gdu
 python -m pip install -r requirements-test.txt
-PYTHONPATH=src python -m unittest discover -s tests -v
+PYTHONPATH=src:. pytest -q
 ```
 
-当本地已放置 Pilot 03 的预登记 PDF 和提取文本时，可运行：
+旧 Builder 流程仍可使用：
 
 ```bash
 PYTHONPATH=src python -m gdu.builder_v0.cli run \
   --config builder-run-pilot03.example.json
 ```
 
-运行前请确保配置中的输出目录尚不存在。公开仓库不必附带第三方原始 PDF，可通过配置中的 SHA-256 核对本地文件。
+## 当前边界
 
-## 当前不作出的主张
+目前已经证明一个真实财务文档切片能够被完整对账、推理、阻错、修复和版本化生长，但尚未证明：
 
-本项目目前不声称：
+- GDU 在多个领域稳定优于强 Chunk RAG 或其他知识图方案；
+- 长文档可以在很少人工参与的情况下稳定建出同等质量的图；
+- 当前两跳扩散适合大规模图；
+- 当前结构中的每个模块都不可进一步删除。
 
-- GDU 已在公平实验中优于 Chunk/RAG、PageIndex、知识图谱或其他知识存储体系；
-- Fixed Adapter 的成功等于真实模型理解成功；
-- 当前纯文本 SourceReader 已解决 OCR、图像、表格视觉结构或公式；
-- 强模型上的可行性可直接推广到小模型。
-
-Builder v0 确定性基础设施已冻结。下一个研究节点是将真实模型 Adapter 和长文档选页/分段作为独立变量开始实验。
+下一项研究是非财务文本中的第二次缺口生长实验。
