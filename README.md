@@ -32,19 +32,9 @@ GDU（生成式文档理解单元）研究如何把长文档转换为可追溯�
 
 ## 阅读入口
 
-建议按以下顺序了解当前研究：
+只需先读 [GDU V1 研究路径](docs/current/GDU_RESEARCH_PATH_V1.md)，其中已统一当前研究目标、三层逻辑主干＋两个横向模块、Builder 最小架构、成长轮次方法和 V1 完成判据。
 
-1. [研究目标](docs/current/GDU_REASONING_GRAPH_OBJECTIVE_V1.md)
-2. [候选逻辑架构](docs/current/GDU_CANDIDATE_LOGIC_ARCHITECTURE_V0_1.md)
-3. [真实文档逻辑实验](docs/current/GDU_LOGIC_REAL_DOCUMENT_REPORT_V0_1.md)
-4. [可审计回答实验](docs/current/GDU_ANSWER_EXECUTION_REPORT_V0_1.md)
-5. [查询规划理论与实验](docs/current/GDU_QUERY_PLANNER_THEORY_AND_EXPERIMENT_V0_1.md)
-6. [第一次正式生长闭环](docs/current/GDU_FIRST_CLOSED_LOOP_GROWTH_REPORT_V0_1.md)
-7. [第二次非财务生长实验](docs/current/GDU_SECOND_NONFINANCIAL_GROWTH_REPORT_V0_1.md)
-8. [通用生长晋升框架](docs/current/GDU_GENERIC_PROMOTION_FRAMEWORK_REPORT_V0_1.md)
-9. [第三次规范性文档生长实验](docs/current/GDU_THIRD_NORMATIVE_GROWTH_REPORT_V0_1.md)
-
-完整文档导航见 [docs/README.md](docs/README.md)。
+需要核对某项结论时，再查看 [实验导航](docs/experiments/README.md)。全部 Markdown 和截图中旧文件的用途见 [文档导航](docs/README.md)。
 
 ## 仓库结构
 

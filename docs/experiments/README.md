@@ -1,10 +1,39 @@
-# 实验记录导航
+# GDU 实验记录导航
 
-本目录保存研究过程中的计划、对照和结果，不把所有阶段报告都视为当前规范。
+本目录保存已运行或可重放的研究证据。实验报告记录当时的输入、方法、结果和边界，不与 [V1 研究路径](../current/GDU_RESEARCH_PATH_V1.md) 并列为系统规范。
 
-- `logic/`：逻辑接口组合、冲突处理、Context 和自修复；
-- `growth/`：第一次正式闭环之前的查询驱动增长实验；
-- `benchmarks/`：可行性门、外部复现、表示消融及 Chunk RAG 对照；
-- `models/`：Adapter 契约与远程模型检查点。
+## `logic/`
 
-当前有效的系统说明位于 `../current/`。阅读旧实验时应以报告当时冻结的条件为准，不用后续结果反向修改原始结论。
+逻辑接口、真实文档映射、可审计回答、查询规划和自修复：
+
+- `GDU_CANDIDATE_LOGIC_ARCHITECTURE_V0_1.md`：三层＋两模块的理论起点与接口约束；
+- `GDU_LOGIC_INTERFACE_REPORT_V0_1—V0_4.md`：逻辑接口逐步验证；
+- `GDU_LOGIC_REAL_DOCUMENT_REPORT_V0_1.md`：真实年报切片上的精确对账、阻错和失效重算；
+- `GDU_ANSWER_EXECUTION_REPORT_V0_1.md`：从 accepted 论证生成带证据答案；
+- `GDU_QUERY_PLANNER_THEORY_AND_EXPERIMENT_V0_1.md`：自然语言问题到目标 Atom 与缺口的映射；
+- `GDU_SELF_REPAIR_EXPERIMENT_REPORT_V1.md`：错误发现、依赖失效和修复实验。
+
+## `growth/`
+
+问题驱动成长、隔离候选、通用晋升与三领域闭环：
+
+- `GDU_QUERY_DRIVEN_GROWTH_EXPERIMENT_*`：早期查询驱动生长计划与实验；
+- `GDU_FIRST_CLOSED_LOOP_GROWTH_REPORT_V0_1.md`：财务数字闭合；
+- `GDU_SECOND_NONFINANCIAL_GROWTH_REPORT_V0_1.md`：论文正文、图与算法冲突；
+- `GDU_GENERIC_PROMOTION_FRAMEWORK_REPORT_V0_1.md`：多领域共用的安全晋升事务；
+- `GDU_THIRD_NORMATIVE_GROWTH_REPORT_V0_1.md`：规范义务、局部满足、违规和整体合规判断。
+
+## `benchmarks/`
+
+可行性门、外部复现、表示消融和 Chunk RAG 对照。这些文件用于回答“GDU 的净价值是什么”，不定义当前 Builder 接口。
+
+## `models/`
+
+Adapter 契约、远程模型检查点和横向模型运行记录。模型运行结果不自动成为 GDU 逻辑规格。
+
+## 阅读原则
+
+- 查找当前方向：读 `docs/current/GDU_RESEARCH_PATH_V1.md`；
+- 核对某个实验结论：读对应 `REPORT`；
+- 重现实验：同时检查 `research_inputs/`、`scripts/` 和测试；
+- 报告中的历史测试数量保持当时记录，当前总数以根 `README.md` 为准。
