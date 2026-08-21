@@ -490,8 +490,6 @@ def validate_representation_candidates(
             if quantity.normalization_rule not in QUANTITY_NORMALIZATION_RULES:
                 errors.append(f"{location}:quantity_normalization_rule_invalid")
 
-        if candidate.comparison_constraints and "comparison" not in cue_kinds:
-            errors.append(f"{location}:comparison_constraint_without_cue")
         if "comparison" in cue_kinds and not candidate.comparison_constraints:
             errors.append(f"{location}:comparison_cue_without_constraint")
         constraint_keys: list[tuple[str, str, str | None, str | None, str | None]] = []

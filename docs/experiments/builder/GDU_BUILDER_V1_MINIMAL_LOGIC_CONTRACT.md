@@ -83,6 +83,8 @@ normalization_rule   从原文到规范值所用规则
 
 只有固定阈值比较必须连接 Quantity。相对比较不能伪造数值阈值，集合最值不能把“其他对象”写进 threshold。
 
+`ComparisonConstraint.surface` 本身就是必须逐字追溯的比较线索，因此不再强制重复提交同文本的 `SemanticCue(comparison)`；但如果单独提交 comparison cue 而没有可计算的 ComparisonConstraint，候选仍会被拒绝。
+
 ## 6. 当前实现边界
 
 当前代码已经实现：

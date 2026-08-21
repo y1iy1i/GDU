@@ -277,7 +277,7 @@ class BuilderV1RepresentationTests(unittest.TestCase):
                     candidate.comparison_constraints[0].operator, operator
                 )
 
-    def test_comparison_cue_and_constraint_must_be_linked_both_ways(self) -> None:
+    def test_comparison_cue_requires_a_computable_constraint(self) -> None:
         manifest = self.manifest("文字高度不低于5%。")
         block = manifest.blocks[0]
         without_constraint = make_representation_candidate(
@@ -295,6 +295,36 @@ class BuilderV1RepresentationTests(unittest.TestCase):
         errors = validate_representation_candidates(manifest, [without_constraint])
 
         self.assertTrue(any(error.endswith("comparison_cue_without_constraint") for error in errors))
+
+    def test_grounded_constraint_surface_does_not_require_duplicate_cue(self) -> None:
+        text = "系统从候选方案中选择成本最低的方案。"
+        manifest = self.manifest(text, document_id="extremum-no-duplicate-cue")
+        block = manifest.blocks[0]
+        candidate = make_representation_candidate(
+            statement=text,
+            atom="lowest_cost_selection",
+            semantic_arguments=(
+                SemanticArgument("metric", "成本"),
+                SemanticArgument("set", "候选方案"),
+            ),
+            polarity="positive",
+            context={"document_scope": "comparison-fixture"},
+            evidence_quotes=(make_evidence_quote(block.block_id, text),),
+            comparison_constraints=(
+                ComparisonConstraint(
+                    metric="成本",
+                    operator="min",
+                    threshold=None,
+                    unit=None,
+                    surface="成本最低",
+                    comparison_kind="extremum",
+                    reference_set="候选方案",
+                ),
+            ),
+            compiler_id="fixture-compiler-v1.1",
+        )
+
+        self.assertEqual(validate_representation_candidates(manifest, [candidate]), [])
 
     def test_hallucinated_or_unannotated_number_is_rejected(self) -> None:
         manifest, candidate = self.finance_candidate()
