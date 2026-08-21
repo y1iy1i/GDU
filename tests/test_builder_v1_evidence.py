@@ -16,9 +16,11 @@ from gdu.builder_v0.types import (  # noqa: E402
     SourcePacket,
 )
 from gdu.builder_v1 import (  # noqa: E402
+    EvidenceRelationSpec,
     EvidenceManifest,
     EvidenceValidationError,
     PageElement,
+    TableRegion,
     build_document_map,
     evidence_manifest_from_elements,
     evidence_manifest_from_packet,
@@ -192,6 +194,54 @@ class BuilderV1EvidenceTests(unittest.TestCase):
             blocks=(),
         )
         self.assertIn("manifest_blocks_missing", validate_evidence_manifest(manifest))
+
+    def test_table_region_links_cells_to_document_text_position(self) -> None:
+        manifest = evidence_manifest_from_elements(
+            self.identity,
+            [
+                PageElement(
+                    2,
+                    "2025年 2024年 同比变动",
+                    "table",
+                    source_locator="paper.pdf#page=2&table=1&rows=0&cols=0-2",
+                    bbox=(20, 100, 560, 130),
+                    table_region=TableRegion("table-1", "header", 0, 0, 0, 2),
+                ),
+                PageElement(
+                    2,
+                    "经营活动产生的现金流量净额 72,545,781.16 161,441,300.00 -55.06",
+                    "table",
+                    source_locator="paper.pdf#page=2&table=1&rows=1&cols=0-3",
+                    bbox=(20, 130, 560, 165),
+                    table_region=TableRegion("table-1", "body", 1, 1, 0, 3),
+                ),
+                PageElement(
+                    2,
+                    "本期经营活动现金流下降，主要由于销售商品收到的现金减少。",
+                    "paragraph",
+                    source_locator="paper.pdf#page=2&paragraph=7",
+                    bbox=(20, 190, 560, 220),
+                ),
+            ],
+            relation_specs=(
+                EvidenceRelationSpec(
+                    "paper.pdf#page=2&table=1&rows=0&cols=0-2",
+                    "paper.pdf#page=2&table=1&rows=1&cols=0-3",
+                    "qualifies",
+                ),
+                EvidenceRelationSpec(
+                    "paper.pdf#page=2&paragraph=7",
+                    "paper.pdf#page=2&table=1&rows=1&cols=0-3",
+                    "describes",
+                ),
+            ),
+        )
+
+        self.assertEqual(validate_evidence_manifest(manifest), [])
+        self.assertEqual(manifest.blocks[0].table_region.region_kind, "header")
+        self.assertEqual(manifest.blocks[1].table_region.row_start, 1)
+        self.assertEqual(len(manifest.relations), 2)
+        self.assertEqual(manifest.relations[1].relation, "describes")
 
 
 if __name__ == "__main__":

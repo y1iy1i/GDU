@@ -396,6 +396,102 @@ class BuilderV1RepresentationTests(unittest.TestCase):
         self.assertEqual(parsed, expected)
         self.assertEqual(validate_representation_candidates(manifest, [parsed]), [])
 
+    def test_quantity_can_combine_value_and_unit_from_separate_evidence_blocks(self) -> None:
+        identity = SourceDocumentIdentity(
+            document_id="split-table",
+            original_filename="table.pdf",
+            source_sha256="c" * 64,
+            pdf_page_count=1,
+            extraction_system="fixture-parser 1.0",
+        )
+        manifest = evidence_manifest_from_elements(
+            identity,
+            [
+                PageElement(1, "同比变动（%）", "table"),
+                PageElement(1, "经营现金流 -55.06", "table"),
+            ],
+        )
+        header, body = manifest.blocks
+        candidate = make_representation_candidate(
+            statement="经营现金流同比变动为-55.06%。",
+            atom="operating_cash_flow_yoy_change",
+            semantic_arguments=(
+                SemanticArgument("metric", "经营现金流同比变动"),
+                SemanticArgument("value", "-55.06%"),
+            ),
+            polarity="positive",
+            context={"document_scope": "split-table"},
+            evidence_quotes=(
+                make_evidence_quote(header.block_id, header.text),
+                make_evidence_quote(body.block_id, body.text),
+            ),
+            quantities=(
+                Quantity("-55.06", "-55.06", "percent", "%", "identity"),
+            ),
+            compiler_id="fixture-compiler-v1.1",
+        )
+
+        self.assertEqual(validate_representation_candidates(manifest, [candidate]), [])
+
+        altered = make_representation_candidate(
+            statement=candidate.statement,
+            atom=candidate.atom,
+            semantic_arguments=candidate.semantic_arguments,
+            polarity="positive",
+            context=candidate.context,
+            evidence_quotes=candidate.evidence_quotes,
+            quantities=(Quantity("-55.06", "99", "percent", "%", "identity"),),
+            compiler_id=candidate.compiler_id,
+        )
+        self.assertTrue(
+            any(
+                "quantity_normalization_mismatch" in error
+                for error in validate_representation_candidates(manifest, [altered])
+            )
+        )
+
+    def test_relative_and_extremum_comparisons_do_not_require_fake_quantities(self) -> None:
+        cases = (
+            ComparisonConstraint(
+                metric="本期经营现金流",
+                operator="lt",
+                threshold=None,
+                unit="CNY",
+                surface="本期低于上期",
+                comparison_kind="relative",
+                reference_metric="上期经营现金流",
+            ),
+            ComparisonConstraint(
+                metric="验证损失",
+                operator="min",
+                threshold=None,
+                unit=None,
+                surface="验证损失最低",
+                comparison_kind="extremum",
+                reference_set="候选模型",
+            ),
+        )
+        texts = ("本期低于上期。", "返回候选模型中验证损失最低的模型。")
+        for index, (constraint, text) in enumerate(zip(cases, texts), 1):
+            with self.subTest(kind=constraint.comparison_kind):
+                manifest = self.manifest(text, document_id=f"comparison-{index}")
+                block = manifest.blocks[0]
+                candidate = make_representation_candidate(
+                    statement=text,
+                    atom=f"comparison_family_{index}",
+                    semantic_arguments=(SemanticArgument("metric", constraint.metric),),
+                    polarity="positive",
+                    context={"document_scope": "comparison-fixture"},
+                    evidence_quotes=(make_evidence_quote(block.block_id, text),),
+                    semantic_cues=(SemanticCue("comparison", constraint.surface),),
+                    comparison_constraints=(constraint,),
+                    compiler_id="fixture-compiler-v1.1",
+                )
+
+                self.assertEqual(
+                    validate_representation_candidates(manifest, [candidate]), []
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

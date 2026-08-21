@@ -20,6 +20,8 @@ BlockType = Literal[
     "footnote",
     "other",
 ]
+TableRegionKind = Literal["title", "caption", "header", "body", "footnote", "unit_note"]
+EvidenceRelationKind = Literal["describes", "qualifies", "defines_unit", "refers_to"]
 BLOCK_TYPES: frozenset[str] = frozenset(
     {
         "page_text",
@@ -33,6 +35,8 @@ BLOCK_TYPES: frozenset[str] = frozenset(
     }
 )
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+TABLE_REGION_KINDS = frozenset({"title", "caption", "header", "body", "footnote", "unit_note"})
+EVIDENCE_RELATION_KINDS = frozenset({"describes", "qualifies", "defines_unit", "refers_to"})
 
 
 class EvidenceValidationError(ValueError):
@@ -64,8 +68,9 @@ def _block_hash_payload(
     source_locator: str,
     source_hash: str,
     bbox: tuple[float, float, float, float] | None,
+    table_region: TableRegion | None,
 ) -> dict[str, Any]:
-    return {
+    value = {
         "document_id": document_id,
         "physical_page": physical_page,
         "sequence": sequence,
@@ -75,11 +80,52 @@ def _block_hash_payload(
         "source_hash": source_hash,
         "bbox": list(bbox) if bbox is not None else None,
     }
+    if table_region is not None:
+        value["table_region"] = table_region.as_dict()
+    return value
 
 
 def _slug(value: str) -> str:
     slug = re.sub(r"[^0-9a-z]+", "-", value.lower()).strip("-")
     return slug[:32] or "document"
+
+
+@dataclass(frozen=True)
+class TableRegion:
+    """Physical and logical position of a block inside a table."""
+
+    table_id: str
+    region_kind: TableRegionKind
+    row_start: int | None = None
+    row_end: int | None = None
+    column_start: int | None = None
+    column_end: int | None = None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "table_id": self.table_id,
+            "region_kind": self.region_kind,
+            "row_start": self.row_start,
+            "row_end": self.row_end,
+            "column_start": self.column_start,
+            "column_end": self.column_end,
+        }
+
+
+@dataclass(frozen=True)
+class EvidenceRelation:
+    """Typed connection between a table region and document text evidence."""
+
+    source_block_id: str
+    target_block_id: str
+    relation: EvidenceRelationKind
+
+    def as_dict(self) -> dict[str, str]:
+        return {
+            "source_block_id": self.source_block_id,
+            "target_block_id": self.target_block_id,
+            "relation": self.relation,
+        }
 
 
 @dataclass(frozen=True)
@@ -95,6 +141,7 @@ class EvidenceBlock:
     block_hash: str
     extraction_system: str
     bbox: tuple[float, float, float, float] | None = None
+    table_region: TableRegion | None = None
 
     def as_dict(self) -> dict[str, Any]:
         value: dict[str, Any] = {
@@ -111,6 +158,8 @@ class EvidenceBlock:
         }
         if self.bbox is not None:
             value["bbox"] = list(self.bbox)
+        if self.table_region is not None:
+            value["table_region"] = self.table_region.as_dict()
         return value
 
 
@@ -124,6 +173,7 @@ class EvidenceManifest:
     extraction_system: str
     blocks: tuple[EvidenceBlock, ...]
     extraction_notes: tuple[str, ...] = ()
+    relations: tuple[EvidenceRelation, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -135,6 +185,7 @@ class EvidenceManifest:
             "extraction_system": self.extraction_system,
             "blocks": [block.as_dict() for block in self.blocks],
             "extraction_notes": list(self.extraction_notes),
+            "relations": [relation.as_dict() for relation in self.relations],
         }
 
     @property
@@ -153,6 +204,7 @@ def make_evidence_block(
     source_hash: str,
     extraction_system: str,
     bbox: tuple[float, float, float, float] | None = None,
+    table_region: TableRegion | None = None,
 ) -> EvidenceBlock:
     normalized = normalize_evidence_text(text)
     payload = _block_hash_payload(
@@ -164,6 +216,7 @@ def make_evidence_block(
         source_locator=source_locator,
         source_hash=source_hash,
         bbox=bbox,
+        table_region=table_region,
     )
     block_hash = _canonical_hash(payload)
     block_id = (
@@ -181,6 +234,7 @@ def make_evidence_block(
         block_hash=block_hash,
         extraction_system=extraction_system.strip(),
         bbox=bbox,
+        table_region=table_region,
     )
 
 
@@ -255,6 +309,7 @@ def validate_evidence_manifest(manifest: EvidenceManifest) -> list[str]:
                 source_locator=block.source_locator,
                 source_hash=block.source_hash,
                 bbox=block.bbox,
+                table_region=block.table_region,
             )
         )
         if block.block_hash != expected_hash:
@@ -265,6 +320,22 @@ def validate_evidence_manifest(manifest: EvidenceManifest) -> list[str]:
         )
         if block.block_id != expected_id:
             errors.append(f"{location}:block_id_mismatch")
+
+        if block.table_region is not None:
+            region = block.table_region
+            if block.block_type != "table":
+                errors.append(f"{location}:table_region_on_non_table_block")
+            if not region.table_id.strip():
+                errors.append(f"{location}:table_id_missing")
+            if region.region_kind not in TABLE_REGION_KINDS:
+                errors.append(f"{location}:table_region_kind_invalid")
+            for start_name, end_name in (("row_start", "row_end"), ("column_start", "column_end")):
+                start = getattr(region, start_name)
+                end = getattr(region, end_name)
+                if (start is None) != (end is None):
+                    errors.append(f"{location}:table_{start_name.split('_')[0]}_range_incomplete")
+                elif start is not None and (start < 0 or end < start):
+                    errors.append(f"{location}:table_{start_name.split('_')[0]}_range_invalid")
 
     for name, values in (
         ("block_id_collision", block_ids),
@@ -277,6 +348,23 @@ def validate_evidence_manifest(manifest: EvidenceManifest) -> list[str]:
         manifest.blocks, key=lambda item: (item.physical_page, item.sequence, item.block_id)
     ):
         errors.append("blocks_not_in_physical_order")
+
+    known_blocks = set(block_ids)
+    relation_keys: list[tuple[str, str, str]] = []
+    for relation in manifest.relations:
+        relation_keys.append(
+            (relation.source_block_id, relation.target_block_id, relation.relation)
+        )
+        if relation.source_block_id not in known_blocks:
+            errors.append(f"relation_source_unknown:{relation.source_block_id}")
+        if relation.target_block_id not in known_blocks:
+            errors.append(f"relation_target_unknown:{relation.target_block_id}")
+        if relation.source_block_id == relation.target_block_id:
+            errors.append("evidence_relation_self_reference")
+        if relation.relation not in EVIDENCE_RELATION_KINDS:
+            errors.append(f"evidence_relation_kind_invalid:{relation.relation}")
+    if len(relation_keys) != len(set(relation_keys)):
+        errors.append("evidence_relation_collision")
     return sorted(set(errors))
 
 

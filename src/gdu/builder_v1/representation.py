@@ -19,6 +19,7 @@ from .evidence import (
 )
 
 
+# Logical form of the proposition (P or not-P), never a truth verdict.
 Polarity = Literal["positive", "negative"]
 EpistemicStatus = Literal["certain", "possible"]
 NormativeForce = Literal[
@@ -27,7 +28,8 @@ NormativeForce = Literal[
 CueKind = Literal[
     "negation", "epistemic", "normative", "comparison", "condition", "attribution"
 ]
-ComparisonOperator = Literal["lt", "lte", "eq", "gte", "gt"]
+ComparisonKind = Literal["threshold", "relative", "extremum"]
+ComparisonOperator = Literal["lt", "lte", "eq", "gte", "gt", "min", "max"]
 
 POLARITIES = frozenset({"positive", "negative"})
 EPISTEMIC_STATUSES = frozenset({"certain", "possible"})
@@ -37,7 +39,11 @@ NORMATIVE_FORCES = frozenset(
 CUE_KINDS = frozenset(
     {"negation", "epistemic", "normative", "comparison", "condition", "attribution"}
 )
-COMPARISON_OPERATORS = frozenset({"lt", "lte", "eq", "gte", "gt"})
+COMPARISON_KINDS = frozenset({"threshold", "relative", "extremum"})
+COMPARISON_OPERATORS = frozenset({"lt", "lte", "eq", "gte", "gt", "min", "max"})
+QUANTITY_NORMALIZATION_RULES = frozenset(
+    {"identity", "strip_grouping", "percent_symbol", "unit_alias", "date_label"}
+)
 _ATOM = re.compile(r"^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$")
 _ROLE = re.compile(r"^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$")
 _NUMBER = re.compile(r"(?<![\d.,])[-+]?\d[\d,]*(?:\.\d+)?%?(?![\d.,])")
@@ -98,24 +104,31 @@ class Quantity:
     surface: str
     normalized_value: str
     unit: str | None = None
+    unit_surface: str | None = None
+    normalization_rule: str = "identity"
 
     def as_dict(self) -> dict[str, str | None]:
         return {
             "surface": self.surface,
             "normalized_value": self.normalized_value,
             "unit": self.unit,
+            "unit_surface": self.unit_surface,
+            "normalization_rule": self.normalization_rule,
         }
 
 
 @dataclass(frozen=True)
 class ComparisonConstraint:
-    """Canonical comparison separated from its potentially negative wording."""
+    """Threshold, relative, or extremum comparison with explicit scope."""
 
     metric: str
     operator: ComparisonOperator
-    threshold: str
+    threshold: str | None
     unit: str | None
     surface: str
+    comparison_kind: ComparisonKind = "threshold"
+    reference_metric: str | None = None
+    reference_set: str | None = None
 
     def as_dict(self) -> dict[str, str | None]:
         return {
@@ -124,6 +137,9 @@ class ComparisonConstraint:
             "threshold": self.threshold,
             "unit": self.unit,
             "surface": self.surface,
+            "comparison_kind": self.comparison_kind,
+            "reference_metric": self.reference_metric,
+            "reference_set": self.reference_set,
         }
 
 
@@ -266,6 +282,12 @@ def representation_candidate_from_proposal(
                 surface=str(item["surface"]),
                 normalized_value=str(item["normalized_value"]),
                 unit=str(item["unit"]) if item.get("unit") is not None else None,
+                unit_surface=(
+                    str(item["unit_surface"])
+                    if item.get("unit_surface") is not None
+                    else None
+                ),
+                normalization_rule=str(item.get("normalization_rule", "identity")),
             )
             for item in value.get("quantities", [])
         )
@@ -273,9 +295,24 @@ def representation_candidate_from_proposal(
             ComparisonConstraint(
                 metric=str(item["metric"]),
                 operator=str(item["operator"]),
-                threshold=str(item["threshold"]),
+                threshold=(
+                    str(item["threshold"])
+                    if item.get("threshold") is not None
+                    else None
+                ),
                 unit=str(item["unit"]) if item.get("unit") is not None else None,
                 surface=str(item["surface"]),
+                comparison_kind=str(item.get("comparison_kind", "threshold")),
+                reference_metric=(
+                    str(item["reference_metric"])
+                    if item.get("reference_metric") is not None
+                    else None
+                ),
+                reference_set=(
+                    str(item["reference_set"])
+                    if item.get("reference_set") is not None
+                    else None
+                ),
             )
             for item in value.get("comparison_constraints", [])
         )
@@ -337,6 +374,12 @@ def _validate_context(value: Mapping[str, Any], location: str) -> list[str]:
     except (TypeError, ValueError):
         errors.append(f"{location}:context_not_canonical_json")
     return errors
+
+
+def _normalized_number(value: str) -> str:
+    """Compare numeric meaning without requiring the same punctuation surface."""
+
+    return value.strip().replace(",", "").removesuffix("%").lstrip("+")
 
 
 def validate_representation_candidates(
@@ -420,27 +463,43 @@ def validate_representation_candidates(
         if candidate.attribution and "attribution" not in cue_kinds:
             errors.append(f"{location}:attribution_without_cue")
 
-        quantity_surfaces: list[str] = []
+        quantity_values: set[str] = set()
         for quantity in candidate.quantities:
             surface = normalize_evidence_text(quantity.surface)
-            quantity_surfaces.append(surface)
             if not surface or surface not in support:
                 errors.append(f"{location}:quantity_untraced:{surface or '<missing>'}")
             if not quantity.normalized_value.strip():
                 errors.append(f"{location}:quantity_normalized_value_missing")
+            else:
+                normalized_value = _normalized_number(quantity.normalized_value)
+                quantity_values.add(normalized_value)
+                surface_values = {
+                    _normalized_number(token) for token in _NUMBER.findall(surface)
+                }
+                if normalized_value not in surface_values:
+                    errors.append(f"{location}:quantity_normalization_mismatch:{surface}")
+            if quantity.unit_surface is not None:
+                unit_surface = normalize_evidence_text(quantity.unit_surface)
+                if not unit_surface or unit_surface not in support:
+                    errors.append(
+                        f"{location}:quantity_unit_untraced:{unit_surface or '<missing>'}"
+                    )
+            if quantity.normalization_rule not in QUANTITY_NORMALIZATION_RULES:
+                errors.append(f"{location}:quantity_normalization_rule_invalid")
 
         if candidate.comparison_constraints and "comparison" not in cue_kinds:
             errors.append(f"{location}:comparison_constraint_without_cue")
         if "comparison" in cue_kinds and not candidate.comparison_constraints:
             errors.append(f"{location}:comparison_cue_without_constraint")
-        constraint_keys: list[tuple[str, str, str, str | None]] = []
+        constraint_keys: list[tuple[str, str, str | None, str | None, str | None]] = []
         for constraint in candidate.comparison_constraints:
             constraint_keys.append(
                 (
+                    constraint.comparison_kind,
                     constraint.metric,
                     constraint.operator,
                     constraint.threshold,
-                    constraint.unit,
+                    constraint.reference_metric or constraint.reference_set,
                 )
             )
             if (
@@ -450,25 +509,50 @@ def validate_representation_candidates(
                 errors.append(f"{location}:comparison_metric_invalid")
             if constraint.operator not in COMPARISON_OPERATORS:
                 errors.append(f"{location}:comparison_operator_invalid")
-            if not constraint.threshold.strip():
-                errors.append(f"{location}:comparison_threshold_missing")
+            if constraint.comparison_kind not in COMPARISON_KINDS:
+                errors.append(f"{location}:comparison_kind_invalid")
             surface = normalize_evidence_text(constraint.surface)
             if not surface or surface not in support:
                 errors.append(f"{location}:comparison_surface_untraced")
-            matching_quantities = [
-                quantity
-                for quantity in candidate.quantities
-                if quantity.normalized_value == constraint.threshold
-                and quantity.unit == constraint.unit
-            ]
-            if not matching_quantities:
-                errors.append(f"{location}:comparison_quantity_unlinked")
+            if constraint.comparison_kind == "threshold":
+                if constraint.operator in {"min", "max"}:
+                    errors.append(f"{location}:threshold_comparison_operator_invalid")
+                if constraint.threshold is None or not constraint.threshold.strip():
+                    errors.append(f"{location}:comparison_threshold_missing")
+                else:
+                    matching_quantities = [
+                        quantity
+                        for quantity in candidate.quantities
+                        if _normalized_number(quantity.normalized_value)
+                        == _normalized_number(constraint.threshold)
+                        and quantity.unit == constraint.unit
+                    ]
+                    if not matching_quantities:
+                        errors.append(f"{location}:comparison_quantity_unlinked")
+                if constraint.reference_metric or constraint.reference_set:
+                    errors.append(f"{location}:threshold_comparison_reference_forbidden")
+            elif constraint.comparison_kind == "relative":
+                if constraint.operator in {"min", "max"}:
+                    errors.append(f"{location}:relative_comparison_operator_invalid")
+                if not constraint.reference_metric:
+                    errors.append(f"{location}:relative_comparison_reference_missing")
+                if constraint.threshold is not None or constraint.reference_set:
+                    errors.append(f"{location}:relative_comparison_shape_invalid")
+            elif constraint.comparison_kind == "extremum":
+                if constraint.operator not in {"min", "max"}:
+                    errors.append(f"{location}:extremum_comparison_operator_invalid")
+                if not constraint.reference_set:
+                    errors.append(f"{location}:extremum_comparison_set_missing")
+                if constraint.threshold is not None or constraint.reference_metric:
+                    errors.append(f"{location}:extremum_comparison_shape_invalid")
         if len(constraint_keys) != len(set(constraint_keys)):
             errors.append(f"{location}:comparison_constraint_collision")
         for token in _NUMBER.findall(candidate.statement):
-            if token not in support:
+            normalized_token = _normalized_number(token)
+            traced_by_quantity = normalized_token in quantity_values
+            if token not in support and not traced_by_quantity:
                 errors.append(f"{location}:statement_number_untraced:{token}")
-            if not any(token in surface for surface in quantity_surfaces):
+            if not traced_by_quantity:
                 errors.append(f"{location}:statement_number_unannotated:{token}")
 
         expected_hash = _canonical_hash(candidate.content_dict())
@@ -496,18 +580,23 @@ def require_valid_representation_candidates(
 
 
 def _evidence_node(block: EvidenceBlock) -> dict[str, Any]:
+    provenance: dict[str, Any] = {
+        "source_locator": block.source_locator,
+        "source_hash": block.source_hash,
+        "physical_page": block.physical_page,
+        "block_hash": block.block_hash,
+        "extraction_system": block.extraction_system,
+    }
+    if block.bbox is not None:
+        provenance["bbox"] = list(block.bbox)
+    if block.table_region is not None:
+        provenance["table_region"] = block.table_region.as_dict()
     return {
         "id": block.block_id,
         "kind": "evidence",
         "text": block.text,
         "block_type": block.block_type,
-        "provenance": {
-            "source_locator": block.source_locator,
-            "source_hash": block.source_hash,
-            "physical_page": block.physical_page,
-            "block_hash": block.block_hash,
-            "extraction_system": block.extraction_system,
-        },
+        "provenance": provenance,
     }
 
 
@@ -560,6 +649,12 @@ def compile_representation_seed(
         "document_id": manifest.document_id,
         "source_hash": manifest.source_hash,
         "information_nodes": information_nodes,
+        "evidence_relations": [
+            relation.as_dict()
+            for relation in manifest.relations
+            if relation.source_block_id in referenced_ids
+            and relation.target_block_id in referenced_ids
+        ],
         "scheme_nodes": [],
     }
     issues = validate_aif_interface(graph)

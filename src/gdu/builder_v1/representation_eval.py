@@ -21,12 +21,15 @@ def _quantity_signature(items: Sequence[Mapping[str, Any]]) -> list[tuple[str, s
 
 def _constraint_signature(
     items: Sequence[Mapping[str, Any]],
-) -> list[tuple[str, str, str | None]]:
+) -> list[tuple[str, str, str, str | None, str | None, str | None]]:
     return sorted(
         (
+            str(item.get("comparison_kind", "threshold")),
             str(item.get("operator", "")),
-            str(item.get("threshold", "")),
+            str(item.get("threshold", "")) if item.get("threshold") is not None else "",
             item.get("unit"),
+            item.get("reference_metric"),
+            item.get("reference_set"),
         )
         for item in items
     )

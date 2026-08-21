@@ -11,11 +11,14 @@ from gdu.builder_v0.types import SourceDocumentIdentity, SourcePacket
 from .evidence import (
     BLOCK_TYPES,
     BlockType,
+    EvidenceRelation,
+    EvidenceRelationKind,
     EvidenceManifest,
     EvidenceValidationError,
     make_evidence_block,
     normalize_evidence_text,
     require_valid_evidence_manifest,
+    TableRegion,
 )
 
 
@@ -26,6 +29,16 @@ class PageElement:
     block_type: BlockType = "paragraph"
     source_locator: str | None = None
     bbox: tuple[float, float, float, float] | None = None
+    table_region: TableRegion | None = None
+
+
+@dataclass(frozen=True)
+class EvidenceRelationSpec:
+    """Relate parser elements by their stable source locators."""
+
+    source_locator: str
+    target_locator: str
+    relation: EvidenceRelationKind
 
 
 def evidence_manifest_from_elements(
@@ -33,6 +46,7 @@ def evidence_manifest_from_elements(
     elements: Iterable[PageElement],
     *,
     extraction_notes: Iterable[str] = (),
+    relation_specs: Iterable[EvidenceRelationSpec] = (),
 ) -> EvidenceManifest:
     """Compile typed parser elements without treating them as final knowledge units."""
 
@@ -65,8 +79,24 @@ def evidence_manifest_from_elements(
                 source_hash=identity.source_sha256,
                 extraction_system=identity.extraction_system,
                 bbox=element.bbox,
+                table_region=element.table_region,
             )
         )
+    if errors:
+        raise EvidenceValidationError(errors)
+    blocks_by_locator = {block.source_locator: block for block in blocks}
+    relations: list[EvidenceRelation] = []
+    for spec in relation_specs:
+        source = blocks_by_locator.get(spec.source_locator)
+        target = blocks_by_locator.get(spec.target_locator)
+        if source is None:
+            errors.append(f"relation_source_locator_unknown:{spec.source_locator}")
+        if target is None:
+            errors.append(f"relation_target_locator_unknown:{spec.target_locator}")
+        if source is not None and target is not None:
+            relations.append(
+                EvidenceRelation(source.block_id, target.block_id, spec.relation)
+            )
     if errors:
         raise EvidenceValidationError(errors)
     manifest = EvidenceManifest(
@@ -78,6 +108,7 @@ def evidence_manifest_from_elements(
         extraction_system=identity.extraction_system,
         blocks=tuple(blocks),
         extraction_notes=tuple(str(note) for note in extraction_notes),
+        relations=tuple(relations),
     )
     return require_valid_evidence_manifest(manifest)
 

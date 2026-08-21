@@ -54,7 +54,7 @@ AIF式表示 → ASPIC+式论证构造 → Dung式接受计算
 保存：
 
 - `Evidence`：原文证据及物理位置；
-- `Claim`：可讨论真假、正反或适用性的命题；
+- `Claim`：原文提出或推导出的命题内容；命题自身不保存永久真假结论；
 - `Inference`：一次前提到结论的规则应用；
 - `Conflict`：对结论、前提或规则适用性的攻击；
 - `Context`：文档、章节、对象、时间、口径和场景。
@@ -81,12 +81,12 @@ AIF式表示 → ASPIC+式论证构造 → Dung式接受计算
 
 记录命题收到的正反信息：
 
-- `NEITHER`：正反信息都不足；
+- `NEITHER`：正反信息都不足，对应可显式保留的待定命题；
 - `TRUE_ONLY`：只有正面信息；
 - `FALSE_ONLY`：只有反面信息；
 - `BOTH`：正反信息同时存在。
 
-Belnap 保留信息冲突，不替代论证接受计算。
+Belnap 保留信息冲突，不替代论证接受计算。`TRUE_ONLY/FALSE_ONLY` 只表示当前收到的信息方向，不表示客观真伪。
 
 ### 3.5 横向模块：TMS / PROV
 
@@ -129,7 +129,7 @@ source_hash
 
 - Evidence；
 - 原子化 Claim；
-- Claim 类型与极性；
+- Claim 类型与命题内部的肯定/否定形式；
 - Context；
 - Provenance。
 
@@ -230,7 +230,7 @@ source_hash
 - 实体、时间、口径和场景不被默认合并；
 - 每个来源 Claim 可回到 Evidence Block。
 
-候选契约、理论筛选和确定性编译实现见 [Builder V1 表示层编译器报告](../experiments/builder/GDU_BUILDER_V1_REPRESENTATION_COMPILER_REPORT.md)。当前已证明候选可安全进入种子图；模型自动抽取的准确率和召回率将通过下一次盲测量化。
+候选契约、理论筛选和确定性编译实现见 [Builder V1 表示层编译器报告](../experiments/builder/GDU_BUILDER_V1_REPRESENTATION_COMPILER_REPORT.md)。首轮盲测后形成的命题状态、表格位置、数值和比较统一规则见 [Builder V1 最小逻辑契约](../experiments/builder/GDU_BUILDER_V1_MINIMAL_LOGIC_CONTRACT.md)。
 
 ### 实验 3：Argument Compiler
 
