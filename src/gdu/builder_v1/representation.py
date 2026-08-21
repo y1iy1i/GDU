@@ -24,7 +24,10 @@ EpistemicStatus = Literal["certain", "possible"]
 NormativeForce = Literal[
     "none", "obligation", "prohibition", "permission", "recommendation"
 ]
-CueKind = Literal["negation", "epistemic", "normative", "condition", "attribution"]
+CueKind = Literal[
+    "negation", "epistemic", "normative", "comparison", "condition", "attribution"
+]
+ComparisonOperator = Literal["lt", "lte", "eq", "gte", "gt"]
 
 POLARITIES = frozenset({"positive", "negative"})
 EPISTEMIC_STATUSES = frozenset({"certain", "possible"})
@@ -32,8 +35,9 @@ NORMATIVE_FORCES = frozenset(
     {"none", "obligation", "prohibition", "permission", "recommendation"}
 )
 CUE_KINDS = frozenset(
-    {"negation", "epistemic", "normative", "condition", "attribution"}
+    {"negation", "epistemic", "normative", "comparison", "condition", "attribution"}
 )
+COMPARISON_OPERATORS = frozenset({"lt", "lte", "eq", "gte", "gt"})
 _ATOM = re.compile(r"^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$")
 _ROLE = re.compile(r"^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$")
 _NUMBER = re.compile(r"(?<![\d.,])[-+]?\d[\d,]*(?:\.\d+)?%?(?![\d.,])")
@@ -104,6 +108,26 @@ class Quantity:
 
 
 @dataclass(frozen=True)
+class ComparisonConstraint:
+    """Canonical comparison separated from its potentially negative wording."""
+
+    metric: str
+    operator: ComparisonOperator
+    threshold: str
+    unit: str | None
+    surface: str
+
+    def as_dict(self) -> dict[str, str | None]:
+        return {
+            "metric": self.metric,
+            "operator": self.operator,
+            "threshold": self.threshold,
+            "unit": self.unit,
+            "surface": self.surface,
+        }
+
+
+@dataclass(frozen=True)
 class RepresentationCandidate:
     candidate_id: str
     statement: str
@@ -116,6 +140,7 @@ class RepresentationCandidate:
     evidence_quotes: tuple[EvidenceQuote, ...]
     semantic_cues: tuple[SemanticCue, ...]
     quantities: tuple[Quantity, ...]
+    comparison_constraints: tuple[ComparisonConstraint, ...]
     attribution: str | None
     compiler_id: str
     candidate_hash: str
@@ -132,6 +157,9 @@ class RepresentationCandidate:
             "evidence_quotes": [item.as_dict() for item in self.evidence_quotes],
             "semantic_cues": [item.as_dict() for item in self.semantic_cues],
             "quantities": [item.as_dict() for item in self.quantities],
+            "comparison_constraints": [
+                item.as_dict() for item in self.comparison_constraints
+            ],
             "attribution": self.attribution,
             "compiler_id": self.compiler_id,
         }
@@ -166,6 +194,7 @@ def make_representation_candidate(
     normative_force: NormativeForce = "none",
     semantic_cues: Iterable[SemanticCue] = (),
     quantities: Iterable[Quantity] = (),
+    comparison_constraints: Iterable[ComparisonConstraint] = (),
     attribution: str | None = None,
 ) -> RepresentationCandidate:
     candidate = RepresentationCandidate(
@@ -180,6 +209,7 @@ def make_representation_candidate(
         evidence_quotes=tuple(evidence_quotes),
         semantic_cues=tuple(semantic_cues),
         quantities=tuple(quantities),
+        comparison_constraints=tuple(comparison_constraints),
         attribution=normalize_evidence_text(attribution) if attribution else None,
         compiler_id=compiler_id.strip(),
         candidate_hash="",
@@ -210,6 +240,7 @@ def representation_candidate_from_proposal(
         "normative_force",
         "semantic_cues",
         "quantities",
+        "comparison_constraints",
         "attribution",
     }
     unknown = sorted(set(value) - expected)
@@ -238,6 +269,16 @@ def representation_candidate_from_proposal(
             )
             for item in value.get("quantities", [])
         )
+        constraints = tuple(
+            ComparisonConstraint(
+                metric=str(item["metric"]),
+                operator=str(item["operator"]),
+                threshold=str(item["threshold"]),
+                unit=str(item["unit"]) if item.get("unit") is not None else None,
+                surface=str(item["surface"]),
+            )
+            for item in value.get("comparison_constraints", [])
+        )
         context = value["context"]
         if not isinstance(context, Mapping):
             raise TypeError("context must be an object")
@@ -253,6 +294,7 @@ def representation_candidate_from_proposal(
             evidence_quotes=quotes,
             semantic_cues=cues,
             quantities=quantities,
+            comparison_constraints=constraints,
             attribution=str(attribution_value) if attribution_value is not None else None,
             compiler_id=compiler_id,
         )
@@ -386,6 +428,43 @@ def validate_representation_candidates(
                 errors.append(f"{location}:quantity_untraced:{surface or '<missing>'}")
             if not quantity.normalized_value.strip():
                 errors.append(f"{location}:quantity_normalized_value_missing")
+
+        if candidate.comparison_constraints and "comparison" not in cue_kinds:
+            errors.append(f"{location}:comparison_constraint_without_cue")
+        if "comparison" in cue_kinds and not candidate.comparison_constraints:
+            errors.append(f"{location}:comparison_cue_without_constraint")
+        constraint_keys: list[tuple[str, str, str, str | None]] = []
+        for constraint in candidate.comparison_constraints:
+            constraint_keys.append(
+                (
+                    constraint.metric,
+                    constraint.operator,
+                    constraint.threshold,
+                    constraint.unit,
+                )
+            )
+            if (
+                not constraint.metric
+                or constraint.metric != normalize_evidence_text(constraint.metric)
+            ):
+                errors.append(f"{location}:comparison_metric_invalid")
+            if constraint.operator not in COMPARISON_OPERATORS:
+                errors.append(f"{location}:comparison_operator_invalid")
+            if not constraint.threshold.strip():
+                errors.append(f"{location}:comparison_threshold_missing")
+            surface = normalize_evidence_text(constraint.surface)
+            if not surface or surface not in support:
+                errors.append(f"{location}:comparison_surface_untraced")
+            matching_quantities = [
+                quantity
+                for quantity in candidate.quantities
+                if quantity.normalized_value == constraint.threshold
+                and quantity.unit == constraint.unit
+            ]
+            if not matching_quantities:
+                errors.append(f"{location}:comparison_quantity_unlinked")
+        if len(constraint_keys) != len(set(constraint_keys)):
+            errors.append(f"{location}:comparison_constraint_collision")
         for token in _NUMBER.findall(candidate.statement):
             if token not in support:
                 errors.append(f"{location}:statement_number_untraced:{token}")
@@ -464,6 +543,9 @@ def compile_representation_seed(
                 "normative_force": candidate.normative_force,
                 "attribution": candidate.attribution,
                 "quantities": [item.as_dict() for item in candidate.quantities],
+                "comparison_constraints": [
+                    item.as_dict() for item in candidate.comparison_constraints
+                ],
                 "provenance": {
                     "quoted_from": sorted(
                         {quote.block_id for quote in candidate.evidence_quotes}

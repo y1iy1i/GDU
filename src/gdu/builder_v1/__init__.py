@@ -16,6 +16,7 @@ from .source_adapter import (
     evidence_manifest_from_packet,
 )
 from .representation import (
+    ComparisonConstraint,
     EvidenceQuote,
     Quantity,
     RepresentationCandidate,
@@ -32,6 +33,7 @@ from .representation import (
 __all__ = [
     "BLOCK_TYPES",
     "BlockType",
+    "ComparisonConstraint",
     "DocumentMap",
     "DocumentSection",
     "EvidenceBlock",

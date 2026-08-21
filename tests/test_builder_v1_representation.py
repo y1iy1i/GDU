@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from gdu.builder_v0.types import SourceDocumentIdentity  # noqa: E402
 from gdu.builder_v1 import (  # noqa: E402
+    ComparisonConstraint,
     PageElement,
     Quantity,
     SemanticArgument,
@@ -139,8 +140,20 @@ class BuilderV1RepresentationTests(unittest.TestCase):
                 "playback_scope": "normal_speed",
             },
             evidence_quotes=(make_evidence_quote(block.block_id, text),),
-            semantic_cues=(SemanticCue("normative", "不应"),),
+            semantic_cues=(
+                SemanticCue("normative", "不应"),
+                SemanticCue("comparison", "少于"),
+            ),
             quantities=(Quantity("2秒", "2", "second"),),
+            comparison_constraints=(
+                ComparisonConstraint(
+                    metric="显式标识持续时间",
+                    operator="gte",
+                    threshold="2",
+                    unit="second",
+                    surface="持续时间不应少于2秒",
+                ),
+            ),
             compiler_id="fixture-compiler-v1",
         )
 
@@ -149,6 +162,118 @@ class BuilderV1RepresentationTests(unittest.TestCase):
         claim = next(node for node in graph["information_nodes"] if node["kind"] == "claim")
         self.assertEqual(claim["normative_force"], "obligation")
         self.assertEqual(claim["polarity"], "positive")
+
+    def test_comparison_language_family_normalizes_to_canonical_operators(self) -> None:
+        cases = (
+            (
+                "持续时间不应少于2秒。",
+                "obligation",
+                "gte",
+                "持续时间",
+                "2秒",
+                "2",
+                "second",
+                (SemanticCue("normative", "不应"), SemanticCue("comparison", "少于")),
+            ),
+            (
+                "持续时间应至少达到2秒。",
+                "obligation",
+                "gte",
+                "持续时间",
+                "2秒",
+                "2",
+                "second",
+                (SemanticCue("normative", "应"), SemanticCue("comparison", "至少")),
+            ),
+            (
+                "文件大小不得超过10MB。",
+                "prohibition",
+                "lte",
+                "文件大小",
+                "10MB",
+                "10",
+                "MB",
+                (SemanticCue("normative", "不得"), SemanticCue("comparison", "超过")),
+            ),
+            (
+                "文件大小至多为10MB。",
+                "none",
+                "lte",
+                "文件大小",
+                "10MB",
+                "10",
+                "MB",
+                (SemanticCue("comparison", "至多"),),
+            ),
+            (
+                "文字高度低于5%。",
+                "none",
+                "lt",
+                "文字高度",
+                "5%",
+                "5",
+                "%",
+                (SemanticCue("comparison", "低于"),),
+            ),
+            (
+                "文字高度不低于5%。",
+                "none",
+                "gte",
+                "文字高度",
+                "5%",
+                "5",
+                "%",
+                (SemanticCue("comparison", "不低于"),),
+            ),
+        )
+        for text, force, operator, metric, surface, value, unit, cues in cases:
+            with self.subTest(text=text):
+                manifest = self.manifest(text, document_id="comparison-family")
+                block = manifest.blocks[0]
+                candidate = make_representation_candidate(
+                    statement=text,
+                    atom="metric_threshold_relation",
+                    semantic_arguments=(
+                        SemanticArgument("metric", metric),
+                        SemanticArgument("threshold", surface),
+                    ),
+                    polarity="positive",
+                    normative_force=force,
+                    context={"document_scope": "comparison-fixture"},
+                    evidence_quotes=(make_evidence_quote(block.block_id, text),),
+                    semantic_cues=cues,
+                    quantities=(Quantity(surface, value, unit),),
+                    comparison_constraints=(
+                        ComparisonConstraint(metric, operator, value, unit, text[:-1]),
+                    ),
+                    compiler_id="fixture-compiler-v1",
+                )
+
+                self.assertEqual(
+                    validate_representation_candidates(manifest, [candidate]), []
+                )
+                self.assertEqual(
+                    candidate.comparison_constraints[0].operator, operator
+                )
+
+    def test_comparison_cue_and_constraint_must_be_linked_both_ways(self) -> None:
+        manifest = self.manifest("文字高度不低于5%。")
+        block = manifest.blocks[0]
+        without_constraint = make_representation_candidate(
+            statement=block.text,
+            atom="height_threshold",
+            semantic_arguments=(SemanticArgument("metric", "文字高度"),),
+            polarity="positive",
+            context={"document_scope": "fixture"},
+            evidence_quotes=(make_evidence_quote(block.block_id, block.text),),
+            semantic_cues=(SemanticCue("comparison", "不低于"),),
+            quantities=(Quantity("5%", "5", "%"),),
+            compiler_id="fixture-compiler-v1",
+        )
+
+        errors = validate_representation_candidates(manifest, [without_constraint])
+
+        self.assertTrue(any(error.endswith("comparison_cue_without_constraint") for error in errors))
 
     def test_hallucinated_or_unannotated_number_is_rejected(self) -> None:
         manifest, candidate = self.finance_candidate()
@@ -258,6 +383,9 @@ class BuilderV1RepresentationTests(unittest.TestCase):
             ],
             "semantic_cues": [],
             "quantities": [item.as_dict() for item in expected.quantities],
+            "comparison_constraints": [
+                item.as_dict() for item in expected.comparison_constraints
+            ],
             "attribution": None,
         }
 
