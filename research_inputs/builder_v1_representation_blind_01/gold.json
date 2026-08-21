@@ -1,0 +1,146 @@
+{
+  "experiment_id": "builder-v1-representation-blind-01",
+  "cases": [
+    {
+      "case_id": "finance",
+      "claims": [
+        {
+          "atom": "finance_2025_ocf_amount",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "lafang-2025-annual-report", "company_scope": "consolidated", "table_scope": "key_financial_metrics"},
+          "quantities": [{"normalized_value": "72545781.16", "unit": "CNY"}],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "finance_2024_ocf_amount",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "lafang-2025-annual-report", "company_scope": "consolidated", "table_scope": "key_financial_metrics"},
+          "quantities": [{"normalized_value": "161421214.02", "unit": "CNY"}],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "finance_ocf_yoy_change",
+          "polarity": "negative",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "lafang-2025-annual-report", "company_scope": "consolidated", "table_scope": "key_financial_metrics"},
+          "quantities": [{"normalized_value": "-55.06", "unit": "percent"}],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "finance_ocf_change_reason",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "lafang-2025-annual-report", "company_scope": "consolidated", "table_scope": "key_financial_metrics"},
+          "quantities": [],
+          "comparison_constraints": []
+        }
+      ]
+    },
+    {
+      "case_id": "pgkd",
+      "claims": [
+        {
+          "atom": "pgkd_validation_samples_shared",
+          "polarity": "negative",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "pgkd_uses_early_stopping",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "pgkd_returns_lowest_validation_loss_model",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "pgkd_generates_next_iteration_data",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "none",
+          "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "methods"},
+          "quantities": [],
+          "comparison_constraints": []
+        }
+      ]
+    },
+    {
+      "case_id": "standard",
+      "claims": [
+        {
+          "atom": "gb_video_label_start_position",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "obligation",
+          "context": {"document_scope": "gb-45438-2025", "content_type": "video", "section_scope": "5.4"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "gb_video_label_optional_positions",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "permission",
+          "context": {"document_scope": "gb-45438-2025", "content_type": "video", "section_scope": "5.4"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "gb_video_label_edge_or_corner",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "obligation",
+          "context": {"document_scope": "gb-45438-2025", "content_type": "video", "section_scope": "5.4"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "gb_video_label_font_legibility",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "obligation",
+          "context": {"document_scope": "gb-45438-2025", "content_type": "video", "section_scope": "5.4"},
+          "quantities": [],
+          "comparison_constraints": []
+        },
+        {
+          "atom": "gb_video_label_minimum_height",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "obligation",
+          "context": {"document_scope": "gb-45438-2025", "content_type": "video", "section_scope": "5.4"},
+          "quantities": [{"normalized_value": "5", "unit": "percent"}],
+          "comparison_constraints": [{"operator": "gte", "threshold": "5", "unit": "percent"}]
+        },
+        {
+          "atom": "gb_video_label_minimum_duration",
+          "polarity": "positive",
+          "epistemic_status": "certain",
+          "normative_force": "obligation",
+          "context": {"document_scope": "gb-45438-2025", "content_type": "video", "section_scope": "5.4"},
+          "quantities": [{"normalized_value": "2", "unit": "second"}],
+          "comparison_constraints": [{"operator": "gte", "threshold": "2", "unit": "second"}]
+        }
+      ]
+    }
+  ]
+}

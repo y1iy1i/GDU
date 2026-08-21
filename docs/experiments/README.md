@@ -29,6 +29,7 @@ Builder V1 从原文到逻辑结构的编译实验：
 
 - `GDU_BUILDER_V1_EVIDENCE_INTERFACE_REPORT.md`：统一 Evidence Block、确定性验证、上游解析器适配和最小 Document Map。
 - `GDU_BUILDER_V1_REPRESENTATION_COMPILER_REPORT.md`：命题表示理论筛选、隔离候选、数值/范围/来源校验与 AIF-like 种子图编译。
+- `GDU_BUILDER_V1_REPRESENTATION_BLIND_01_SETUP.md`：三领域首次受约束盲抽取的冻结输入、隐藏 Gold、评分器和实际运行记录。
 
 ## `benchmarks/`
 

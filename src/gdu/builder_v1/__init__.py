@@ -15,6 +15,7 @@ from .source_adapter import (
     evidence_manifest_from_elements,
     evidence_manifest_from_packet,
 )
+from .representation_eval import score_representation_response
 from .representation import (
     ComparisonConstraint,
     EvidenceQuote,
@@ -54,6 +55,7 @@ __all__ = [
     "make_evidence_quote",
     "make_representation_candidate",
     "representation_candidate_from_proposal",
+    "score_representation_response",
     "validate_evidence_manifest",
     "validate_representation_candidates",
 ]

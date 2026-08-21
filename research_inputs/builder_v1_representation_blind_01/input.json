@@ -1,0 +1,79 @@
+{
+  "experiment_id": "builder-v1-representation-blind-01",
+  "task_type": "constrained_atomic_claim_extraction",
+  "cases": [
+    {
+      "case_id": "finance",
+      "document": {
+        "document_id": "lafang-2025",
+        "original_filename": "paper.pdf",
+        "source_sha256": "f3998163e47f7708c0613fd8e178ce94af04c2dda306bb548229739b451a4b23",
+        "pdf_page_count": 189,
+        "physical_page": 15,
+        "source_locator": "paper.pdf#physical-page=15&target=operating-cash-flow",
+        "text": "经营活动产生的现金流量净额 72,545,781.16 161,421,214.02 -55.06。经营活动产生的现金流量净额变动原因说明：主要系本期销售商品、提供劳务收到的现金减少所致。",
+        "layout_context": "表格前三个数值依次为2025年金额（元）、2024年金额（元）、同比变动（%）。"
+      },
+      "required_context": {
+        "document_scope": "lafang-2025-annual-report",
+        "company_scope": "consolidated",
+        "table_scope": "key_financial_metrics"
+      },
+      "allowed_atoms": {
+        "finance_2025_ocf_amount": "2025年经营活动现金流量净额",
+        "finance_2024_ocf_amount": "2024年经营活动现金流量净额",
+        "finance_ocf_yoy_change": "经营活动现金流量净额同比变动",
+        "finance_ocf_change_reason": "经营活动现金流量净额变化原因"
+      }
+    },
+    {
+      "case_id": "pgkd",
+      "document": {
+        "document_id": "pgkd-emnlp-2024",
+        "original_filename": "paper.pdf",
+        "source_sha256": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "pdf_page_count": 13,
+        "physical_page": 3,
+        "source_locator": "paper.pdf#physical-page=3&section=methods",
+        "text": "Only high-level validation metrics are shared with the LLM, but no validation sample is leaked. PGKD uses early stopping to control the overall validation loss. PGKD returns the model having the lowest validation loss as the best model to be used for testing. PGKD then computes the model val_results on the validation set Dval and leverages an LLM to generate new training data Di+1 tailored to these findings.",
+        "layout_context": "连续方法正文，句子按原文顺序排列。"
+      },
+      "required_context": {
+        "document_scope": "pgkd-emnlp-2024",
+        "section_scope": "methods"
+      },
+      "allowed_atoms": {
+        "pgkd_validation_samples_shared": "是否向LLM共享验证样本",
+        "pgkd_uses_early_stopping": "是否采用早停",
+        "pgkd_returns_lowest_validation_loss_model": "最终返回哪个模型",
+        "pgkd_generates_next_iteration_data": "是否根据验证发现生成下一轮训练数据"
+      }
+    },
+    {
+      "case_id": "standard",
+      "document": {
+        "document_id": "gb-45438-2025",
+        "original_filename": "paper.pdf",
+        "source_sha256": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+        "pdf_page_count": 19,
+        "physical_page": 7,
+        "source_locator": "paper.pdf#physical-page=7&section=5.4",
+        "text": "c) 视频内容显式标识应位于视频起始画面,可位于视频末尾和中间适当位置。d) 视频内容显式标识应位于视频画面的边或角。e) 视频内容显式标识使用的字型应清晰可辨。f) 视频内容显式标识的文字高度不应低于画面最短边长度的5%。g) 在视频正常播放速度下,视频内容显式标识持续时间不应少于2s。",
+        "layout_context": "GB 45438-2025第5.4节视频内容显式标识方法。"
+      },
+      "required_context": {
+        "document_scope": "gb-45438-2025",
+        "content_type": "video",
+        "section_scope": "5.4"
+      },
+      "allowed_atoms": {
+        "gb_video_label_start_position": "起始画面位置要求",
+        "gb_video_label_optional_positions": "末尾和中间位置许可",
+        "gb_video_label_edge_or_corner": "画面边或角位置要求",
+        "gb_video_label_font_legibility": "字型清晰可辨要求",
+        "gb_video_label_minimum_height": "文字高度下限",
+        "gb_video_label_minimum_duration": "正常播放速度下的持续时间下限"
+      }
+    }
+  ]
+}
