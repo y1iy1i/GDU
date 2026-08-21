@@ -215,6 +215,8 @@ source_hash
 - 实体、时间、口径和场景不被默认合并；
 - 每个来源 Claim 可回到 Evidence Block。
 
+候选契约、理论筛选和确定性编译实现见 [Builder V1 表示层编译器报告](../experiments/builder/GDU_BUILDER_V1_REPRESENTATION_COMPILER_REPORT.md)。当前已证明候选可安全进入种子图；模型自动抽取的准确率和召回率将通过下一次盲测量化。
+
 ### 实验 3：Argument Compiler
 
 目标：自动提出联合前提、结论、严格/可废止类型与攻击位置，由确定性逻辑接口执行终检。
@@ -296,7 +298,7 @@ source_hash
 2. 论文方法：正文、流程图与算法索引冲突；
 3. 规范文档：义务、局部满足、违规和整体合规判断。
 
-三个领域共用同一通用晋升事务层。当前全仓回归为 `227 passed, 5 skipped`。
+三个领域共用同一通用晋升事务层。当前全仓回归为 `236 passed, 5 skipped`。
 
 ## 10. 当前边界
 

@@ -15,6 +15,19 @@ from .source_adapter import (
     evidence_manifest_from_elements,
     evidence_manifest_from_packet,
 )
+from .representation import (
+    EvidenceQuote,
+    Quantity,
+    RepresentationCandidate,
+    RepresentationValidationError,
+    SemanticArgument,
+    SemanticCue,
+    compile_representation_seed,
+    make_evidence_quote,
+    make_representation_candidate,
+    representation_candidate_from_proposal,
+    validate_representation_candidates,
+)
 
 __all__ = [
     "BLOCK_TYPES",
@@ -24,10 +37,21 @@ __all__ = [
     "EvidenceBlock",
     "EvidenceManifest",
     "EvidenceValidationError",
+    "EvidenceQuote",
     "PageElement",
+    "Quantity",
+    "RepresentationCandidate",
+    "RepresentationValidationError",
+    "SemanticArgument",
+    "SemanticCue",
     "build_document_map",
+    "compile_representation_seed",
     "evidence_manifest_from_elements",
     "evidence_manifest_from_packet",
     "make_evidence_block",
+    "make_evidence_quote",
+    "make_representation_candidate",
+    "representation_candidate_from_proposal",
     "validate_evidence_manifest",
+    "validate_representation_candidates",
 ]

@@ -28,7 +28,7 @@ GDU（生成式文档理解单元）研究如何把长文档转换为可追溯�
 → 可审计回答
 ```
 
-项目已经完成三次提问驱动生长：财务数字闭合、论文来源冲突和国家标准规范合规判断。三者共用同一个通用晋升事务层。当前全仓测试结果为 `227 passed, 5 skipped`。
+项目已经完成三次提问驱动生长：财务数字闭合、论文来源冲突和国家标准规范合规判断。三者共用同一个通用晋升事务层。当前全仓测试结果为 `236 passed, 5 skipped`。
 
 ## 阅读入口
 
@@ -59,7 +59,7 @@ schemas/                  辅助 Schema
 - `src/gdu/answer_v01.py`：从被接受的论证生成可审计答案；
 - `src/gdu/query_planner_v01.py`：问题结构、Context、目标命题和缺口规划；
 - `src/gdu/promotion_v01.py`：通用候选包络验证和原子化晋升事务；
-- `src/gdu/builder_v1/`：统一 Evidence Block、来源验证、解析器适配和最小 Document Map；
+- `src/gdu/builder_v1/`：统一 Evidence Block、来源验证、最小 Document Map，以及带原文引文、Context、语义角色和模态的 Representation Candidate 编译；
 - `src/gdu/growth_v01.py` 与 `growth_pgkd_v01.py`：财务与论文方法的领域验证规则；
 - `src/gdu/growth_ai_labeling_v01.py`：GB 45438-2025 规范义务与合规检查规则；
 - `scripts/run_growth_promotion_v01.py`：从固定输入重放 v0.2 生长事件。
