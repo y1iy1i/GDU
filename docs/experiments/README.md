@@ -23,6 +23,12 @@
 - `GDU_GENERIC_PROMOTION_FRAMEWORK_REPORT_V0_1.md`：多领域共用的安全晋升事务；
 - `GDU_THIRD_NORMATIVE_GROWTH_REPORT_V0_1.md`：规范义务、局部满足、违规和整体合规判断。
 
+## `builder/`
+
+Builder V1 从原文到逻辑结构的编译实验：
+
+- `GDU_BUILDER_V1_EVIDENCE_INTERFACE_REPORT.md`：统一 Evidence Block、确定性验证、上游解析器适配和最小 Document Map。
+
 ## `benchmarks/`
 
 可行性门、外部复现、表示消融和 Chunk RAG 对照。这些文件用于回答“GDU 的净价值是什么”，不定义当前 Builder 接口。

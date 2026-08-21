@@ -202,6 +202,8 @@ source_hash
 - 物理页和表格、图、算法位置不丢失；
 - 文档解析器可替换，内部接口不变。
 
+实现与三文档验证见 [Builder V1 证据接口报告](../experiments/builder/GDU_BUILDER_V1_EVIDENCE_INTERFACE_REPORT.md)。当前已完成按页文本和类型化元素的统一入口；表格、图和算法区域的真实坐标仍取决于后续版面解析器。
+
 ### 实验 2：Representation Compiler
 
 目标：自动提出 Evidence、原子 Claim、语义角色、极性和 Context，通过来源包络验证后进入种子图。
@@ -294,7 +296,7 @@ source_hash
 2. 论文方法：正文、流程图与算法索引冲突；
 3. 规范文档：义务、局部满足、违规和整体合规判断。
 
-三个领域共用同一通用晋升事务层。当前全仓回归为 `217 passed, 5 skipped`。
+三个领域共用同一通用晋升事务层。当前全仓回归为 `227 passed, 5 skipped`。
 
 ## 10. 当前边界
 
