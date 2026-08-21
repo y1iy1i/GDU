@@ -117,10 +117,31 @@ class BuilderV1RepresentationTests(unittest.TestCase):
         )
         self.assertTrue(
             any(
-                error.endswith("possible_status_without_cue")
+                error.endswith("noncertain_status_without_cue")
                 for error in validate_representation_candidates(manifest, [without_cue])
             )
         )
+
+    def test_source_can_explicitly_leave_a_proposition_undetermined(self) -> None:
+        text = "现有资料尚未判定方案甲是否满足上线条件。"
+        manifest = self.manifest(text, document_id="undetermined-source")
+        block = manifest.blocks[0]
+        candidate = make_representation_candidate(
+            statement="方案甲是否满足上线条件尚未判定。",
+            atom="option_a_meets_deployment_requirement",
+            semantic_arguments=(
+                SemanticArgument("subject", "方案甲"),
+                SemanticArgument("requirement", "上线条件"),
+            ),
+            polarity="positive",
+            epistemic_status="undetermined",
+            context={"document_scope": "undetermined-source"},
+            evidence_quotes=(make_evidence_quote(block.block_id, text),),
+            semantic_cues=(SemanticCue("epistemic", "尚未判定"),),
+            compiler_id="fixture-compiler-v1.1",
+        )
+
+        self.assertEqual(validate_representation_candidates(manifest, [candidate]), [])
 
     def test_normative_claim_keeps_force_separate_from_polarity(self) -> None:
         text = "在正常播放速度下，视频内容显式标识持续时间不应少于2秒。"

@@ -15,6 +15,7 @@ from gdu.adapter_v1.remote_transport import (  # noqa: E402
     OpenAICompatibleRemoteTransport,
     load_remote_transport_config,
 )
+from gdu.adapter_v1.env_file import load_env_file  # noqa: E402
 from gdu.builder_v0.types import SourceDocumentIdentity, TechnicalFailure  # noqa: E402
 from gdu.builder_v1 import (  # noqa: E402
     PageElement,
@@ -256,6 +257,8 @@ def main() -> int:
     parser.add_argument("--replay-response", type=Path)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+
+    load_env_file(ROOT / ".env", allowed_names={"DASHSCOPE_API_KEY"})
 
     input_value = _load_json(INPUT_PATH)
     manifests, request = _build_request(input_value)

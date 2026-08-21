@@ -1,0 +1,146 @@
+{
+  "experiment_id": "builder-v1-representation-blind-02",
+  "task_type": "held_out_problem_family_extraction",
+  "cases": [
+    {
+      "case_id": "finance_table",
+      "document": {
+        "document_id": "finance-table-control-v1",
+        "original_filename": "finance-table-control.txt",
+        "source_sha256": "a82f7930ff17dfea9afe223a02b048ff586b6c4543f0b03a238b398c8be41c1b",
+        "pdf_page_count": 1,
+        "extraction_system": "frozen-controlled-fixture-v1",
+        "elements": [
+          {
+            "element_key": "header",
+            "physical_page": 1,
+            "block_type": "table",
+            "text": "项目 期末余额 期初余额",
+            "source_locator": "finance-table-control.txt#table=1&region=header",
+            "table_region": {"table_id": "cash-reconciliation", "region_kind": "header", "row_start": 0, "row_end": 0, "column_start": 0, "column_end": 2}
+          },
+          {
+            "element_key": "unit",
+            "physical_page": 1,
+            "block_type": "table",
+            "text": "单位：元",
+            "source_locator": "finance-table-control.txt#table=1&region=unit",
+            "table_region": {"table_id": "cash-reconciliation", "region_kind": "unit_note"}
+          },
+          {
+            "element_key": "cash_row",
+            "physical_page": 1,
+            "block_type": "table",
+            "text": "现金 966,796,041.70 1,154,680,964.08",
+            "source_locator": "finance-table-control.txt#table=1&row=cash",
+            "table_region": {"table_id": "cash-reconciliation", "region_kind": "body", "row_start": 1, "row_end": 1, "column_start": 0, "column_end": 2}
+          },
+          {
+            "element_key": "change_row",
+            "physical_page": 1,
+            "block_type": "table",
+            "text": "现金及现金等价物净增加额 -187,884,922.38",
+            "source_locator": "finance-table-control.txt#table=1&row=net-change",
+            "table_region": {"table_id": "cash-reconciliation", "region_kind": "body", "row_start": 2, "row_end": 2, "column_start": 0, "column_end": 1}
+          }
+        ],
+        "relations": [
+          {"source_key": "header", "target_key": "cash_row", "relation": "qualifies"},
+          {"source_key": "unit", "target_key": "cash_row", "relation": "defines_unit"},
+          {"source_key": "unit", "target_key": "change_row", "relation": "defines_unit"}
+        ]
+      },
+      "required_context": {"document_scope": "finance-table-control-v1", "company_scope": "consolidated", "table_scope": "cash_reconciliation"},
+      "allowed_atoms": {
+        "finance_cash_ending_balance": "现金期末余额",
+        "finance_cash_beginning_balance": "现金期初余额",
+        "finance_cash_net_change": "现金及现金等价物净增加额"
+      }
+    },
+    {
+      "case_id": "pgkd_algorithm",
+      "document": {
+        "document_id": "pgkd-emnlp-2024-heldout-algorithm",
+        "original_filename": "paper.pdf",
+        "source_sha256": "5cb57ed53d64000eeec1fb6225d83a90ea156ab622e2a3ec247a8a802eb79492",
+        "pdf_page_count": 13,
+        "extraction_system": "verified-project-evidence-v1",
+        "elements": [
+          {
+            "element_key": "algorithm",
+            "physical_page": 4,
+            "block_type": "algorithm",
+            "text": "model^{i+1} <- train model on history; new_loss, val_results <- evaluate(model^i, D^val); model^best <- model^i.",
+            "source_locator": "paper.pdf#physical-page=4&algorithm=1&lines=8-17"
+          }
+        ],
+        "relations": []
+      },
+      "required_context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "algorithm-1"},
+      "allowed_atoms": {
+        "pgkd_trains_next_model_on_history": "训练哪个模型",
+        "pgkd_algorithm_evaluates_current_model": "算法字面评估哪个模型",
+        "pgkd_algorithm_assigns_current_as_best": "算法字面将哪个模型赋给best"
+      }
+    },
+    {
+      "case_id": "standard_metadata",
+      "document": {
+        "document_id": "gb-45438-2025-heldout-metadata",
+        "original_filename": "paper.pdf",
+        "source_sha256": "9958b4679c1c72a4d41c1063cd6e3a7e315544af68bf1d8e43331e5697189f95",
+        "pdf_page_count": 19,
+        "extraction_system": "verified-project-evidence-v1",
+        "elements": [
+          {
+            "element_key": "metadata_rule",
+            "physical_page": 8,
+            "block_type": "paragraph",
+            "text": "文件元数据隐式标识应包括生成合成标签、生成合成服务提供者、内容制作编号、内容传播服务提供者和内容传播编号等要素，格式应符合附录E。",
+            "source_locator": "paper.pdf#physical-page=8&section=6.1"
+          },
+          {
+            "element_key": "appendix_e",
+            "physical_page": 17,
+            "block_type": "paragraph",
+            "text": "规范性附录E要求在文件元数据中添加名称或关键词含AIGC的隐式标识扩展字段，并规定Label、ContentProducer、ProduceID、ContentPropagator和PropagateID等字段取值。",
+            "source_locator": "paper.pdf#physical-page=17&appendix=E"
+          }
+        ],
+        "relations": [
+          {"source_key": "metadata_rule", "target_key": "appendix_e", "relation": "refers_to"}
+        ]
+      },
+      "required_context": {"document_scope": "gb-45438-2025", "content_type": "file_metadata", "section_scope": "6.1-and-appendix-e"},
+      "allowed_atoms": {
+        "gb_metadata_required_elements": "元数据隐式标识应包括哪些要素",
+        "gb_metadata_conforms_to_appendix_e": "元数据格式要求",
+        "gb_appendix_e_requires_aigc_extension": "附录E对AIGC扩展字段的要求"
+      }
+    },
+    {
+      "case_id": "comparison_control",
+      "document": {
+        "document_id": "comparison-control-v1",
+        "original_filename": "comparison-control.txt",
+        "source_sha256": "42add292e98d94a8365b4823aed69cc43dd5af6c9809bf24c4210de908678d85",
+        "pdf_page_count": 1,
+        "extraction_system": "frozen-controlled-fixture-v1",
+        "elements": [
+          {"element_key": "relative", "physical_page": 1, "block_type": "paragraph", "text": "方案甲的响应时间低于方案乙。", "source_locator": "comparison-control.txt#paragraph=1"},
+          {"element_key": "extremum", "physical_page": 1, "block_type": "paragraph", "text": "系统应从全部候选方案中选择运行成本最低的方案。", "source_locator": "comparison-control.txt#paragraph=2"},
+          {"element_key": "threshold", "physical_page": 1, "block_type": "paragraph", "text": "上传文件大小不得超过10 MB。", "source_locator": "comparison-control.txt#paragraph=3"},
+          {"element_key": "pending", "physical_page": 1, "block_type": "paragraph", "text": "现有资料尚未判定方案甲是否满足上线条件。", "source_locator": "comparison-control.txt#paragraph=4"}
+        ],
+        "relations": []
+      },
+      "required_context": {"document_scope": "comparison-control-v1", "scenario_scope": "heldout"},
+      "allowed_atoms": {
+        "control_option_a_latency_vs_b": "甲乙响应时间比较",
+        "control_lowest_cost_selection": "候选方案中的成本最值选择",
+        "control_upload_file_size_limit": "上传文件大小限制",
+        "control_option_a_deployment_eligibility": "方案甲是否满足上线条件"
+      }
+    }
+  ]
+}

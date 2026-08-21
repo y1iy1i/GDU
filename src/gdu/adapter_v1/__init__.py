@@ -11,6 +11,7 @@ from .remote_transport import (
     load_remote_transport_config,
     sha256_file,
 )
+from .env_file import load_env_file
 
 __all__ = [
     "StructuredUnderstandingAdapter",
@@ -19,5 +20,6 @@ __all__ = [
     "OpenAICompatibleRemoteTransport",
     "RemoteTransportConfig",
     "load_remote_transport_config",
+    "load_env_file",
     "sha256_file",
 ]

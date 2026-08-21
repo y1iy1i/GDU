@@ -32,6 +32,7 @@ Builder V1 从原文到逻辑结构的编译实验：
 - `GDU_BUILDER_V1_REPRESENTATION_BLIND_01_SETUP.md`：三领域首次受约束盲抽取的冻结输入、隐藏 Gold、评分器和实际运行记录。
 - `GDU_BUILDER_V1_REPRESENTATION_BLIND_01_REPORT.md`：首次 DeepSeek 真实响应、原始 50% 评分、逐候选审计、Gold 修正和四个一般问题族。
 - `GDU_BUILDER_V1_MINIMAL_LOGIC_CONTRACT.md`：首轮盲测后确定的命题状态、表格位置、数值规范化和三类比较契约。
+- `GDU_BUILDER_V1_REPRESENTATION_BLIND_02_SETUP.md`：未见问题族变体、来源/控制案例分层、冻结哈希和运行约束。
 
 ## `benchmarks/`
 

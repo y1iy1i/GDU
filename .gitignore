@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 .env*
+!.env.example
 
 # Generated local artifacts and copied data stay out of source control.
 artifacts/

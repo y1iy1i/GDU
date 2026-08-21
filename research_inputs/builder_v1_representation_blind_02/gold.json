@@ -1,0 +1,38 @@
+{
+  "experiment_id": "builder-v1-representation-blind-02",
+  "cases": [
+    {
+      "case_id": "finance_table",
+      "claims": [
+        {"atom": "finance_cash_ending_balance", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "finance-table-control-v1", "company_scope": "consolidated", "table_scope": "cash_reconciliation"}, "quantities": [{"normalized_value": "966796041.70", "unit": "CNY"}], "comparison_constraints": []},
+        {"atom": "finance_cash_beginning_balance", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "finance-table-control-v1", "company_scope": "consolidated", "table_scope": "cash_reconciliation"}, "quantities": [{"normalized_value": "1154680964.08", "unit": "CNY"}], "comparison_constraints": []},
+        {"atom": "finance_cash_net_change", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "finance-table-control-v1", "company_scope": "consolidated", "table_scope": "cash_reconciliation"}, "quantities": [{"normalized_value": "-187884922.38", "unit": "CNY"}], "comparison_constraints": []}
+      ]
+    },
+    {
+      "case_id": "pgkd_algorithm",
+      "claims": [
+        {"atom": "pgkd_trains_next_model_on_history", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "algorithm-1"}, "quantities": [], "comparison_constraints": []},
+        {"atom": "pgkd_algorithm_evaluates_current_model", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "algorithm-1"}, "quantities": [], "comparison_constraints": []},
+        {"atom": "pgkd_algorithm_assigns_current_as_best", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "pgkd-emnlp-2024", "section_scope": "algorithm-1"}, "quantities": [], "comparison_constraints": []}
+      ]
+    },
+    {
+      "case_id": "standard_metadata",
+      "claims": [
+        {"atom": "gb_metadata_required_elements", "polarity": "positive", "epistemic_status": "certain", "normative_force": "obligation", "context": {"document_scope": "gb-45438-2025", "content_type": "file_metadata", "section_scope": "6.1-and-appendix-e"}, "quantities": [], "comparison_constraints": []},
+        {"atom": "gb_metadata_conforms_to_appendix_e", "polarity": "positive", "epistemic_status": "certain", "normative_force": "obligation", "context": {"document_scope": "gb-45438-2025", "content_type": "file_metadata", "section_scope": "6.1-and-appendix-e"}, "quantities": [], "comparison_constraints": []},
+        {"atom": "gb_appendix_e_requires_aigc_extension", "polarity": "positive", "epistemic_status": "certain", "normative_force": "obligation", "context": {"document_scope": "gb-45438-2025", "content_type": "file_metadata", "section_scope": "6.1-and-appendix-e"}, "quantities": [], "comparison_constraints": []}
+      ]
+    },
+    {
+      "case_id": "comparison_control",
+      "claims": [
+        {"atom": "control_option_a_latency_vs_b", "polarity": "positive", "epistemic_status": "certain", "normative_force": "none", "context": {"document_scope": "comparison-control-v1", "scenario_scope": "heldout"}, "quantities": [], "comparison_constraints": [{"comparison_kind": "relative", "operator": "lt", "threshold": null, "unit": null, "reference_metric": "方案乙的响应时间", "reference_set": null}]},
+        {"atom": "control_lowest_cost_selection", "polarity": "positive", "epistemic_status": "certain", "normative_force": "obligation", "context": {"document_scope": "comparison-control-v1", "scenario_scope": "heldout"}, "quantities": [], "comparison_constraints": [{"comparison_kind": "extremum", "operator": "min", "threshold": null, "unit": null, "reference_metric": null, "reference_set": "全部候选方案"}]},
+        {"atom": "control_upload_file_size_limit", "polarity": "positive", "epistemic_status": "certain", "normative_force": "prohibition", "context": {"document_scope": "comparison-control-v1", "scenario_scope": "heldout"}, "quantities": [{"normalized_value": "10", "unit": "MB"}], "comparison_constraints": [{"comparison_kind": "threshold", "operator": "lte", "threshold": "10", "unit": "MB", "reference_metric": null, "reference_set": null}]},
+        {"atom": "control_option_a_deployment_eligibility", "polarity": "positive", "epistemic_status": "undetermined", "normative_force": "none", "context": {"document_scope": "comparison-control-v1", "scenario_scope": "heldout"}, "quantities": [], "comparison_constraints": []}
+      ]
+    }
+  ]
+}

@@ -21,7 +21,7 @@ from .evidence import (
 
 # Logical form of the proposition (P or not-P), never a truth verdict.
 Polarity = Literal["positive", "negative"]
-EpistemicStatus = Literal["certain", "possible"]
+EpistemicStatus = Literal["certain", "possible", "undetermined"]
 NormativeForce = Literal[
     "none", "obligation", "prohibition", "permission", "recommendation"
 ]
@@ -32,7 +32,7 @@ ComparisonKind = Literal["threshold", "relative", "extremum"]
 ComparisonOperator = Literal["lt", "lte", "eq", "gte", "gt", "min", "max"]
 
 POLARITIES = frozenset({"positive", "negative"})
-EPISTEMIC_STATUSES = frozenset({"certain", "possible"})
+EPISTEMIC_STATUSES = frozenset({"certain", "possible", "undetermined"})
 NORMATIVE_FORCES = frozenset(
     {"none", "obligation", "prohibition", "permission", "recommendation"}
 )
@@ -456,8 +456,11 @@ def validate_representation_candidates(
                 errors.append(f"{location}:semantic_cue_untraced:{cue.kind}")
         if candidate.polarity == "negative" and "negation" not in cue_kinds:
             errors.append(f"{location}:negative_polarity_without_cue")
-        if candidate.epistemic_status == "possible" and "epistemic" not in cue_kinds:
-            errors.append(f"{location}:possible_status_without_cue")
+        if (
+            candidate.epistemic_status in {"possible", "undetermined"}
+            and "epistemic" not in cue_kinds
+        ):
+            errors.append(f"{location}:noncertain_status_without_cue")
         if candidate.normative_force != "none" and "normative" not in cue_kinds:
             errors.append(f"{location}:normative_force_without_cue")
         if candidate.attribution and "attribution" not in cue_kinds:
