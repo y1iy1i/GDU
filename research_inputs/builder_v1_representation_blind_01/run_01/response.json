@@ -1,0 +1,598 @@
+{
+  "cases": [
+    {
+      "case_id": "finance",
+      "proposals": [
+        {
+          "atom": "finance_2024_ocf_amount",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "company_scope": "consolidated",
+            "document_scope": "lafang-2025-annual-report",
+            "table_scope": "key_financial_metrics"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-lafang-2025-0015-001-21cc5c37aa60",
+              "quote": "经营活动产生的现金流量净额 72,545,781.16 161,421,214.02 -55.06"
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "positive",
+          "quantities": [
+            {
+              "normalized_value": "72545781.16",
+              "surface": "72,545,781.16",
+              "unit": "CNY"
+            }
+          ],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "经营活动现金流量净额"
+            },
+            {
+              "role": "year",
+              "value": "2025"
+            },
+            {
+              "role": "amount",
+              "value": "72,545,781.16"
+            }
+          ],
+          "semantic_cues": [],
+          "statement": "2025年经营活动现金流量净额为72,545,781.16元"
+        },
+        {
+          "atom": "finance_2024_ocf_amount",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "company_scope": "consolidated",
+            "document_scope": "lafang-2025-annual-report",
+            "table_scope": "key_financial_metrics"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-lafang-2025-0015-001-21cc5c37aa60",
+              "quote": "经营活动产生的现金流量净额 72,545,781.16 161,421,214.02 -55.06"
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "positive",
+          "quantities": [
+            {
+              "normalized_value": "161421214.02",
+              "surface": "161,421,214.02",
+              "unit": "CNY"
+            }
+          ],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "经营活动现金流量净额"
+            },
+            {
+              "role": "year",
+              "value": "2024"
+            },
+            {
+              "role": "amount",
+              "value": "161,421,214.02"
+            }
+          ],
+          "semantic_cues": [],
+          "statement": "2024年经营活动现金流量净额为161,421,214.02元"
+        },
+        {
+          "atom": "finance_ocf_yoy_change",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "company_scope": "consolidated",
+            "document_scope": "lafang-2025-annual-report",
+            "table_scope": "key_financial_metrics"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-lafang-2025-0015-001-21cc5c37aa60",
+              "quote": "经营活动产生的现金流量净额 72,545,781.16 161,421,214.02 -55.06"
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "negative",
+          "quantities": [
+            {
+              "normalized_value": "-55.06",
+              "surface": "-55.06",
+              "unit": "percent"
+            }
+          ],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "经营活动现金流量净额"
+            },
+            {
+              "role": "change_type",
+              "value": "同比变动"
+            },
+            {
+              "role": "change_value",
+              "value": "-55.06%"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "negation",
+              "text": "-55.06"
+            }
+          ],
+          "statement": "经营活动现金流量净额同比变动为-55.06%"
+        },
+        {
+          "atom": "finance_ocf_change_reason",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "company_scope": "consolidated",
+            "document_scope": "lafang-2025-annual-report",
+            "table_scope": "key_financial_metrics"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-lafang-2025-0015-001-21cc5c37aa60",
+              "quote": "经营活动产生的现金流量净额变动原因说明：主要系本期销售商品、提供劳务收到的现金减少所致。"
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "negative",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "经营活动现金流量净额"
+            },
+            {
+              "role": "reason",
+              "value": "本期销售商品、提供劳务收到的现金减少"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "negation",
+              "text": "减少"
+            }
+          ],
+          "statement": "经营活动现金流量净额变动原因是本期销售商品、提供劳务收到的现金减少"
+        }
+      ]
+    },
+    {
+      "case_id": "pgkd",
+      "proposals": [
+        {
+          "atom": "pgkd_generates_next_iteration_data",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "document_scope": "pgkd-emnlp-2024",
+            "section_scope": "methods"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-pgkd-emnlp-2024-0003-001-60b05856b564",
+              "quote": "PGKD then computes the model val_results on the validation set Dval and leverages an LLM to generate new training data Di+1 tailored to these findings."
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "PGKD"
+            },
+            {
+              "role": "action",
+              "value": "生成下一轮训练数据"
+            },
+            {
+              "role": "basis",
+              "value": "验证发现"
+            }
+          ],
+          "semantic_cues": [],
+          "statement": "PGKD根据验证发现生成下一轮训练数据"
+        },
+        {
+          "atom": "pgkd_returns_lowest_validation_loss_model",
+          "attribution": null,
+          "comparison_constraints": [
+            {
+              "metric": "validation loss",
+              "operator": "lt",
+              "surface": "lowest",
+              "threshold": "other models",
+              "unit": null
+            }
+          ],
+          "context": {
+            "document_scope": "pgkd-emnlp-2024",
+            "section_scope": "methods"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-pgkd-emnlp-2024-0003-001-60b05856b564",
+              "quote": "PGKD returns the model having the lowest validation loss as the best model to be used for testing."
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "PGKD"
+            },
+            {
+              "role": "action",
+              "value": "返回模型"
+            },
+            {
+              "role": "criterion",
+              "value": "验证损失最低"
+            }
+          ],
+          "semantic_cues": [],
+          "statement": "PGKD返回验证损失最低的模型"
+        },
+        {
+          "atom": "pgkd_uses_early_stopping",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "document_scope": "pgkd-emnlp-2024",
+            "section_scope": "methods"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-pgkd-emnlp-2024-0003-001-60b05856b564",
+              "quote": "PGKD uses early stopping to control the overall validation loss."
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "PGKD"
+            },
+            {
+              "role": "action",
+              "value": "采用早停"
+            }
+          ],
+          "semantic_cues": [],
+          "statement": "PGKD采用早停"
+        },
+        {
+          "atom": "pgkd_validation_samples_shared",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "document_scope": "pgkd-emnlp-2024",
+            "section_scope": "methods"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-pgkd-emnlp-2024-0003-001-60b05856b564",
+              "quote": "Only high-level validation metrics are shared with the LLM, but no validation sample is leaked."
+            }
+          ],
+          "normative_force": "none",
+          "polarity": "negative",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "PGKD"
+            },
+            {
+              "role": "action",
+              "value": "共享验证样本"
+            },
+            {
+              "role": "recipient",
+              "value": "LLM"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "negation",
+              "text": "no validation sample is leaked"
+            }
+          ],
+          "statement": "PGKD不向LLM共享验证样本"
+        }
+      ]
+    },
+    {
+      "case_id": "standard",
+      "proposals": [
+        {
+          "atom": "gb_video_label_start_position",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "content_type": "video",
+            "document_scope": "gb-45438-2025",
+            "section_scope": "5.4"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-gb-45438-2025-0007-001-93332a26e247",
+              "quote": "视频内容显式标识应位于视频起始画面"
+            }
+          ],
+          "normative_force": "obligation",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "视频内容显式标识"
+            },
+            {
+              "role": "position",
+              "value": "视频起始画面"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "normative",
+              "text": "应"
+            }
+          ],
+          "statement": "视频内容显式标识应位于视频起始画面"
+        },
+        {
+          "atom": "gb_video_label_optional_positions",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "content_type": "video",
+            "document_scope": "gb-45438-2025",
+            "section_scope": "5.4"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-gb-45438-2025-0007-001-93332a26e247",
+              "quote": "可位于视频末尾和中间适当位置"
+            }
+          ],
+          "normative_force": "permission",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "视频内容显式标识"
+            },
+            {
+              "role": "position",
+              "value": "视频末尾和中间适当位置"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "normative",
+              "text": "可"
+            }
+          ],
+          "statement": "视频内容显式标识可位于视频末尾和中间适当位置"
+        },
+        {
+          "atom": "gb_video_label_edge_or_corner",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "content_type": "video",
+            "document_scope": "gb-45438-2025",
+            "section_scope": "5.4"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-gb-45438-2025-0007-001-93332a26e247",
+              "quote": "视频内容显式标识应位于视频画面的边或角"
+            }
+          ],
+          "normative_force": "obligation",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "视频内容显式标识"
+            },
+            {
+              "role": "position",
+              "value": "视频画面的边或角"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "normative",
+              "text": "应"
+            }
+          ],
+          "statement": "视频内容显式标识应位于视频画面的边或角"
+        },
+        {
+          "atom": "gb_video_label_font_legibility",
+          "attribution": null,
+          "comparison_constraints": [],
+          "context": {
+            "content_type": "video",
+            "document_scope": "gb-45438-2025",
+            "section_scope": "5.4"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-gb-45438-2025-0007-001-93332a26e247",
+              "quote": "视频内容显式标识使用的字型应清晰可辨"
+            }
+          ],
+          "normative_force": "obligation",
+          "polarity": "positive",
+          "quantities": [],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "视频内容显式标识使用的字型"
+            },
+            {
+              "role": "property",
+              "value": "清晰可辨"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "normative",
+              "text": "应"
+            }
+          ],
+          "statement": "视频内容显式标识使用的字型应清晰可辨"
+        },
+        {
+          "atom": "gb_video_label_minimum_height",
+          "attribution": null,
+          "comparison_constraints": [
+            {
+              "metric": "文字高度",
+              "operator": "gte",
+              "surface": "不应低于",
+              "threshold": "画面最短边长度的5%",
+              "unit": "percent"
+            }
+          ],
+          "context": {
+            "content_type": "video",
+            "document_scope": "gb-45438-2025",
+            "section_scope": "5.4"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-gb-45438-2025-0007-001-93332a26e247",
+              "quote": "视频内容显式标识的文字高度不应低于画面最短边长度的5%"
+            }
+          ],
+          "normative_force": "prohibition",
+          "polarity": "negative",
+          "quantities": [
+            {
+              "normalized_value": "5",
+              "surface": "5%",
+              "unit": "percent"
+            }
+          ],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "视频内容显式标识的文字高度"
+            },
+            {
+              "role": "minimum",
+              "value": "画面最短边长度的5%"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "normative",
+              "text": "不应"
+            },
+            {
+              "kind": "comparison",
+              "text": "低于"
+            }
+          ],
+          "statement": "视频内容显式标识的文字高度不应低于画面最短边长度的5%"
+        },
+        {
+          "atom": "gb_video_label_minimum_duration",
+          "attribution": null,
+          "comparison_constraints": [
+            {
+              "metric": "持续时间",
+              "operator": "gte",
+              "surface": "不应少于",
+              "threshold": "2s",
+              "unit": "second"
+            }
+          ],
+          "context": {
+            "content_type": "video",
+            "document_scope": "gb-45438-2025",
+            "section_scope": "5.4"
+          },
+          "epistemic_status": "certain",
+          "evidence_quotes": [
+            {
+              "block_id": "EB-gb-45438-2025-0007-001-93332a26e247",
+              "quote": "在视频正常播放速度下,视频内容显式标识持续时间不应少于2s"
+            }
+          ],
+          "normative_force": "prohibition",
+          "polarity": "negative",
+          "quantities": [
+            {
+              "normalized_value": "2",
+              "surface": "2s",
+              "unit": "second"
+            }
+          ],
+          "semantic_arguments": [
+            {
+              "role": "subject",
+              "value": "视频内容显式标识持续时间"
+            },
+            {
+              "role": "condition",
+              "value": "视频正常播放速度下"
+            },
+            {
+              "role": "minimum",
+              "value": "2s"
+            }
+          ],
+          "semantic_cues": [
+            {
+              "kind": "normative",
+              "text": "不应"
+            },
+            {
+              "kind": "comparison",
+              "text": "少于"
+            }
+          ],
+          "statement": "在视频正常播放速度下，视频内容显式标识持续时间不应少于2s"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder-v1-representation-blind-01",
+  "created_after_run": true,
+  "purpose": "Preserve post-run Gold corrections without overwriting preregistered gold.json.",
+  "changes": [
+    {
+      "case_id": "finance",
+      "atom": "finance_ocf_yoy_change",
+      "field": "polarity",
+      "original": "negative",
+      "adjudicated": "positive",
+      "problem_family": "polarity_scope",
+      "rationale": "The source asserts that the change value is -55.06%. The negative sign belongs to the Quantity; it does not negate the truth of the top-level claim."
+    }
+  ]
+}
